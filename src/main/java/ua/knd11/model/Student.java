@@ -1,4 +1,4 @@
-package ua.shid11.model;
+package ua.knd11.model;
 
 public class Student {
 }

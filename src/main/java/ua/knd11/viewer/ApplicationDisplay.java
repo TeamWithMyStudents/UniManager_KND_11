@@ -1,4 +1,4 @@
-package ua.shid11.viewer;
+package ua.knd11.viewer;
 
 public class ApplicationDisplay {
 }
