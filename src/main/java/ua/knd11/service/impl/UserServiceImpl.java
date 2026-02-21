@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
     public void getAll() {
         for (User value : repository) {
             if (value == null) {
-                System.out.print("");
+                System.out.println("-");
             } else System.out.print(value);
         }
     }

@@ -1,7 +1,7 @@
 package ua.knd11.model;
 
 public abstract class User {
-    private static int nextId;
+    private static int nextId = 1;
     private final int id;
     private String name;
     private String surname;
