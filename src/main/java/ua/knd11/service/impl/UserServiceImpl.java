@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
 
     public void delete(int id) {
         for (int i = 0; i < repository.length; i++) {
-            if (repository[i].getId() == id) {
+            if (repository[i] != null && repository[i].getId() == id) {
                 repository[i] = null;
                 for (int j = i + 1; j < repository.length; j++) {
                     repository[j - 1] = repository[j];
@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
 
     public void findByName(String query){
         for (User value : repository) {
-            if (value.getName().equalsIgnoreCase(query) || (value.getName().toLowerCase().contains(query))) {
+            if (value != null && (value.getName().equalsIgnoreCase(query) || value.getName().toLowerCase().contains(query.toLowerCase()))) {
                 System.out.print(value);
             }
         }
@@ -57,20 +57,15 @@ public class UserServiceImpl implements UserService {
 
     public void findBySurname(String query){
         for (User value : repository) {
-            if (value.getSurname().equalsIgnoreCase(query) || value.getSurname().toLowerCase().contains(query)) {
+            if (value != null && (value.getSurname().equalsIgnoreCase(query) ||  value.getSurname().toLowerCase().contains(query.toLowerCase()))) {
                 System.out.print(value);
             }
         }
     }
 
-    public void sortBySurname(){
+    public void sortBySurname() {
         Collator uaCollator = Collator.getInstance(new Locale("uk", "UA"));
-        Arrays.sort(repository, Comparator.comparing(User::getSurname, uaCollator));
-        for (User value : repository) {
-            if (value.getSurname() == null || value.getSurname().isEmpty()){
-                System.out.println("Incorrect surname");
-            } else System.out.print(value);
-        }
+        Arrays.sort(repository, Comparator.nullsLast(Comparator.comparing(User::getSurname, uaCollator)));
     }
 
 
