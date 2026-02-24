@@ -23,18 +23,13 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public boolean delete(int id) {
         for (int i = 0; i < repository.length; i++) {
-            if (repository[i] != null && repository[i].getId() == id) {
                 repository[i] = null;
                 for (int j = i + 1; j < repository.length; j++) {
                     repository[j - 1] = repository[j];
                 }
-                repository[repository.length - 1] = null;
-                return true;
             }
         }
-        return false;
     }
 
     public void getAll() {
@@ -47,7 +42,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String toString() {
-        return "Users: \n" + Arrays.toString(repository);
+        return "Users: \n"  + Arrays.toString(repository);
     }
 }
-
