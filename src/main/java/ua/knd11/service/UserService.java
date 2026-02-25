@@ -6,5 +6,4 @@ public interface UserService {
     void add(User u);
     void delete(int id);
     void getAll();
-    //df
 }
