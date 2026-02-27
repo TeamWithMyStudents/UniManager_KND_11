@@ -25,7 +25,7 @@ public class StudentServiceImpl extends UserServiceImpl implements StudentServic
         }
 
         if (!found) {
-            System.out.println("Student in" + groupName + "is not exist");
+            System.out.println("Student in " + groupName + " is not exist");
         }
     }
 }
