@@ -33,17 +33,28 @@ public class UserServiceImpl implements UserService {
                 for (int j = i + 1; j < repository.length; j++) {
                     repository[j - 1] = repository[j];
                 }
+                repository[repository.length - 1] = null;
                 break;
             }
         }
     }
 
-    public void getAll() {
-        for (User value : repository) {
-            if (value == null) {
-                System.out.println("-");
-            } else System.out.print(value);
+    public User[] getAll() {
+        int count = 0;
+        for (User user : repository) {
+            if (user != null) {
+                count++;
+            }
         }
+
+        User[] users = new User[count];
+        int index = 0;
+        for (User user : repository) {
+            if (user != null) {
+                users[index++] = user;
+            }
+        }
+        return users;
     }
 
 
