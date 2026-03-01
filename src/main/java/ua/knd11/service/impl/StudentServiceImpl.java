@@ -5,7 +5,7 @@ import ua.knd11.service.StudentService;
 
 public class StudentServiceImpl extends UserServiceImpl implements StudentService {
 
-    public StudentServiceImpl(Student[] initialArray) {super(initialArray);}
+    public StudentServiceImpl(Student[] initialArray) {super(initialArray); }
 
     @Override
     public void findByGroup(String groupName) {
