@@ -18,6 +18,6 @@ public class Student extends User {
 
     @Override
     public String toString() {
-        return super.toString() + "Group: " + getGroup();
+        return super.toString() + "Group: " + getGroup()+"\n";
     }
 }
