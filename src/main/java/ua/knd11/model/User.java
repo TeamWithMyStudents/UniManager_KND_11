@@ -5,11 +5,13 @@ public abstract class User {
     private final int id;
     private String name;
     private String surname;
+    private String lastName;
 
-    public User(String name, String surname) {
+    public User(String name, String surname, String lastName) {
         this.id = nextId++;
         this.name = name;
         this.surname = surname;
+        this.lastName = lastName;
     }
 
     public int getId() {
@@ -32,8 +34,13 @@ public abstract class User {
         this.surname = surname;
     }
 
+    public String getLastName() { return lastName; }
+
+    public void setLastName(String lastName) { this.lastName = lastName; }
+
+
     @Override
     public String toString() {
-        return "Id: " + getId() + ", Name: " + getName() + ", Surname: " + getSurname() ;
+        return "Id: " + getId() + ", Surname: " + getSurname() + ", Name: " + getName()  + ", LastName: " + getLastName();
     }
 }
