@@ -30,6 +30,7 @@ public class UserServiceImpl implements UserService {
                 for (int j = i + 1; j < repository.length; j++) {
                     repository[j - 1] = repository[j];
                 }
+                repository[repository.length - 1] = null;
                 return true;
             }
         }

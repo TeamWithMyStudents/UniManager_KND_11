@@ -1,5 +1,6 @@
 package ua.knd11.model;
 
+@SuppressWarnings("unused")
 public abstract class User {
     private static int nextId = 1;
     private final int id;
@@ -41,6 +42,6 @@ public abstract class User {
 
     @Override
     public String toString() {
-        return "Id: " + getId() + ", Surname: " + getSurname() + ", name: " + getName()  + ", Lastname: " + getLastname();
+        return "Id: " + getId() + ", Surname: " + getSurname() + ", Name: " + getName()  + ", Lastname: " + getLastname();
     }
 }
