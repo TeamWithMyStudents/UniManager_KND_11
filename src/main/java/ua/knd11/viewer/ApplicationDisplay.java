@@ -5,9 +5,8 @@ import ua.knd11.controller.StudentController;
 
 public class ApplicationDisplay {
     private final StudentController controller = new StudentController();
+    private final Scanner sc = new Scanner(System.in);
 
-
-    Scanner sc = new Scanner(System.in);
     public void start(){
         label:
         while(true){

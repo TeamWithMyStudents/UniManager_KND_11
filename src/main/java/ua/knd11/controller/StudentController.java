@@ -32,8 +32,12 @@ public class StudentController {
     }
 
     public void delete(int id) {
-        service.delete(id);
-        System.out.println("Операцію видалення виконано.");
+        boolean deleted = service.delete(id);
+        if (deleted) {
+            System.out.println("Студента успішно видалено.");
+        } else {
+            System.out.println("Студента з ID " + id + " не знайдено.");
+        }
     }
 
 

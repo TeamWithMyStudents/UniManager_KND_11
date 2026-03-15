@@ -18,11 +18,11 @@ public abstract class User {
         return id;
     }
 
-    public String getname() {
+    public String getName() {
         return name;
     }
 
-    public void setname(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -41,6 +41,6 @@ public abstract class User {
 
     @Override
     public String toString() {
-        return "Id: " + getId() + ", Surname: " + getSurname() + ", name: " + getname()  + ", Lastname: " + getLastname();
+        return "Id: " + getId() + ", Surname: " + getSurname() + ", name: " + getName()  + ", Lastname: " + getLastname();
     }
 }
