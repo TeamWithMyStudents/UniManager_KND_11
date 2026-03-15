@@ -9,8 +9,7 @@ public class StudentController {
 
     public void create(String input) {
 
-
-        if (input.trim().isEmpty()) {
+        if (input == null || input.trim().isEmpty()) {
             System.out.println("Рядок є пустим. Помилка");
             return;
         }
@@ -38,8 +37,8 @@ public class StudentController {
     }
 
 
-    public UserService getService() {
-        return service;
+    public void getAll() {
+        service.getAll();
     }
 
 

@@ -2,12 +2,10 @@ package ua.knd11.model;
 
 public class Student extends User {
     private String group;
-    private String lastname;
 
     public Student(String surname, String name, String lastname , String group) {
         super(name, surname, lastname);
         this.group = group;
-        this.lastname = lastname;
     }
 
     public String getGroup() {
@@ -16,14 +14,6 @@ public class Student extends User {
 
     public void setGroup(String group) {
         this.group = group;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
     }
 
     @Override

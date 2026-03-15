@@ -20,19 +20,18 @@ public class ApplicationDisplay {
                     3. Видалити Студент по ID
                     4. Вихід
                     """);
-            int choice = sc.nextInt();
+            String choice = sc.nextLine();
 
             switch (choice) {
-                case 1:
-                    sc.nextLine();
+                case "1":
                     System.out.println("Будь ласка, введіть дані студента: ПІБ, Група");
                     String input = sc.nextLine();
                     controller.create(input);
                     break;
-                case 2:
-                    controller.getService().getAll();
+                case "2":
+                    controller.getAll();
                     break;
-                case 3:
+                case "3":
                     System.out.println("Введіть ID студента щоб видалити");
                     if (sc.hasNextInt()) {
                         int id = sc.nextInt();
@@ -43,7 +42,7 @@ public class ApplicationDisplay {
                         sc.nextLine();
                     }
                     break;
-                case 4:
+                case "4":
                     System.out.println("Вихід");
                     sc.close();
                     break label;

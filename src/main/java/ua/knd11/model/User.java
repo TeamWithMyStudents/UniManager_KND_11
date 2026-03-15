@@ -5,24 +5,24 @@ public abstract class User {
     private final int id;
     private String name;
     private String surname;
-    private String lastName;
+    private String lastname;
 
-    public User(String name, String surname, String lastName) {
+    public User(String name, String surname, String lastname) {
         this.id = nextId++;
         this.name = name;
         this.surname = surname;
-        this.lastName = lastName;
+        this.lastname = lastname;
     }
 
     public int getId() {
         return id;
     }
 
-    public String getName() {
+    public String getname() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setname(String name) {
         this.name = name;
     }
 
@@ -34,13 +34,13 @@ public abstract class User {
         this.surname = surname;
     }
 
-    public String getLastName() { return lastName; }
+    public String getLastname() { return lastname; }
 
-    public void setLastName(String lastName) { this.lastName = lastName; }
+    public void setLastname(String lastname) { this.lastname = lastname; }
 
 
     @Override
     public String toString() {
-        return "Id: " + getId() + ", Surname: " + getSurname() + ", Name: " + getName()  + ", LastName: " + getLastName();
+        return "Id: " + getId() + ", Surname: " + getSurname() + ", name: " + getname()  + ", Lastname: " + getLastname();
     }
 }
