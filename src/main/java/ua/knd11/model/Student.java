@@ -3,8 +3,8 @@ package ua.knd11.model;
 public class Student extends User {
     private String group;
 
-    public Student(String name, String surname, String group) {
-        super(name, surname);
+    public Student(String surname, String name, String lastname , String group) {
+        super(name, surname, lastname);
         this.group = group;
     }
 
@@ -18,6 +18,6 @@ public class Student extends User {
 
     @Override
     public String toString() {
-        return super.toString() + "Group: " + getGroup()+"\n";
+        return super.toString() + " Group: " + getGroup()+"\n";
     }
 }
