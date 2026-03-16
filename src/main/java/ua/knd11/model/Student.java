@@ -14,6 +14,7 @@ public class Student extends User {
         return group;
     }
 
+    @SuppressWarnings("unused")
     public void setGroup(String group) {
         this.group = group;
     }
@@ -22,12 +23,13 @@ public class Student extends User {
         return lastname;
     }
 
+    @SuppressWarnings("unused")
     public void setLastname(String lastname) {
         this.lastname = lastname;
     }
 
     @Override
     public String toString() {
-        return super.toString()  +  ", Lastname: " + getLastname() + ", Group: " + getGroup() + "\n";
+        return super.toString()  +  ", Lastname: " + getLastname() + ", Group: " + getGroup();
     }
 }

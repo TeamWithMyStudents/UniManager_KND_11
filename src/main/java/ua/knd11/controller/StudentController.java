@@ -17,7 +17,7 @@ public class StudentController {
 
         String[] parts = input.trim().split("\\s+");
         if (parts.length < 4) {
-            System.out.println("Недостатньо данних");
+            System.out.println("Недостатньо даних");
             return;
         }
 

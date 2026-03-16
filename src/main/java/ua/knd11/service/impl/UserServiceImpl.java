@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
     public boolean delete(int id) {
         for(int i = 0; i < repository.length; i++) {
             if(repository[i] == null) {
-                return false;
+                continue;
             }
 
             if (repository[i].getId() == id) {
@@ -38,10 +38,10 @@ public class UserServiceImpl implements UserService {
                     repository[j - 1] = repository[j];
                 }
                 repository[repository.length - 1] = null;
-                break;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     public User[] getAll() {
@@ -89,7 +89,8 @@ public class UserServiceImpl implements UserService {
         Collator uaCollator = Collator.getInstance(new Locale("uk", "UA"));
         Arrays.sort(repository, Comparator.nullsLast(Comparator.comparing(User::getSurname, Comparator.nullsLast(uaCollator))));
         for (User value : repository) {
-            if (value.getSurname() == null || value.getSurname().isEmpty()){
+            if (value == null) continue;
+            if (value.getSurname().isEmpty()){
                 System.out.println("Incorrect surname");
             } else System.out.print(value);
         }
