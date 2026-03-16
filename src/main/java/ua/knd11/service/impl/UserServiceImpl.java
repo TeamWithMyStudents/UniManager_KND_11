@@ -26,8 +26,12 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public void delete(int id) {
-        for (int i = 0; i < repository.length; i++) {
+    public boolean delete(int id) {
+        for(int i = 0; i < repository.length; i++) {
+            if(repository[i] == null) {
+                return false;
+            }
+
             if (repository[i].getId() == id) {
                 repository[i] = null;
                 for (int j = i + 1; j < repository.length; j++) {
@@ -37,6 +41,7 @@ public class UserServiceImpl implements UserService {
                 break;
             }
         }
+        return true;
     }
 
     public User[] getAll() {
@@ -59,24 +64,30 @@ public class UserServiceImpl implements UserService {
 
 
     public void findByName(String query){
+        if (query == null) return;
+        String q = query.toLowerCase(Locale.ROOT);
         for (User value : repository) {
-            if (value.getName().equalsIgnoreCase(query) || (value.getName().toLowerCase().contains(query))) {
+            String name = (value != null) ? value.getName() : null;
+            if (name != null && (name.equalsIgnoreCase(query) || name.toLowerCase(Locale.ROOT).contains(q))) {
                 System.out.print(value);
             }
         }
     }
 
     public void findBySurname(String query){
+        if (query == null) return;
+        String q = query.toLowerCase(Locale.ROOT);
         for (User value : repository) {
-            if (value.getSurname().equalsIgnoreCase(query) || value.getSurname().toLowerCase().contains(query)) {
-                System.out.print(value);
+            String surname = (value != null) ? value.getSurname() : null;
+            if (surname != null && (surname.equalsIgnoreCase(query) || surname.toLowerCase(Locale.ROOT).contains(q))){
+                System.out.println(value);
             }
         }
     }
 
     public void sortBySurname(){
         Collator uaCollator = Collator.getInstance(new Locale("uk", "UA"));
-        Arrays.sort(repository, Comparator.comparing(User::getSurname, uaCollator));
+        Arrays.sort(repository, Comparator.nullsLast(Comparator.comparing(User::getSurname, Comparator.nullsLast(uaCollator))));
         for (User value : repository) {
             if (value.getSurname() == null || value.getSurname().isEmpty()){
                 System.out.println("Incorrect surname");

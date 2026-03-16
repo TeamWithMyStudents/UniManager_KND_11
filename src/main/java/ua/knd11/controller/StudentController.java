@@ -4,11 +4,12 @@ import ua.knd11.model.Student;
 import ua.knd11.service.UserService;
 import ua.knd11.service.impl.StudentServiceImpl;
 
+import java.util.Arrays;
+
 public class StudentController {
     private final UserService service = new StudentServiceImpl();
 
     public void create(String input) {
-
         if (input == null || input.trim().isEmpty()) {
             System.out.println("Рядок є пустим. Помилка");
             return;
@@ -40,10 +41,7 @@ public class StudentController {
         }
     }
 
-
     public void getAll() {
-        service.getAll();
+        System.out.println(Arrays.toString(service.getAll()));
     }
-
-
 }

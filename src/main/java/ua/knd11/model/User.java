@@ -6,6 +6,7 @@ public abstract class User {
     private String name;
     private String surname;
 
+    public User(String name, String surname) {
         this.id = nextId++;
         this.name = name;
         this.surname = surname;
@@ -33,5 +34,6 @@ public abstract class User {
 
     @Override
     public String toString() {
+        return "Id: " + getId() + ", Surname: " + surname + ", Name: " + name;
     }
 }
