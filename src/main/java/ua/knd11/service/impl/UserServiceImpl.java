@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService {
         Arrays.sort(repository, Comparator.nullsLast(Comparator.comparing(User::getSurname, Comparator.nullsLast(uaCollator))));
         for (User value : repository) {
             if (value == null) continue;
-            if (value.getSurname().isEmpty()){
+            if (value.getSurname() == null || value.getSurname().isEmpty()) {
                 System.out.println("Incorrect surname");
             } else System.out.print(value);
         }
