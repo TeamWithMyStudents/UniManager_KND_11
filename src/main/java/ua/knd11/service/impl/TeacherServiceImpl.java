@@ -20,7 +20,7 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
     }
 
     public void filterByDegree(String degree) {
-        if (degree == null) return;
+        if (degree == null || degree.isBlank()) return;
         for (User user : repository) {
             if (!(user instanceof Teacher t)) continue;
             if (t.getDegree().equalsIgnoreCase(degree) || t.getDegree().toLowerCase().contains(degree.toLowerCase())) {
@@ -32,25 +32,16 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
     @Override
     public void add(User u) {
         if (u == null) {
-            System.out.println("User cannot be null");
-            return;
-        }
-        if (!(u instanceof Teacher t)) {
-            System.out.println("Expected Teacher instance");
-            return;
-        }
-    if (t.getName() == null || t.getName().isEmpty() ||
-                t.getSurname() == null || t.getSurname().isEmpty() ||
-                t.getDepartment() == null || t.getDepartment().isEmpty() ||
-                t.getDegree() == null || t.getDegree().isEmpty()
-        ) {
-            System.out.println("\n" + t + " isn't added" + "\nSome fields are empty");
-            return;
+            throw new IllegalArgumentException("User cannot be null");
+        } else if (!(u instanceof Teacher t)) {
+            throw new IllegalArgumentException("Expected Teacher instance");
+        } else if (t.getName() == null || t.getName().isEmpty() || t.getSurname() == null || t.getSurname().isEmpty() || t.getDepartment() == null || t.getDepartment().isEmpty() || t.getDegree() == null || t.getDegree().isEmpty()) {
+            throw new IllegalArgumentException("Teacher has empty required fields: " + t);
         } else if (t.getSalary() <= 0) {
-            System.out.println("\n" + t + " isn't added" + "\nSalary must be positive");
-            return;
+            throw new IllegalArgumentException("Teacher has empty required fields: " + t);
+        } else {
+            System.out.println("Teacher added: " + t);
+            super.add(t);
         }
-        System.out.println("Teacher added: " + t);
-        super.add(t);
     }
 }
