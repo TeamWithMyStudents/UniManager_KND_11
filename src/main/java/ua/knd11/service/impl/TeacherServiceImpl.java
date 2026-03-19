@@ -35,7 +35,7 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
             throw new IllegalArgumentException("User cannot be null");
         } else if (!(u instanceof Teacher t)) {
             throw new IllegalArgumentException("Expected Teacher instance");
-        } else if (t.getName() == null || t.getName().isEmpty() || t.getSurname() == null || t.getSurname().isEmpty() || t.getDepartment() == null || t.getDepartment().isEmpty() || t.getDegree() == null || t.getDegree().isEmpty()) {
+        } else if (t.getName() == null || t.getName().isBlank() || t.getSurname() == null || t.getSurname().isBlank() || t.getDepartment() == null || t.getDepartment().isBlank() || t.getDegree() == null || t.getDegree().isBlank()) {
             throw new IllegalArgumentException("Teacher has empty required fields: " + t);
         } else if (t.getSalary() <= 0) {
             throw new IllegalArgumentException("Teacher salary must be positive: " + t);
