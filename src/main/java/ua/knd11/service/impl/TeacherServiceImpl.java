@@ -4,8 +4,6 @@ import ua.knd11.model.Teacher;
 import ua.knd11.model.User;
 import ua.knd11.service.TeacherService;
 
-import java.util.Objects;
-
 public class TeacherServiceImpl extends UserServiceImpl implements TeacherService {
 
     public TeacherServiceImpl() {
@@ -41,10 +39,10 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
             System.out.println("Expected Teacher instance");
             return;
         }
-        if (Objects.equals(t.getName(), "") ||
-                Objects.equals(t.getSurname(), "") ||
-                Objects.equals(t.getDepartment(), "") ||
-                Objects.equals(t.getDegree(), "")
+    if (t.getName() == null || t.getName().isEmpty() ||
+                t.getSurname() == null || t.getSurname().isEmpty() ||
+                t.getDepartment() == null || t.getDepartment().isEmpty() ||
+                t.getDegree() == null || t.getDegree().isEmpty()
         ) {
             System.out.println("\n" + t + " isn't added" + "\nSome fields are empty");
             return;
