@@ -13,6 +13,7 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
     public void calculateTotalSalary(){
         double result = 0;
         for(User user : repository){
+            if (user == null) continue;
             Teacher t = (Teacher) user;
             result += t.getSalary();
         }
@@ -21,9 +22,10 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
 
     public void filterByDegree(String degree){
         for (User user : repository){
+            if (user == null) continue;
             Teacher t = (Teacher) user;
-            if ( t != null && (t.getDegree().equalsIgnoreCase(degree) || t.getDegree().toLowerCase().contains(degree.toLowerCase()))){
-                System.out.print(t);
+            if (t.getDegree().equalsIgnoreCase(degree) || t.getDegree().toLowerCase().contains(degree.toLowerCase())){
+                System.out.println(t);
             }
         }
     }
