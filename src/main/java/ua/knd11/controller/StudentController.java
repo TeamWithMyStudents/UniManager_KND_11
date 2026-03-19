@@ -35,8 +35,6 @@ public class StudentController {
     }
 
     public void getAll() {
-        System.out.println(service.getAll().toString()
-                .replace("[", "")
-                .replace("]", "")); // .replaceall("[]", "") gives Unclosed character class []
+        service.getAll().forEach(System.out::println);
     }
 }

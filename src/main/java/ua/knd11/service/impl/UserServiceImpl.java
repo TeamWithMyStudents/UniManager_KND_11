@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public List<User> getAll() {
-        return repository;
+        return new ArrayList<>(repository);
     }
 
     public void findByName(String query) {

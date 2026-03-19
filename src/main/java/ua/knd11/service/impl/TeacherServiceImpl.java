@@ -17,6 +17,9 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
 
     @Override
     public void add(User user) {
+        if (!(user instanceof Teacher)) {
+            throw new IllegalArgumentException("Only Teacher instances can be added");
+        }
         repository.add(user);
     }
 }

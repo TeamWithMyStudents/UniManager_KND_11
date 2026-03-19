@@ -16,7 +16,7 @@ public class Student extends User {
 
     @SuppressWarnings("unused")
     public void setGroup(String group) {
-        this.group = group;
+        this.group = group.toUpperCase();
     }
 
     public String getLastname() {
