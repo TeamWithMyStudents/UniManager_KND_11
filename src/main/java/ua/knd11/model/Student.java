@@ -6,7 +6,7 @@ public class Student extends User {
 
     public Student(String surname, String name, String lastname , String group) {
         super(name, surname);
-        this.group = group;
+        this.group = group.toUpperCase();
         this.lastname = lastname;
     }
 
