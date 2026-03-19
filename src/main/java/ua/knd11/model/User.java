@@ -20,6 +20,7 @@ public abstract class User {
         return name;
     }
 
+    @SuppressWarnings("unused")
     public void setName(String name) {
         this.name = name;
     }
@@ -28,12 +29,13 @@ public abstract class User {
         return surname;
     }
 
+    @SuppressWarnings("unused")
     public void setSurname(String surname) {
         this.surname = surname;
     }
 
     @Override
     public String toString() {
-        return "Id: " + getId() + ", Name: " + getName() + ", Surname: " + getSurname() ;
+        return "\n Id: " + getId() + ", Name: " + getName() + ", Surname: " + getSurname() ;
     }
 }
