@@ -38,7 +38,7 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
         } else if (t.getName() == null || t.getName().isEmpty() || t.getSurname() == null || t.getSurname().isEmpty() || t.getDepartment() == null || t.getDepartment().isEmpty() || t.getDegree() == null || t.getDegree().isEmpty()) {
             throw new IllegalArgumentException("Teacher has empty required fields: " + t);
         } else if (t.getSalary() <= 0) {
-            throw new IllegalArgumentException("Teacher has empty required fields: " + t);
+            throw new IllegalArgumentException("Teacher salary must be positive: " + t);
         } else {
             System.out.println("Teacher added: " + t);
             super.add(t);
