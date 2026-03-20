@@ -18,17 +18,24 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
                 var matches = repository.stream().filter(user -> user instanceof Teacher t &&
                         t.getDegree() != null &&
                         !t.getDegree().isBlank() &&
-                        normalizedDegree.equalsIgnoreCase(t.getDegree())).toList();
+                        normalizedDegree.equalsIgnoreCase(t.getDegree().trim())).toList();
                 matches.forEach(System.out::println);
                 return !matches.isEmpty();
     }
-
-
-    @Override
-    public void add(User user) {
-        if (!(user instanceof Teacher)) {
-            throw new IllegalArgumentException("Only Teacher instances can be added");
-        }
-        super.add(user);
-    }
+@Override
+public void add(User u) {
+    if (u == null) {throw new IllegalArgumentException("User cannot be null");}
+    if (!(u instanceof Teacher t)) {throw new IllegalArgumentException("Expected Teacher instance");}
+    boolean hasEmptyFields = isNullOrBlank(t.getName())
+            || isNullOrBlank(t.getSurname())
+            || isNullOrBlank(t.getDepartment())
+            || isNullOrBlank(t.getDegree());
+    if (hasEmptyFields) {throw new IllegalArgumentException("Teacher has empty required fields: " + t);}
+    if (t.getSalary() <= 0) {throw new IllegalArgumentException("Teacher salary must be positive: " + t);}
+    System.out.println("Teacher added: " + t);
+    super.add(t);
 }
+private boolean isNullOrBlank(String str) {
+    return str == null || str.isBlank();
+}}
+
