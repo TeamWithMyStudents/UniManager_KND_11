@@ -30,7 +30,7 @@ public void add(User u) {
             || isNullOrBlank(t.getDepartment())
             || isNullOrBlank(t.getDegree());
     if (hasEmptyFields) {throw new IllegalArgumentException("Teacher has empty required fields: " + t);}
-    if (t.getSalary() <= 0) {throw new IllegalArgumentException("Teacher salary must be positive: " + t);}
+    if (!Double.isFinite(t.getSalary()) || t.getSalary() <= 0) {throw new IllegalArgumentException("Teacher salary must be a finite positive number");}
     System.out.println("Teacher added: " + t);
     super.add(t);
 }
