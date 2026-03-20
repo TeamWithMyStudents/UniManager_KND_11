@@ -31,6 +31,10 @@ public class TeacherController {
     }}
     public void getAll() {service.getAll().forEach(System.out::println);}
     public void calculateTotalSalary() {service.calculateTotalSalary();}
-    public void filterByDegree(String degree) {service.filterByDegree(degree);}
-    }
+    public void filterByDegree(String degree) {
+        service.filterByDegree(degree);
+        boolean found = service.filterByDegree(degree);
+        if (!found) {System.out.println("Teachers with degree " + degree + " are not found.");
+        }
+    }}
 
