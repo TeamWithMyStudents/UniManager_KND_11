@@ -7,11 +7,11 @@ public class StudentServiceImpl extends UserServiceImpl implements StudentServic
 
     @Override
     public void findByGroup(String groupQuery) {
-        if (groupQuery == null || groupQuery.isBlank()) {
-            System.out.println("Group query cannot be empty.");
-            return;
-        }
-        repository.stream().filter(user -> user instanceof Student st && st.getGroup().contains(groupQuery.toUpperCase())).forEach(System.out::println);
+        repository.stream().filter(user -> user instanceof Student st &&
+                !groupQuery.isBlank() &&
+                !st.getGroup().isBlank() &&
+                st.getGroup() == null &&
+                st.getGroup().contains(groupQuery.toUpperCase())).forEach(System.out::println);
     }
 }
 

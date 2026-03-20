@@ -14,6 +14,9 @@ public class UserServiceImpl implements UserService {
     }
 
     public void add(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User can't be null");
+        }
         repository.add(user);
     }
 
@@ -26,10 +29,16 @@ public class UserServiceImpl implements UserService {
     }
 
     public void findByName(String query) {
+        if (query == null) {
+            throw new IllegalArgumentException("Query must not be null");
+        }
         repository.stream().filter(user -> query.equalsIgnoreCase(user.getName())).forEach(System.out::println);
     }
 
     public void findBySurname(String query) {
+        if (query == null) {
+            throw new IllegalArgumentException("Query must not be null");
+        }
         repository.stream().filter(user -> query.equalsIgnoreCase(user.getSurname())).forEach(System.out::println);
     }
 
