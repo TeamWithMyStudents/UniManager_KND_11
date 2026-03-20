@@ -49,7 +49,7 @@ package ua.knd11.viewer;
                     0. Back to Main Menu
                     """);
                 System.out.print("Select an option (number): ");
-                    String choice = sc.nextLine();
+                    String choice = sc.nextLine().trim();;
                     switch (choice) {
                         case "1":
                             System.out.println("Please enter Student data (Surname Name Lastname Group):");
