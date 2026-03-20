@@ -12,7 +12,7 @@ public class StudentController {
         String normalized = input.trim().replace(",", " ");
         String[] parts = normalized.split("\\s+");
         if (parts.length != 4) {
-            System.out.println("Error: Expected 5 fields (Surname Name Lastname Group).");
+            System.out.println("Error: Expected 4 fields (Surname Name Lastname Group).");
             return;
         }
 

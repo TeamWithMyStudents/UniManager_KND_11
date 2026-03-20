@@ -52,7 +52,7 @@ package ua.knd11.viewer;
                     String choice = sc.nextLine();
                     switch (choice) {
                         case "1":
-                            System.out.println("Please enter teacher data (Surname Name Lastname Group):");
+                            System.out.println("Please enter Student data (Surname Name Lastname Group):");
                             String input = sc.nextLine();
                             studentController.create(input);
                             break;
@@ -73,6 +73,7 @@ package ua.knd11.viewer;
                         case "0":
                             System.out.println("returning to Main Menu ↺");
                             back = true;
+                            break;
                           //  break label;
                         default:
                             System.out.println("Invalid option. Please try again.");
@@ -98,7 +99,7 @@ package ua.knd11.viewer;
 
                 switch (choice) {
                     case "1":
-                        System.out.print("Please enter teacher data (Name Surname Dept Degree Salary): ");
+                        System.out.print("Please enter Teacher data (Name Surname Dept Degree Salary): ");
                         teacherController.create(sc.nextLine());
                         break;
                     case "2":
@@ -117,6 +118,7 @@ package ua.knd11.viewer;
                         break;
                     default:
                         System.out.println("Invalid option. Please try again.");
+                        break;
                 }
             }
         }
