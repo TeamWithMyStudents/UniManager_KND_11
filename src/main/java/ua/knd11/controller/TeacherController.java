@@ -21,6 +21,8 @@ public class TeacherController {
             String department = parts[2];
             String degree = parts[3];
             double salary = Double.parseDouble(parts[4]);
+            if (salary<0){
+                System.out.println("Invalid salary");return;}
             Teacher teacher = new Teacher(name, surname, department, degree, salary);
             service.add(teacher);
             System.out.println("Teacher added successfully!");
