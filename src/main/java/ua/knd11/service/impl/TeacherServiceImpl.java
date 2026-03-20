@@ -12,7 +12,7 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
     }
 
     public void filterByDegree(String degreeQuery) {
-        repository.stream().filter(user -> user instanceof Teacher t && t.getDegree().equalsIgnoreCase(degreeQuery)).forEach(System.out::println);
+        repository.stream().filter(user -> user instanceof Teacher t && degreeQuery.equalsIgnoreCase(t.getDegree())).forEach(System.out::println);
     }
 
     @Override

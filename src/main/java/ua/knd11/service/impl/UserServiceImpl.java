@@ -26,16 +26,16 @@ public class UserServiceImpl implements UserService {
     }
 
     public void findByName(String query) {
-        repository.stream().filter(user -> user.getName().equalsIgnoreCase(query)).forEach(System.out::println);
+        repository.stream().filter(user -> query.equalsIgnoreCase(user.getName())).forEach(System.out::println);
     }
 
     public void findBySurname(String query) {
-        repository.stream().filter(user -> user.getSurname().equalsIgnoreCase(query)).forEach(System.out::println);
+        repository.stream().filter(user -> query.equalsIgnoreCase(user.getSurname())).forEach(System.out::println);
     }
 
     public void sortBySurname() {
         Collator uaCollator = Collator.getInstance(new Locale("uk", "UA"));
-        repository.sort(Comparator.comparing(User::getSurname, uaCollator));
+        repository.sort(Comparator.comparing(User::getSurname, Comparator.nullsLast(uaCollator)));
     }
 
     @Override
