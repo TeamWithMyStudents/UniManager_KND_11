@@ -15,7 +15,7 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
         repository.stream().filter(user -> user instanceof Teacher t &&
                 !degreeQuery.isBlank() &&
                 !t.getDegree().isBlank() &&
-                t.getDegree() == null &&
+                t.getDegree() != null &&
                 degreeQuery.equalsIgnoreCase(t.getDegree())).forEach(System.out::println);
     }
 
@@ -24,6 +24,6 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
         if (!(user instanceof Teacher)) {
             throw new IllegalArgumentException("Only Teacher instances can be added");
         }
-        repository.add(user);
+        super.add(user);
     }
 }
