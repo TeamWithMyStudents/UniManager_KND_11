@@ -4,8 +4,6 @@ import ua.knd11.model.Student;
 import ua.knd11.service.UserService;
 import ua.knd11.service.impl.StudentServiceImpl;
 
-import java.util.Arrays;
-
 public class StudentController {
     private final UserService service = new StudentServiceImpl();
 
@@ -29,8 +27,7 @@ public class StudentController {
     }
 
     public void delete(int id) {
-        boolean deleted = service.delete(id);
-        if (deleted) {
+        if (service.delete(id)) {
             System.out.println("Студента успішно видалено.");
         } else {
             System.out.println("Студента з ID " + id + " не знайдено.");
@@ -38,8 +35,6 @@ public class StudentController {
     }
 
     public void getAll() {
-        System.out.println(Arrays.toString(service.getAll()).
-                replace("[", "").
-                replace("]", ""));  // .replaceall("[]", "") gives Unclosed character class []
+        service.getAll().forEach(System.out::println);
     }
 }

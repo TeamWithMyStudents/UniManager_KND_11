@@ -6,42 +6,24 @@ import ua.knd11.service.TeacherService;
 
 public class TeacherServiceImpl extends UserServiceImpl implements TeacherService {
 
-    public TeacherServiceImpl() {
-        super(new Teacher[5]);
-    }
-
     public void calculateTotalSalary() {
-        double result = 0;
-        for (User user : repository) {
-            if (!(user instanceof Teacher t)) continue;
-            result += t.getSalary();
-        }
+        double result = repository.stream().mapToDouble(user -> user instanceof Teacher t ? t.getSalary() : 0).sum();
         System.out.println("Total University Budget: " + result);
     }
 
-    public void filterByDegree(String degree) {
-        if (degree == null || degree.isBlank()) return;
-        for (User user : repository) {
-            if (!(user instanceof Teacher t)) continue;
-            if (t.getDegree().equalsIgnoreCase(degree) || t.getDegree().toLowerCase().contains(degree.toLowerCase())) {
-                System.out.println("\n" + t);
-            }
-        }
+    public void filterByDegree(String degreeQuery) {
+        repository.stream().filter(user -> user instanceof Teacher t &&
+                !degreeQuery.isBlank() &&
+                !t.getDegree().isBlank() &&
+                t.getDegree() != null &&
+                degreeQuery.equalsIgnoreCase(t.getDegree())).forEach(System.out::println);
     }
 
     @Override
-    public void add(User u) {
-        if (u == null) {
-            throw new IllegalArgumentException("User cannot be null");
-        } else if (!(u instanceof Teacher t)) {
-            throw new IllegalArgumentException("Expected Teacher instance");
-        } else if (t.getName() == null || t.getName().isBlank() || t.getSurname() == null || t.getSurname().isBlank() || t.getDepartment() == null || t.getDepartment().isBlank() || t.getDegree() == null || t.getDegree().isBlank()) {
-            throw new IllegalArgumentException("Teacher has empty required fields: " + t);
-        } else if (t.getSalary() <= 0) {
-            throw new IllegalArgumentException("Teacher salary must be positive: " + t);
-        } else {
-            System.out.println("Teacher added: " + t);
-            super.add(t);
+    public void add(User user) {
+        if (!(user instanceof Teacher)) {
+            throw new IllegalArgumentException("Only Teacher instances can be added");
         }
+        super.add(user);
     }
 }

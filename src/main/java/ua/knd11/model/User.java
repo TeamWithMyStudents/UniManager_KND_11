@@ -36,6 +36,6 @@ public abstract class User {
 
     @Override
     public String toString() {
-        return "\n Id: " + getId() + ", Name: " + getName() + ", Surname: " + getSurname() ;
+        return "Id: " + getId() + ", Name: " + getName() + ", Surname: " + getSurname() ;
     }
 }

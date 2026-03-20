@@ -1,12 +1,14 @@
 package ua.knd11.model;
 
+import java.util.Objects;
+
 public class Student extends User {
     private String group;
     private String lastname;
 
     public Student(String surname, String name, String lastname , String group) {
         super(name, surname);
-        this.group = group;
+        this.group = normalizeGroup(group);
         this.lastname = lastname;
     }
 
@@ -16,7 +18,11 @@ public class Student extends User {
 
     @SuppressWarnings("unused")
     public void setGroup(String group) {
-        this.group = group;
+        this.group = normalizeGroup(group);
+    }
+
+    private static String normalizeGroup(String group) {
+        return Objects.requireNonNull(group, "group must not be null").toUpperCase();
     }
 
     public String getLastname() {
