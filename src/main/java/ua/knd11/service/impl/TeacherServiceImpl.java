@@ -20,8 +20,7 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
                         !t.getDegree().isBlank() &&
                         normalizedDegree.equalsIgnoreCase(t.getDegree().trim())).toList();
                 matches.forEach(System.out::println);
-                return !matches.isEmpty();
-    }
+                return !matches.isEmpty(); }
 @Override
 public void add(User u) {
     if (u == null) {throw new IllegalArgumentException("User cannot be null");}
