@@ -11,13 +11,18 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
         System.out.println("Total University Budget: " + result);
     }
 
-    public void filterByDegree(String degreeQuery) {
-        repository.stream().filter(user -> user instanceof Teacher t &&
-                !degreeQuery.isBlank() &&
-                !t.getDegree().isBlank() &&
-                t.getDegree() != null &&
-                degreeQuery.equalsIgnoreCase(t.getDegree())).forEach(System.out::println);
+    public boolean filterByDegree(String degreeQuery) {
+                if (degreeQuery == null) {return false;}
+                String normalizedDegree = degreeQuery.trim();
+                if (normalizedDegree.isEmpty()) {return false;}
+                var matches = repository.stream().filter(user -> user instanceof Teacher t &&
+                        t.getDegree() != null &&
+                        !t.getDegree().isBlank() &&
+                        normalizedDegree.equalsIgnoreCase(t.getDegree())).toList();
+                matches.forEach(System.out::println);
+                return !matches.isEmpty();
     }
+
 
     @Override
     public void add(User user) {
