@@ -30,7 +30,7 @@ package ua.knd11.viewer;
                         break;
                     case "0":
                         sc.close();
-                        System.exit(0);
+                        return;
                     default:
                         System.out.println("Invalid option. Please try again ");
                 }
