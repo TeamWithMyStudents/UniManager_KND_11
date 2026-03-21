@@ -13,14 +13,17 @@ public class Teacher extends User {
     }
 
     private static double normalizerSalary(double salary) {
-        if (salary <= 0) throw new IllegalArgumentException("Salary cant be negative or zero");
-        else return salary;
+        if (Double.isNaN(salary) || Double.isInfinite(salary) || salary <= 0) {
+            throw new IllegalArgumentException("Salary must be a positive finite number");
+        }
+        return salary;
     }
 
     public String getDepartment() {
         return department;
     }
 
+    @SuppressWarnings("unused")
     public void setDepartment(String department) {
         this.department = normalizer(department, "Department");
     }
@@ -29,6 +32,7 @@ public class Teacher extends User {
         return degree;
     }
 
+    @SuppressWarnings("unused")
     public void setDegree(String degree) {
         this.degree = normalizer(degree, "Degree");
     }
@@ -37,6 +41,7 @@ public class Teacher extends User {
         return salary;
     }
 
+    @SuppressWarnings("unused")
     public void setSalary(double salary) {
         this.salary = normalizerSalary(salary);
     }

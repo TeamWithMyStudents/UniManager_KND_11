@@ -29,11 +29,15 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
 
     @Override
     public boolean add(User user) {
-        Teacher teacher = (Teacher) user;
-        if (isNullOrBlank(teacher.getName()) ||
-                isNullOrBlank(teacher.getSurname()) ||
-                isNullOrBlank(teacher.getDepartment()) ||
-                isNullOrBlank(teacher.getDegree()) ||
+        if (!(user instanceof Teacher teacher)){
+            throw new IllegalArgumentException("User must be an instance of Teacher");
+        }
+        if (    isNullOrBlank(teacher.getName(), "Name") ||
+                isNullOrBlank(teacher.getSurname(), "Surname") ||
+                isNullOrBlank(teacher.getDepartment(), "Department") ||
+                isNullOrBlank(teacher.getDegree(), "Degree") ||
+                Double.isNaN(teacher.getSalary()) ||
+                Double.isInfinite(teacher.getSalary()) ||
                 teacher.getSalary() <= 0) {
             return false;
         } else return super.add(teacher);

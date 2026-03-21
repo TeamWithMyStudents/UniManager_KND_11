@@ -1,12 +1,14 @@
 package ua.knd11.model;
 
+import java.util.Locale;
+
 public class Student extends User {
     private String group;
     private String lastname;
 
     public Student(String surname, String name, String lastname , String group) {
         super(name, surname);
-        this.group = normalizer(group, "Group").toUpperCase();
+        this.group = normalizer(group, "Group").toUpperCase(Locale.ROOT);
         this.lastname = normalizer(lastname, "Lastname");
     }
 
@@ -16,7 +18,7 @@ public class Student extends User {
 
     @SuppressWarnings("unused")
     public void setGroup(String group) {
-        this.group = normalizer(group, "Group");
+        this.group = normalizer(group, "Group").toUpperCase(Locale.ROOT);
     }
 
     public String getLastname() {

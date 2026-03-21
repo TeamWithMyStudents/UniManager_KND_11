@@ -16,11 +16,13 @@ public class StudentServiceImpl extends UserServiceImpl implements StudentServic
 
     @Override
     public boolean add(User user) {
-        Student student = (Student) user;
-        if (isNullOrBlank(student.getName()) ||
-                isNullOrBlank(student.getSurname()) ||
-                isNullOrBlank(student.getLastname()) ||
-                isNullOrBlank(student.getGroup())) {
+        if (!(user instanceof Student student)){
+            throw new IllegalArgumentException("User must be an instance of Student");
+        }
+        if (    isNullOrBlank(student.getName(), "Name") ||
+                isNullOrBlank(student.getSurname(), "Surname") ||
+                isNullOrBlank(student.getLastname(), "Lastname") ||
+                isNullOrBlank(student.getGroup(), "Group")) {
             return false;
         } else return super.add(student);
     }

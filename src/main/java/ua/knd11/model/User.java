@@ -20,6 +20,9 @@ public abstract class User {
     }
 
     public void assignId() {
+        if (this.id != 0) {
+            throw new IllegalStateException("Id has already been assigned");
+        }
         this.id = nextId++;
     }
 
