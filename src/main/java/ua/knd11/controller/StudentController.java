@@ -1,8 +1,11 @@
 package ua.knd11.controller;
 
 import ua.knd11.model.Student;
+import ua.knd11.model.User;
 import ua.knd11.service.UserService;
 import ua.knd11.service.impl.StudentServiceImpl;
+
+import java.util.List;
 
 public class StudentController {
     private final UserService service = new StudentServiceImpl();
@@ -33,8 +36,12 @@ public class StudentController {
             System.out.println("Student with ID " + id + " is not found.");
         }
     }
-
-    public void getAll() {
-        service.getAll().forEach(System.out::println);
+        public void getAll() {
+            List<User> students = service.getAll();
+            if (students == null || students.isEmpty()) {
+                System.out.println("No students found in the repository.");
+            } else {
+                for (User user : students) {
+                    System.out.println(user);
     }
-}
+}}}
