@@ -8,17 +8,24 @@ public class StudentServiceImpl extends UserServiceImpl implements StudentServic
     public StudentServiceImpl() {super();}
     @Override
     public void findByGroup(String groupQuery) {
-        if (groupQuery == null || groupQuery.isBlank()) {
-            return;
+
+        repository.stream().filter(user -> user instanceof Student st &&
+                !groupQuery.isBlank() &&
+                !st.getGroup().isBlank() &&
+                st.getGroup().contains(groupQuery.toUpperCase())).forEach(System.out::println);
+    }
+    @Override
+    public boolean add(User user) {
+        if (!(user instanceof Student student)){
+            throw new IllegalArgumentException("User must be an instance of Student");
         }
-        for (User user : repository) {
-            if (user instanceof Student) {
-                Student student = (Student) user;
-                if (student.getGroup() != null &&
-                        !student.getGroup().isBlank() &&
-                        student.getGroup().toUpperCase().contains(groupQuery.toUpperCase())) {
-                    System.out.println(student);
-                }
-            }
-}}}
+        if (    isNullOrBlank(student.getName(), "Name") ||
+                isNullOrBlank(student.getSurname(), "Surname") ||
+                isNullOrBlank(student.getLastname(), "Lastname") ||
+                isNullOrBlank(student.getGroup(), "Group")) {
+            return false;
+        } else return super.add(student);
+    }
+}
+
 

@@ -25,8 +25,11 @@ public class StudentController {
         String group = parts[3];
 
         Student student = new Student(surname, name, lastname, group);
-        service.add(student);
-        System.out.println("Student added successfully!");
+        if (service.add(student)) {
+            System.out.println("Student added successfully!");
+        } else {
+            System.out.println("Student wasn't added.");
+        }
     }
 
     public void delete(int id) {
