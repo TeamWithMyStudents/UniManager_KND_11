@@ -19,7 +19,13 @@ public class TeacherController {
         String surname = parts[1];
         String department = parts[2];
         String degree = parts[3];
-        double salary = Double.parseDouble(parts[4]);
+        double salary;
+        try {
+            salary = Double.parseDouble(parts[4]);
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Salary must be a number.");
+            return;
+        }
         Teacher teacher = new Teacher(name, surname, department, degree, salary);
         if (service.add(teacher)) {
             System.out.println("Teacher added successfully!");
