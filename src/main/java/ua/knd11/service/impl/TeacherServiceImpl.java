@@ -12,28 +12,41 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
     }
 
     public boolean filterByDegree(String degreeQuery) {
-                if (degreeQuery == null) {return false;}
-                String normalizedDegree = degreeQuery.trim();
-                if (normalizedDegree.isEmpty()) {return false;}
-                var matches = repository.stream().filter(user -> user instanceof Teacher t &&
-                        t.getDegree() != null &&
-                        !t.getDegree().isBlank() &&
-                        normalizedDegree.equalsIgnoreCase(t.getDegree().trim())).toList();
-                matches.forEach(System.out::println);
-                return !matches.isEmpty(); }
-@Override
-public void add(User u) {
-    if (u == null) {throw new IllegalArgumentException("User cannot be null");}
-    if (!(u instanceof Teacher t)) {throw new IllegalArgumentException("Expected Teacher instance");}
-    boolean hasEmptyFields = isNullOrBlank(t.getName())
-            || isNullOrBlank(t.getSurname())
-            || isNullOrBlank(t.getDepartment())
-            || isNullOrBlank(t.getDegree());
-    if (hasEmptyFields) {throw new IllegalArgumentException("Teacher has empty required fields: " + t);}
-    if (!Double.isFinite(t.getSalary()) || t.getSalary() <= 0) {throw new IllegalArgumentException("Teacher salary must be a finite positive number");}
-    super.add(t);
+        if (degreeQuery == null) {
+            return false;
+        }
+        String normalizedDegree = degreeQuery.trim();
+        if (normalizedDegree.isEmpty()) {
+            return false;
+        }
+        var matches = repository.stream().filter(user -> user instanceof Teacher t &&
+                t.getDegree() != null &&
+                !t.getDegree().isBlank() &&
+                normalizedDegree.equalsIgnoreCase(t.getDegree().trim())).toList();
+        matches.forEach(System.out::println);
+        return !matches.isEmpty();
+    }
+
+    @Override
+    public boolean add(User user) {
+        if (!(user instanceof Teacher teacher)) {
+            throw new IllegalArgumentException("User must be an instance of Teacher");
+        }
+
+        if (isNullOrBlank(teacher.getName(), "Name") ||
+                isNullOrBlank(teacher.getSurname(), "Surname") ||
+                isNullOrBlank(teacher.getDepartment(), "Department") ||
+                isNullOrBlank(teacher.getDegree(), "Degree")) {
+            return false;
+
+        } else if (Double.isNaN(teacher.getSalary()) ||
+                Double.isInfinite(teacher.getSalary()) ||
+                teacher.getSalary() <= 0) {
+            System.out.println("Salary must be a positive finite number");
+            return false;
+        }
+
+        return super.add(teacher);
+    }
 }
-private boolean isNullOrBlank(String str) {
-    return str == null || str.isBlank();
-}}
 
