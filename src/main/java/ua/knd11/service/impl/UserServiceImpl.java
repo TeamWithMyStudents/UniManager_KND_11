@@ -14,8 +14,11 @@ public class UserServiceImpl implements UserService {
     }
 
     public boolean isNullOrBlank(String str, String query) {
-        System.out.println(query + " must not be null or blank");
-        return str == null || str.isBlank();
+        boolean invalid = str == null || str.isBlank();
+        if (invalid){
+            System.out.println(query + " must not be null or blank");
+        }
+        return invalid;
     }
 
     public boolean add(User user) {

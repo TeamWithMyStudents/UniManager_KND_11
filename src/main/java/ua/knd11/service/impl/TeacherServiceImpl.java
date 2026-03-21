@@ -29,18 +29,24 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
 
     @Override
     public boolean add(User user) {
-        if (!(user instanceof Teacher teacher)){
+        if (!(user instanceof Teacher teacher)) {
             throw new IllegalArgumentException("User must be an instance of Teacher");
         }
-        if (    isNullOrBlank(teacher.getName(), "Name") ||
+
+        if (isNullOrBlank(teacher.getName(), "Name") ||
                 isNullOrBlank(teacher.getSurname(), "Surname") ||
                 isNullOrBlank(teacher.getDepartment(), "Department") ||
-                isNullOrBlank(teacher.getDegree(), "Degree") ||
-                Double.isNaN(teacher.getSalary()) ||
+                isNullOrBlank(teacher.getDegree(), "Degree")) {
+            return false;
+
+        } else if (Double.isNaN(teacher.getSalary()) ||
                 Double.isInfinite(teacher.getSalary()) ||
                 teacher.getSalary() <= 0) {
+            System.out.println("Salary must be a positive finite number");
             return false;
-        } else return super.add(teacher);
+        }
+
+        return super.add(teacher);
     }
 }
 
