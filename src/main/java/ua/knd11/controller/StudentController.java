@@ -12,7 +12,7 @@ public class StudentController {
         String normalized = input.trim().replace(",", " ");
         String[] parts = normalized.split("\\s+");
         if (parts.length != 4) {
-            System.out.println("Очікується 4 поля: Прізвище Ім'я По батькові Група.");
+            System.out.println("Error: Expected 4 fields (Surname Name Lastname Group).");
             return;
         }
 
@@ -23,14 +23,14 @@ public class StudentController {
 
         Student student = new Student(surname, name, lastname, group);
         service.add(student);
-        System.out.println("Студента успішно додано!");
+        System.out.println("Student added successfully!");
     }
 
     public void delete(int id) {
         if (service.delete(id)) {
-            System.out.println("Студента успішно видалено.");
+            System.out.println("Student successfully deleted.");
         } else {
-            System.out.println("Студента з ID " + id + " не знайдено.");
+            System.out.println("Student with ID " + id + " is not found.");
         }
     }
 

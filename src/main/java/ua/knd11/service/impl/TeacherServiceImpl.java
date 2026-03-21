@@ -6,8 +6,6 @@ import ua.knd11.service.TeacherService;
 
 import java.util.Optional;
 
-public class TeacherServiceImpl extends UserServiceImpl implements TeacherService {
-
     public void calculateTotalSalary() {
         double result = repository.stream().mapToDouble(user -> user instanceof Teacher t ? t.getSalary() : 0).sum();
         System.out.println("Total University Budget: " + result);
@@ -34,3 +32,7 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
         super.add(user);
     }
 }
+private boolean isNullOrBlank(String str) {
+    return str == null || str.isBlank();
+}}
+
