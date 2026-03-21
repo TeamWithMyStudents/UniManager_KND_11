@@ -6,22 +6,26 @@ import ua.knd11.service.TeacherService;
 
 import java.util.Optional;
 
+public class TeacherServiceImpl extends UserServiceImpl implements TeacherService {
+
     public void calculateTotalSalary() {
         double result = repository.stream().mapToDouble(user -> user instanceof Teacher t ? t.getSalary() : 0).sum();
         System.out.println("Total University Budget: " + result);
     }
 
-    public void filterByDegree(String degreeQuery) {
+    public boolean filterByDegree(String degreeQuery) {
         Optional <String> optional = Optional.ofNullable(degreeQuery);
         for (User user : repository) {
             if (user instanceof Teacher teacher) {
                 if(optional.isPresent()) {
                     if (teacher.getDegree().toLowerCase().contains(optional.get().toLowerCase())) {
                         System.out.println(teacher);
+                        return true;
                     }
                 }
             }
         }
+        return false;
     }
 
     @Override
@@ -31,8 +35,8 @@ import java.util.Optional;
         }
         super.add(user);
     }
-}
-private boolean isNullOrBlank(String str) {
-    return str == null || str.isBlank();
-}}
 
+        private boolean isNullOrBlank(String str) {
+            return str == null || str.isBlank();
+        }
+}
