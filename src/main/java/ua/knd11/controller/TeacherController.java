@@ -1,7 +1,10 @@
 package ua.knd11.controller;
 
 import ua.knd11.model.Teacher;
+import ua.knd11.model.User;
 import ua.knd11.service.impl.TeacherServiceImpl;
+
+import java.util.List;
 
 public class TeacherController {
 
@@ -23,23 +26,26 @@ public class TeacherController {
         try {
             salary = Double.parseDouble(parts[4]);
         } catch (NumberFormatException e) {
-            System.out.println("Error: Salary must be a number.");
-            return;
-        }
+
+            System.out.println("Error: Invalid salary format. Please enter a number.");
+        } catch (IllegalArgumentException e) {
+        System.out.println("Error: " + e.getMessage());
+    }}
+    public void getAll() { List<User> teachers = service.getAll();
+        if (teachers == null || teachers.isEmpty()) {
+            System.out.println("No teachers found in the repository.");
+        } else {
+            for (User user : teachers) {
+                System.out.println(user);
+            }}}
+    public void calculateTotalSalary() {service.calculateTotalSalary();}
+      
         Teacher teacher = new Teacher(name, surname, department, degree, salary);
         if (service.add(teacher)) {
             System.out.println("Teacher added successfully!");
         } else {
             System.out.println("Teacher wasn't added.");
         }
-    }
-
-    public void getAll() {
-        service.getAll().forEach(System.out::println);
-    }
-
-    public void calculateTotalSalary() {
-        service.calculateTotalSalary();
     }
 
     public void filterByDegree(String degree) {

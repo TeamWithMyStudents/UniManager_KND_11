@@ -5,15 +5,15 @@ import ua.knd11.model.User;
 import ua.knd11.service.StudentService;
 
 public class StudentServiceImpl extends UserServiceImpl implements StudentService {
-
+    public StudentServiceImpl() {super();}
     @Override
     public void findByGroup(String groupQuery) {
+
         repository.stream().filter(user -> user instanceof Student st &&
                 !groupQuery.isBlank() &&
                 !st.getGroup().isBlank() &&
                 st.getGroup().contains(groupQuery.toUpperCase())).forEach(System.out::println);
     }
-
     @Override
     public boolean add(User user) {
         if (!(user instanceof Student student)){
@@ -27,4 +27,5 @@ public class StudentServiceImpl extends UserServiceImpl implements StudentServic
         } else return super.add(student);
     }
 }
+
 
