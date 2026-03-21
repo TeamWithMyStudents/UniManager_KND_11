@@ -13,11 +13,17 @@ public class UserServiceImpl implements UserService {
         this.repository = new ArrayList<>();
     }
 
-    public void add(User user) {
-        if (user == null) {
-            throw new IllegalArgumentException("User can't be null");
+    public boolean isNullOrBlank(String str) {
+        return str == null || str.isBlank();
+    }
+
+    public boolean add(User user) {
+        if (isNullOrBlank(user.getName()) || isNullOrBlank(user.getSurname())) {
+            return false;
         }
+        user.assignId();
         repository.add(user);
+        return true;
     }
 
     public boolean delete(int id) {

@@ -22,19 +22,31 @@ public class TeacherController {
             String degree = parts[3];
             double salary = Double.parseDouble(parts[4]);
             Teacher teacher = new Teacher(name, surname, department, degree, salary);
-            service.add(teacher);
-            System.out.println("Teacher added successfully!");
+            if (service.add(teacher)) {
+                System.out.println("Teacher added successfully!");
+            } else {
+                System.out.println("Teacher wasn't added.");
+            }
         } catch (NumberFormatException e) {
             System.out.println("Error: Invalid salary format. Please enter a number.");
         } catch (IllegalArgumentException e) {
-        System.out.println("Error: " + e.getMessage());
-    }}
-    public void getAll() {service.getAll().forEach(System.out::println);}
-    public void calculateTotalSalary() {service.calculateTotalSalary();}
-    public void filterByDegree(String degree) {
-       // service.filterByDegree(degree);
-        boolean found = service.filterByDegree(degree);
-        if (!found) {System.out.println("Teachers with degree " + degree + " are not found.");
+            System.out.println("Error: " + e.getMessage());
         }
-    }}
+    }
+
+    public void getAll() {
+        service.getAll().forEach(System.out::println);
+    }
+
+    public void calculateTotalSalary() {
+        service.calculateTotalSalary();
+    }
+
+    public void filterByDegree(String degree) {
+        boolean found = service.filterByDegree(degree);
+        if (!found) {
+            System.out.println("Teachers with degree " + degree + " are not found.");
+        }
+    }
+}
 
