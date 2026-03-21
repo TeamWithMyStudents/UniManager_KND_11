@@ -4,6 +4,8 @@ import ua.knd11.model.Teacher;
 import ua.knd11.model.User;
 import ua.knd11.service.TeacherService;
 
+import java.util.Optional;
+
 public class TeacherServiceImpl extends UserServiceImpl implements TeacherService {
 
     public void calculateTotalSalary() {
@@ -12,11 +14,16 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
     }
 
     public void filterByDegree(String degreeQuery) {
-        repository.stream().filter(user -> user instanceof Teacher t &&
-                !degreeQuery.isBlank() &&
-                !t.getDegree().isBlank() &&
-                t.getDegree() != null &&
-                degreeQuery.equalsIgnoreCase(t.getDegree())).forEach(System.out::println);
+        Optional <String> optional = Optional.ofNullable(degreeQuery);
+        for (User user : repository) {
+            if (user instanceof Teacher teacher) {
+                if(optional.isPresent()) {
+                    if (teacher.getDegree().toLowerCase().contains(optional.get().toLowerCase())) {
+                        System.out.println(teacher);
+                    }
+                }
+            }
+        }
     }
 
     @Override
