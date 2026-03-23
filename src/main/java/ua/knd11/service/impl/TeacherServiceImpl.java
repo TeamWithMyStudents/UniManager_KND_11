@@ -4,28 +4,27 @@ import ua.knd11.model.Teacher;
 import ua.knd11.model.User;
 import ua.knd11.service.TeacherService;
 
-import java.util.Optional;
-
 public class TeacherServiceImpl extends UserServiceImpl implements TeacherService {
-   // public TeacherServiceImpl() {super();}
     public void calculateTotalSalary() {
         double result = repository.stream().mapToDouble(user -> user instanceof Teacher t ? t.getSalary() : 0).sum();
         System.out.println("Total University Budget: " + result);
     }
 
-    public boolean filterByDegree(String degreeQuery) {
-        Optional <String> optional = Optional.ofNullable(degreeQuery);
+    public void filterByDegree(String degreeQuery) {
+        isNullOrBlank(degreeQuery, "filterByDegree");
+
+        boolean found = false;
         for (User user : repository) {
-            if (user instanceof Teacher teacher) {
-                if (optional.isPresent()) {
-                    if (teacher.getDegree().toLowerCase().contains(optional.get().toLowerCase())) {
-                        System.out.println(teacher);
-                        return true;
-                    }
+            if (user instanceof Teacher t) {
+                if (t.getDegree().toLowerCase().contains(degreeQuery.toLowerCase())) {
+                    System.out.println(t);
+                    found = true;
                 }
             }
         }
-        return false;
+        if (!found) {
+            System.out.println("No teachers found with the specified degree.");
+        }
     }
 
     @Override
@@ -48,9 +47,5 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
         }
 
         return super.add(teacher);
-    }
-
-    private boolean isNullOrBlank(String str) {
-        return str == null || str.isBlank();
     }
 }
