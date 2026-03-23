@@ -1,6 +1,6 @@
 package ua.knd11.model;
 
-import java.util.Objects;
+import java.util.Locale;
 
 public class Student extends User {
     private String group;
@@ -8,8 +8,8 @@ public class Student extends User {
 
     public Student(String surname, String name, String lastname , String group) {
         super(name, surname);
-        this.group = normalizeGroup(group);
-        this.lastname = lastname;
+        this.group = normalizer(group, "Group").toUpperCase(Locale.ROOT);
+        this.lastname = normalizer(lastname, "Lastname");
     }
 
     public String getGroup() {
@@ -18,11 +18,7 @@ public class Student extends User {
 
     @SuppressWarnings("unused")
     public void setGroup(String group) {
-        this.group = normalizeGroup(group);
-    }
-
-    private static String normalizeGroup(String group) {
-        return Objects.requireNonNull(group, "group must not be null").toUpperCase();
+        this.group = normalizer(group, "Group").toUpperCase(Locale.ROOT);
     }
 
     public String getLastname() {
@@ -31,7 +27,7 @@ public class Student extends User {
 
     @SuppressWarnings("unused")
     public void setLastname(String lastname) {
-        this.lastname = lastname;
+        this.lastname = normalizer(lastname, "Lastname");
     }
 
     @Override
