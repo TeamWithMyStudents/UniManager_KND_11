@@ -55,10 +55,7 @@ public class TeacherController {
     }
 
     public void filterByDegree(String degree) {
-        boolean found = service.filterByDegree(degree);
-        if (!found) {
-            System.out.println("Teachers with degree " + degree + " are not found.");
-        }
+        service.filterByDegree(degree);
     }
 }
 

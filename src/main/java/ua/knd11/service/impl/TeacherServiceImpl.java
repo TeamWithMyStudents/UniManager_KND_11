@@ -5,26 +5,26 @@ import ua.knd11.model.User;
 import ua.knd11.service.TeacherService;
 
 public class TeacherServiceImpl extends UserServiceImpl implements TeacherService {
-   // public TeacherServiceImpl() {super();}
     public void calculateTotalSalary() {
         double result = repository.stream().mapToDouble(user -> user instanceof Teacher t ? t.getSalary() : 0).sum();
         System.out.println("Total University Budget: " + result);
     }
 
-    public boolean filterByDegree(String degreeQuery) {
-        if (degreeQuery == null) {
-            return false;
+    public void filterByDegree(String degreeQuery) {
+        if (isNullOrBlank(degreeQuery, "Degree")) return;
+
+        boolean found = false;
+        for (User user : repository) {
+            if (user instanceof Teacher t) {
+                if (t.getDegree().toLowerCase().contains(degreeQuery.toLowerCase())) {
+                    System.out.println(t);
+                    found = true;
+                }
+            }
         }
-        String normalizedDegree = degreeQuery.trim();
-        if (normalizedDegree.isEmpty()) {
-            return false;
+        if (!found) {
+            System.out.println("No teachers found with the specified degree.");
         }
-        var matches = repository.stream().filter(user -> user instanceof Teacher t &&
-                t.getDegree() != null &&
-                !t.getDegree().isBlank() &&
-                normalizedDegree.equalsIgnoreCase(t.getDegree().trim())).toList();
-        matches.forEach(System.out::println);
-        return !matches.isEmpty();
     }
 
     @Override
@@ -49,4 +49,3 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
         return super.add(teacher);
     }
 }
-
