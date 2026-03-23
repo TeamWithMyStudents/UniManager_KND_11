@@ -11,7 +11,7 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
     }
 
     public void filterByDegree(String degreeQuery) {
-        isNullOrBlank(degreeQuery, "filterByDegree");
+        if (isNullOrBlank(degreeQuery, "Degree")) return;
 
         boolean found = false;
         for (User user : repository) {

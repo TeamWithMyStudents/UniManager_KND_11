@@ -8,7 +8,7 @@ public class StudentServiceImpl extends UserServiceImpl implements StudentServic
     public StudentServiceImpl() {super();}
     @Override
     public void findByGroup(String groupQuery) {
-        isNullOrBlank(groupQuery, "Group");
+        if (isNullOrBlank(groupQuery, "Group")) return;
 
         repository.stream().filter(user -> user instanceof Student st &&
                 st.getGroup().contains(groupQuery.toUpperCase())).forEach(System.out::println);
