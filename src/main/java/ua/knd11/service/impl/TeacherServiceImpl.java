@@ -14,19 +14,18 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
     }
 
     public boolean filterByDegree(String degreeQuery) {
-        if (degreeQuery == null) {
-            return false;
+        Optional <String> optional = Optional.ofNullable(degreeQuery);
+        for (User user : repository) {
+            if (user instanceof Teacher teacher) {
+                if (optional.isPresent()) {
+                    if (teacher.getDegree().toLowerCase().contains(optional.get().toLowerCase())) {
+                        System.out.println(teacher);
+                        return true;
+                    }
+                }
+            }
         }
-        String normalizedDegree = degreeQuery.trim();
-        if (normalizedDegree.isEmpty()) {
-            return false;
-        }
-        var matches = repository.stream().filter(user -> user instanceof Teacher t &&
-                t.getDegree() != null &&
-                !t.getDegree().isBlank() &&
-                normalizedDegree.equalsIgnoreCase(t.getDegree().trim())).toList();
-        matches.forEach(System.out::println);
-        return !matches.isEmpty();
+        return false;
     }
 
     @Override
@@ -50,9 +49,8 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
 
         return super.add(teacher);
     }
-}
 
-        private boolean isNullOrBlank(String str) {
-            return str == null || str.isBlank();
-        }
+    private boolean isNullOrBlank(String str) {
+        return str == null || str.isBlank();
+    }
 }
