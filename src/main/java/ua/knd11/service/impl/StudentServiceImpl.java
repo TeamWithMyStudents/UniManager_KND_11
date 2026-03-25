@@ -2,6 +2,7 @@ package ua.knd11.service.impl;
 
 import ua.knd11.model.Student;
 import ua.knd11.model.User;
+import ua.knd11.model.enums.StudentRole;
 import ua.knd11.service.StudentService;
 
 public class StudentServiceImpl extends UserServiceImpl implements StudentService {
@@ -12,6 +13,31 @@ public class StudentServiceImpl extends UserServiceImpl implements StudentServic
 
         repository.stream().filter(user -> user instanceof Student st &&
                 st.getGroup().contains(groupQuery.toUpperCase())).forEach(System.out::println);
+    }
+
+    @Override
+    public void assignHeadStudent(int studentId) {
+        Student newHeadStudent = null;
+        for (User u : getAll()) {
+            if (u.getId() == studentId && u instanceof Student) {
+                newHeadStudent = (Student) u;
+                break;
+            }}if (newHeadStudent == null) {
+            System.out.println("Student with ID " + studentId + " not found.");
+            return;
+        }
+        String targetGroup = newHeadStudent.getGroup();
+
+        for (User u : getAll()) {
+            if (u instanceof Student st) {
+                if (st.getGroup().equals(targetGroup) && st.getRole() == StudentRole.HEAD_STUDENT && st.getId() != studentId) {
+                    st.setRole(StudentRole.REGULAR);
+                    System.out.println("Previous Head Student " + st.getName() + " " + st.getSurname() + " " + st.getLastname() + " in group " + st.getGroup() +" stepped down.");
+                }
+            }
+        }
+        newHeadStudent.setRole(StudentRole.HEAD_STUDENT);
+        System.out.println("Student " + newHeadStudent.getName() + " " + newHeadStudent.getSurname() + " " + newHeadStudent.getLastname() +" is now the Head Student of group " + targetGroup + "!");
     }
 
     @Override

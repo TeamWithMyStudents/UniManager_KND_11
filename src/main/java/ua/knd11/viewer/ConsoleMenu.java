@@ -46,6 +46,7 @@ package ua.knd11.viewer;
                     1. Add Student
                     2. Show All Students
                     3. Delete Student by ID
+                    4. Assign Group Head Student
                     0. Back to Main Menu
                     """);
                 System.out.print("Select an option (number): ");
@@ -65,6 +66,17 @@ package ua.knd11.viewer;
                                 int id = sc.nextInt();
                                 sc.nextLine();
                                 studentController.delete(id);
+                            } else {
+                                System.out.println("Error, ID must be a number!");
+                                sc.nextLine();
+                            }
+                            break;
+                        case "4":
+                            System.out.println("Enter Student's ID to assign as Head Student:");
+                            if (sc.hasNextInt()) {
+                                int assignId = sc.nextInt();
+                                sc.nextLine();
+                                studentController.assignHeadStudent(assignId);
                             } else {
                                 System.out.println("Error, ID must be a number!");
                                 sc.nextLine();
