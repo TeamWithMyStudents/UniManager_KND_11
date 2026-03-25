@@ -1,15 +1,17 @@
 package ua.knd11.model;
-
+import ua.knd11.model.enums.StudentRole;
 import java.util.Locale;
 
 public class Student extends User {
     private String group;
     private String lastname;
+    private StudentRole role;
 
     public Student(String surname, String name, String lastname , String group) {
         super(name, surname);
         this.group = normalizer(group, "Group").toUpperCase(Locale.ROOT);
         this.lastname = normalizer(lastname, "Lastname");
+        this.role = StudentRole.REGULAR;
     }
 
     public String getGroup() {
@@ -30,8 +32,12 @@ public class Student extends User {
         this.lastname = normalizer(lastname, "Lastname");
     }
 
+    public StudentRole getRole() {return role;}
+
+    public void setRole(StudentRole role) {this.role = role;}
+
     @Override
     public String toString() {
-        return super.toString()  +  ", Lastname: " + getLastname() + ", Group: " + getGroup();
+        return super.toString()  +  ", Lastname: " + getLastname() + ", Group: " + getGroup()  + ", Role: "+ getRole();
     }
 }

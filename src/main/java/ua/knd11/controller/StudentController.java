@@ -2,16 +2,18 @@ package ua.knd11.controller;
 
 import ua.knd11.model.Student;
 import ua.knd11.model.User;
-import ua.knd11.service.UserService;
+
+import ua.knd11.service.StudentService;
 import ua.knd11.service.impl.StudentServiceImpl;
 
 import java.util.List;
 
 public class StudentController {
-    private final UserService service = new StudentServiceImpl();
+    private final StudentService service = new StudentServiceImpl();
+
+    public void assignHeadStudent(int id) {service.assignHeadStudent(id);}
 
     public void create(String input) {
-
         String normalized = input.trim().replace(",", " ");
         String[] parts = normalized.split("\\s+");
         if (parts.length != 4) {
