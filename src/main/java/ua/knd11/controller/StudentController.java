@@ -32,10 +32,15 @@ public class StudentController {
 
         Student student = new Student(surname, name, lastname, group,  email, password);
         authService.registration(student);
-        if (service.add(student)) {
-            System.out.println("Student added successfully!");
-        } else {
-            System.out.println("Student wasn't added.");
+        try {
+            authService.registration(student);
+            if (service.add(student)) {
+                System.out.println("Student added successfully!");
+            } else {
+                System.out.println("Student wasn't added.");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
         }
     }
 
