@@ -57,7 +57,7 @@ public abstract class User {
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email = normalizer(email, "Email");
     }
 
     public String getPassword() {
@@ -65,7 +65,7 @@ public abstract class User {
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.password = normalizer(password, "Password");
     }
 
     @Override

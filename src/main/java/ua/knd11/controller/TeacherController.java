@@ -15,7 +15,7 @@ public class TeacherController {
         String[] parts = normalized.split("\\s+");
 
         if (parts.length != 7) {
-            System.out.println("Error: Expected 5 fields (Name Surname Dept Degree Salary).");
+            System.out.println("Error: Expected 7 fields (Name Surname Dept Degree Salary).");
             return;
         }
         String name = parts[0];

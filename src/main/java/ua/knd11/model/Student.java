@@ -37,6 +37,6 @@ public class Student extends User {
 
     @Override
     public String toString() {
-        return super.toString()  +  ", Lastname: " + getLastname() + ", Group: " + getGroup()  + ", Role: "+ getRole() + ", Email: " + getEmail() + ", Password: " + getPassword();
+        return super.toString()  +  ", Lastname: " + getLastname() + ", Group: " + getGroup()  + ", Role: "+ getRole() + ", Email: " + getEmail();
     }
 }

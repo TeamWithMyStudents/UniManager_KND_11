@@ -13,14 +13,12 @@ public class AuthServiceImpl implements AuthService {
     public void registration(User user) {
         String regex = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
         Pattern pattern = Pattern.compile(regex);
-        for (String text : user.getEmail().split(" ") ) {
-            Matcher matcher = pattern.matcher(text);
-            if (matcher.find()){
-                user.setEmail(text);
-            } else {
-                throw new IllegalArgumentException("Invalid email address or password");
-            }
+        String email = User.normalizer(user.getEmail(), "Email");
+        Matcher matcher = pattern.matcher(email);
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("Invalid email address or password");
         }
+        user.setEmail(email);
 
         if (user.getPassword().length() >= 8) {
             user.setPassword(user.getPassword());
@@ -32,9 +30,5 @@ public class AuthServiceImpl implements AuthService {
 
     public ArrayList<User> getRegisteredUsers() {
         return registeredUsers;
-    }
-
-    public void setRegisteredUsers(ArrayList<User> registeredUsers) {
-        this.registeredUsers = registeredUsers;
     }
 }
