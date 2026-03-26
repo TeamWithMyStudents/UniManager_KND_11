@@ -7,8 +7,8 @@ public class Student extends User {
     private String lastname;
     private StudentRole role;
 
-    public Student(String surname, String name, String lastname , String group) {
-        super(name, surname);
+    public Student(String surname, String name, String lastname , String group, String email, String password) {
+        super(name, surname, email, password);
         this.group = normalizer(group, "Group").toUpperCase(Locale.ROOT);
         this.lastname = normalizer(lastname, "Lastname");
         this.role = StudentRole.REGULAR;
@@ -17,7 +17,6 @@ public class Student extends User {
     public String getGroup() {
         return group;
     }
-
     @SuppressWarnings("unused")
     public void setGroup(String group) {
         this.group = normalizer(group, "Group").toUpperCase(Locale.ROOT);
@@ -38,6 +37,6 @@ public class Student extends User {
 
     @Override
     public String toString() {
-        return super.toString()  +  ", Lastname: " + getLastname() + ", Group: " + getGroup()  + ", Role: "+ getRole();
+        return super.toString()  +  ", Lastname: " + getLastname() + ", Group: " + getGroup()  + ", Role: "+ getRole() + ", Email: " + getEmail() + ", Password: " + getPassword();
     }
 }

@@ -5,8 +5,8 @@ public class Teacher extends User {
     private String degree;
     private double salary;
 
-    public Teacher(String name, String surname, String department, String degree, double salary) {
-        super(name, surname);
+    public Teacher(String name, String surname, String department, String degree, double salary, String email, String password) {
+        super(name, surname, email, password);
         this.department = normalizer(department, "Department");
         this.degree = normalizer(degree, "Degree");
         this.salary = normalizerSalary(salary);
@@ -48,6 +48,6 @@ public class Teacher extends User {
 
     @Override
     public String toString() {
-        return "Id: " + getId() + " Name: " + getName() + " Surname: " + getSurname() + " Department: " + getDepartment() + " Degree: " + getDegree() + " Salary: " + getSalary();
+        return "Id: " + getId() + ", Name: " + getName() + ", Surname: " + getSurname() + ", Department: " + getDepartment() + ", Degree: " + getDegree() + ", Salary: " + getSalary() + ", Email: " + getEmail() + ", Password: " + getPassword();
     }
 }

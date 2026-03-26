@@ -16,7 +16,7 @@ public class StudentController {
     public void create(String input) {
         String normalized = input.trim().replace(",", " ");
         String[] parts = normalized.split("\\s+");
-        if (parts.length != 4) {
+        if (parts.length != 6) {
             System.out.println("Error: Expected 4 fields (Surname Name Lastname Group).");
             return;
         }
@@ -25,8 +25,10 @@ public class StudentController {
         String name = parts[1];
         String lastname = parts[2];
         String group = parts[3];
+        String email = parts[4];
+        String password = parts[5];
 
-        Student student = new Student(surname, name, lastname, group);
+        Student student = new Student(surname, name, lastname, group,  email, password);
         if (service.add(student)) {
             System.out.println("Student added successfully!");
         } else {
