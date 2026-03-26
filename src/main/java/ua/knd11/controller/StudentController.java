@@ -31,7 +31,6 @@ public class StudentController {
         String password = parts[5];
 
         Student student = new Student(surname, name, lastname, group,  email, password);
-        authService.registration(student);
         try {
             authService.registration(student);
             if (service.add(student)) {
