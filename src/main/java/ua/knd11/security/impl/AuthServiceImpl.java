@@ -11,24 +11,19 @@ public class AuthServiceImpl implements AuthService {
     private final ArrayList<User> registeredUsers = new ArrayList<>();
 
     public void registration(User user) {
-        String regex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+        String email = user.getEmail();
+        String regex = "^(?=.{1,254}$)(?=.{1,64}@)[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
         Pattern pattern = Pattern.compile(regex);
-        String email = User.normalizer(user.getEmail(), "Email");
         Matcher matcher = pattern.matcher(email);
         if (!matcher.matches()) {
-            throw new IllegalArgumentException("Invalid email address or password");
+            throw new IllegalArgumentException("Invalid email address");
         }
-        user.setEmail(email);
-
-        if (user.getPassword().length() >= 8) {
-            user.setPassword(user.getPassword().hashCode() + "");
-        } else
-            throw new IllegalArgumentException("Invalid email address or password");
+        if (user.getPassword().length() < 8) throw new IllegalArgumentException("Invalid password");
 
         registeredUsers.add(user);
     }
 
     public ArrayList<User> getRegisteredUsers() {
-        return registeredUsers;
+        return new ArrayList<>(registeredUsers);
     }
 }

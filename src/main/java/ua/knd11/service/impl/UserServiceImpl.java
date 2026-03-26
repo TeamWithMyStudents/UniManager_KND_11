@@ -16,7 +16,7 @@ public class UserServiceImpl implements UserService {
     public boolean isNullOrBlank(String str, String query) {
         boolean invalid = str == null || str.isBlank();
         if (invalid){
-            System.out.println(query + " must not be null or blank");
+            throw new IllegalArgumentException(query + " must not be null or blank");
         }
         return invalid;
     }

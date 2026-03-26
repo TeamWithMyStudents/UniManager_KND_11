@@ -53,7 +53,7 @@ package ua.knd11.viewer;
                     String choice = sc.nextLine().trim();
                     switch (choice) {
                         case "1":
-                            System.out.println("Please enter Student data (Surname Name Lastname Group Email Password):");
+                            System.out.println("Please enter Student data (Surname Name Lastname Group Email@example.com Password):");
                             String input = sc.nextLine();
                             studentController.create(input);
                             break;
@@ -111,7 +111,7 @@ package ua.knd11.viewer;
 
                 switch (choice) {
                     case "1":
-                        System.out.print("Please enter Teacher data (Name Surname Dept Degree Salary Email Password): ");
+                        System.out.print("Please enter Teacher data (Name Surname Dept Degree Salary Email@example.com Password): ");
                         teacherController.create(sc.nextLine());
                         break;
                     case "2":

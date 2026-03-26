@@ -48,6 +48,11 @@ public class Teacher extends User {
 
     @Override
     public String toString() {
-        return "Id: " + getId() + ", Name: " + getName() + ", Surname: " + getSurname() + ", Department: " + getDepartment() + ", Degree: " + getDegree() + ", Salary: " + getSalary();
+        return "Id: " + getId() +
+                ", Name: " + getName() +
+                ", Surname: " + getSurname() +
+                ", Department: " + getDepartment() +
+                ", Degree: " + getDegree() +
+                ", Salary: " + getSalary();
     }
 }
