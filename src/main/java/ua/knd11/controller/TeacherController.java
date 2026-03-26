@@ -2,6 +2,7 @@ package ua.knd11.controller;
 
 import ua.knd11.model.Teacher;
 import ua.knd11.model.User;
+import ua.knd11.security.AuthService;
 import ua.knd11.security.impl.AuthServiceImpl;
 import ua.knd11.service.impl.TeacherServiceImpl;
 
@@ -10,7 +11,7 @@ import java.util.List;
 public class TeacherController {
 
     private final TeacherServiceImpl service = new TeacherServiceImpl();
-    private final AuthServiceImpl authService = new AuthServiceImpl();
+    private final AuthService authService = new AuthServiceImpl();
 
     public void create(String input) {
         String normalized = input.trim().replace(",", " ");
@@ -31,13 +32,12 @@ public class TeacherController {
         try {
             salary = Double.parseDouble(parts[4]);
             Teacher teacher = new Teacher(name, surname, department, degree, salary, email, password);
-            authService.registration(teacher);
             if (service.add(teacher)) {
                 System.out.println("Teacher added successfully!");
             } else {
                 System.out.println("Teacher wasn't added.");
             }
-
+            authService.registration(teacher);
         } catch (IllegalArgumentException e) {
             System.out.println("Error: " + e.getMessage());
         }
