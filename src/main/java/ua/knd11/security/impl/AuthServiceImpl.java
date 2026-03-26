@@ -8,10 +8,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class AuthServiceImpl implements AuthService {
-    private ArrayList<User> registeredUsers = new ArrayList<>();
+    private final ArrayList<User> registeredUsers = new ArrayList<>();
 
     public void registration(User user) {
-        String regex = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
+        String regex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
         Pattern pattern = Pattern.compile(regex);
         String email = User.normalizer(user.getEmail(), "Email");
         Matcher matcher = pattern.matcher(email);
@@ -21,7 +21,7 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(email);
 
         if (user.getPassword().length() >= 8) {
-            user.setPassword(user.getPassword());
+            user.setPassword(user.getPassword().hashCode() + "");
         } else
             throw new IllegalArgumentException("Invalid email address or password");
 

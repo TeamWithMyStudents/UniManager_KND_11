@@ -3,6 +3,7 @@ package ua.knd11.controller;
 import ua.knd11.model.Student;
 import ua.knd11.model.User;
 
+import ua.knd11.security.impl.AuthServiceImpl;
 import ua.knd11.service.StudentService;
 import ua.knd11.service.impl.StudentServiceImpl;
 
@@ -10,6 +11,7 @@ import java.util.List;
 
 public class StudentController {
     private final StudentService service = new StudentServiceImpl();
+    private final AuthServiceImpl authService = new AuthServiceImpl();
 
     public void assignHeadStudent(int id) {service.assignHeadStudent(id);}
 
@@ -29,6 +31,7 @@ public class StudentController {
         String password = parts[5];
 
         Student student = new Student(surname, name, lastname, group,  email, password);
+        authService.registration(student);
         if (service.add(student)) {
             System.out.println("Student added successfully!");
         } else {
