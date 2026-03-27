@@ -14,7 +14,7 @@ public class UserSession {
             if (currentUser != null) {
                 throw new IllegalArgumentException("User is already logged in");
             }
-            currentUser = user;
+            currentUser = user.copy();
         }
     }
 

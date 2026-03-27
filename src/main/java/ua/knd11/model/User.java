@@ -10,6 +10,14 @@ public abstract class User {
     private String email;
     private String password;
 
+    protected User(User other) {
+        this.id = other.id;
+        this.name = other.name;
+        this.surname = other.surname;
+        this.email = other.email;
+        this.password = other.password;
+    }
+
     public User(String name, String surname, String email, String password) {
         this.name = normalizer(name, "Name");
         this.surname = normalizer(surname, "Surname");

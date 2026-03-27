@@ -16,6 +16,15 @@ public class Student extends User {
         this.role = StudentRole.REGULAR;
     }
 
+    private Student(Student other) {
+        super(other);
+    }
+
+    @Override
+    public User copy() {
+        return new Student(this);
+    }
+
     public String getGroup() {
         return group;
     }

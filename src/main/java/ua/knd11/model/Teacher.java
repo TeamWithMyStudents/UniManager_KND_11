@@ -12,6 +12,15 @@ public class Teacher extends User {
         this.salary = normalizerSalary(salary);
     }
 
+    private Teacher(Teacher other) {
+        super(other);
+    }
+
+    @Override
+    public User copy() {
+        return new Teacher(this);
+    }
+
     private static double normalizerSalary(double salary) {
         if (Double.isNaN(salary) || Double.isInfinite(salary) || salary <= 0) {
             throw new IllegalArgumentException("Salary must be a positive finite number");
