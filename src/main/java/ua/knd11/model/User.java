@@ -88,6 +88,8 @@ public abstract class User {
         this.password = credentialsValidation(normalizer(password, "Password"), "Password");
     }
 
+    public abstract User copy();
+
     @Override
     public String toString() {
         return "Id: " + getId() +

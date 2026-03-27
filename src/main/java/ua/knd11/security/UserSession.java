@@ -11,7 +11,7 @@ public class UserSession {
             if (user == null) {
                 throw new IllegalArgumentException("User cannot be null");
             }
-            if (isAuthenticated()) {
+            if (currentUser != null) {
                 throw new IllegalArgumentException("User is already logged in");
             }
             currentUser = user;
@@ -26,7 +26,7 @@ public class UserSession {
 
     public static User getCurrentUser() {
         synchronized (lock) {
-            return currentUser;
+            return (currentUser != null) ? currentUser.copy() : null;
         }
     }
 

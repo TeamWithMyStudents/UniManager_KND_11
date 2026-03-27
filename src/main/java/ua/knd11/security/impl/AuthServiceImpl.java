@@ -9,23 +9,28 @@ public class AuthServiceImpl implements AuthService {
     private final ArrayList<User> registeredUsers = new ArrayList<>();
 
     public void registration(User user) {
+        for (User registered : registeredUsers) {
+            if (registered.getEmail().equalsIgnoreCase(user.getEmail())) {
+                throw new IllegalArgumentException("User with this email already exists");
+            }
+        }
+        String simpleHash = String.valueOf(user.getPassword().hashCode());
+        user.setPassword(simpleHash);
         registeredUsers.add(user);
     }
 
     public User login(String email, String password) {
-        User foundUser = null;
+        String inputHash = String.valueOf(password.hashCode());
+
         for (User user : registeredUsers) {
-            if (user.getEmail().equalsIgnoreCase(email)) {
-                foundUser = user;
-                break;
+            if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equals(inputHash)) {
+                return user;
             }
         }
 
-        if (foundUser == null || !foundUser.getPassword().equals(password)) {
-            throw new IllegalArgumentException("Incorrect email or password");
-        }
-        return foundUser;
+        throw new IllegalArgumentException("Incorrect email or password");
     }
+
 
     public ArrayList<User> getRegisteredUsers() {
         return new ArrayList<>(registeredUsers);
