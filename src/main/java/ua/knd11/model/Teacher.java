@@ -14,6 +14,9 @@ public class Teacher extends User {
 
     private Teacher(Teacher other) {
         super(other);
+        this.department = other.department;
+        this.degree = other.degree;
+        this.salary = other.salary;
     }
 
     @Override

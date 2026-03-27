@@ -18,6 +18,9 @@ public class Student extends User {
 
     private Student(Student other) {
         super(other);
+        this.group = other.group;
+        this.lastname = other.lastname;
+        this.role = other.role;
     }
 
     @Override
