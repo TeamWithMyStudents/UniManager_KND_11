@@ -7,13 +7,13 @@ public class UserSession {
     private static final Object lock = new Object();
 
     public static void login(User user) {
-        if (user == null) {
-            throw new IllegalArgumentException("User cannot be null");
-        }
-        if (isAuthenticated()) {
-            throw new IllegalArgumentException("User is already logged in");
-        }
         synchronized (lock) {
+            if (user == null) {
+                throw new IllegalArgumentException("User cannot be null");
+            }
+            if (isAuthenticated()) {
+                throw new IllegalArgumentException("User is already logged in");
+            }
             currentUser = user;
         }
     }
