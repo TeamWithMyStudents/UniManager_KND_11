@@ -2,26 +2,38 @@ package ua.knd11.security;
 
 import ua.knd11.model.User;
 
+import java.util.Objects;
+
 public class UserSession {
+    private static final Object lock = new Object();
     private static User currentUser = null;
 
     public static void login(User user) {
-        currentUser = user;
+        Objects.requireNonNull(user, "User cannot be null");
+        synchronized (lock) {
+            currentUser = user;
+        }
     }
 
     public static void logout() {
-        if (!isAuthenticated()) {
-            throw new IllegalArgumentException("User is not logged in");
+        synchronized (lock) {
+            if (!isAuthenticated()) {
+                throw new IllegalArgumentException("User is not logged in");
+            }
+            System.out.println("Logout successful");
+            currentUser = null;
         }
-        System.out.println("Logout successful");
-        currentUser = null;
     }
 
     public static User getCurrentUser() {
-        return currentUser;
+        synchronized (lock) {
+            return currentUser;
+        }
     }
 
     public static boolean isAuthenticated() {
-        return currentUser != null;
+        synchronized (lock) {
+            return currentUser != null;
+        }
     }
 }
