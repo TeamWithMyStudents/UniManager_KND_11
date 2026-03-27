@@ -44,7 +44,7 @@ public abstract class User {
         }
 
         if (type.equals("Password")) {
-            String regex = "^[!@#$%^&*.A-Za-z\\d]{8,}$";
+            String regex = "^[-!@#$%^&*.A-Za-z\\d]{8,}$";
             if (!credential.matches(regex))
                 throw new IllegalArgumentException("Invalid password");
         }

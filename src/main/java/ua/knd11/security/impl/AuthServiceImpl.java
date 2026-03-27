@@ -2,6 +2,7 @@ package ua.knd11.security.impl;
 
 import ua.knd11.model.User;
 import ua.knd11.security.AuthService;
+import ua.knd11.security.UserSession;
 
 import java.util.ArrayList;
 
@@ -9,28 +10,32 @@ public class AuthServiceImpl implements AuthService {
     private final ArrayList<User> registeredUsers = new ArrayList<>();
 
     public void registration(User user) {
-        for (User registered : registeredUsers) {
-            if (registered.getEmail().equalsIgnoreCase(user.getEmail())) {
-                throw new IllegalArgumentException("User with this email already exists");
-            }
-        }
-        String simpleHash = String.valueOf(user.getPassword().hashCode());
-        user.setPassword(simpleHash);
+        user.setPassword(String.valueOf(user.getPassword().hashCode()));
         registeredUsers.add(user);
     }
 
     public User login(String email, String password) {
-        String inputHash = String.valueOf(password.hashCode());
 
+        if (UserSession.isAuthenticated()) {
+            throw new IllegalArgumentException("User is already logged in");
+        }
+
+        User foundUser = null;
         for (User user : registeredUsers) {
-            if (user.getEmail().equalsIgnoreCase(email) && user.getPassword().equals(inputHash)) {
-                return user;
+            if (user.getEmail().equalsIgnoreCase(email)) {
+                foundUser = user;
+                break;
             }
         }
 
-        throw new IllegalArgumentException("Incorrect email or password");
+        String passwordHash = String.valueOf(password.hashCode());
+        if (foundUser == null || !foundUser.getPassword().equals(passwordHash)) {
+            throw new IllegalArgumentException("User with this email not found or incorrect password");
+        }
+        UserSession.login(foundUser);
+        System.out.println("Login successful");
+        return foundUser;
     }
-
 
     public ArrayList<User> getRegisteredUsers() {
         return new ArrayList<>(registeredUsers);

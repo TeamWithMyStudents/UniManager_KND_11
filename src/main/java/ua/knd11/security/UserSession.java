@@ -4,35 +4,24 @@ import ua.knd11.model.User;
 
 public class UserSession {
     private static User currentUser = null;
-    private static final Object lock = new Object();
 
     public static void login(User user) {
-        synchronized (lock) {
-            if (user == null) {
-                throw new IllegalArgumentException("User cannot be null");
-            }
-            if (currentUser != null) {
-                throw new IllegalArgumentException("User is already logged in");
-            }
-            currentUser = user.copy();
-        }
+        currentUser = user;
     }
 
     public static void logout() {
-        synchronized (lock) {
-            currentUser = null;
+        if (!isAuthenticated()) {
+            throw new IllegalArgumentException("User is not logged in");
         }
+        System.out.println("Logout successful");
+        currentUser = null;
     }
 
     public static User getCurrentUser() {
-        synchronized (lock) {
-            return (currentUser != null) ? currentUser.copy() : null;
-        }
+        return currentUser;
     }
 
     public static boolean isAuthenticated() {
-        synchronized (lock) {
-            return currentUser != null;
-        }
+        return currentUser != null;
     }
 }
