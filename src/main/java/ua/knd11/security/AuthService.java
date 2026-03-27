@@ -4,4 +4,6 @@ import ua.knd11.model.User;
 
 public interface AuthService {
     void registration(User user);
+
+    User login(String email, String password);
 }
