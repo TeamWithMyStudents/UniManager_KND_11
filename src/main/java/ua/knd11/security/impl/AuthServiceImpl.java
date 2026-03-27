@@ -10,6 +10,13 @@ public class AuthServiceImpl implements AuthService {
     private final ArrayList<User> registeredUsers = new ArrayList<>();
 
     public void registration(User user) {
+        if (user == null) throw new IllegalArgumentException("User must not be null");
+
+        for (User registered : registeredUsers) {
+            if (registered.getEmail().equalsIgnoreCase(user.getEmail())) {
+                throw new IllegalArgumentException("User with this email already exists");
+            }
+        }
         user.setPassword(String.valueOf(user.getPassword().hashCode()));
         registeredUsers.add(user);
     }

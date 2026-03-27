@@ -10,14 +10,6 @@ public abstract class User {
     private String email;
     private String password;
 
-    protected User(User other) {
-        this.id = other.id;
-        this.name = other.name;
-        this.surname = other.surname;
-        this.email = other.email;
-        this.password = other.password;
-    }
-
     public User(String name, String surname, String email, String password) {
         this.name = normalizer(name, "Name");
         this.surname = normalizer(surname, "Surname");
@@ -95,8 +87,6 @@ public abstract class User {
     public void setPassword(String password) {
         this.password = credentialsValidation(normalizer(password, "Password"), "Password");
     }
-
-    public abstract User copy();
 
     @Override
     public String toString() {
