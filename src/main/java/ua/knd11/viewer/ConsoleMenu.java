@@ -50,10 +50,10 @@ package ua.knd11.viewer;
                     0. Back to Main Menu
                     """);
                 System.out.print("Select an option (number): ");
-                    String choice = sc.nextLine().trim();;
+                    String choice = sc.nextLine().trim();
                     switch (choice) {
                         case "1":
-                            System.out.println("Please enter Student data (Surname Name Lastname Group):");
+                            System.out.println("Please enter Student data (Surname Name Lastname Group Email@example.com Password):");
                             String input = sc.nextLine();
                             studentController.create(input);
                             break;
@@ -111,7 +111,7 @@ package ua.knd11.viewer;
 
                 switch (choice) {
                     case "1":
-                        System.out.print("Please enter Teacher data (Name Surname Dept Degree Salary): ");
+                        System.out.print("Please enter Teacher data (Name Surname Dept Degree Salary Email@example.com Password): ");
                         teacherController.create(sc.nextLine());
                         break;
                     case "2":
