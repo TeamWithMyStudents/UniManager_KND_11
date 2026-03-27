@@ -33,11 +33,11 @@ public class TeacherController {
             salary = Double.parseDouble(parts[4]);
             Teacher teacher = new Teacher(name, surname, department, degree, salary, email, password);
             if (service.add(teacher)) {
+                authService.registration(teacher);
                 System.out.println("Teacher added successfully!");
             } else {
                 System.out.println("Teacher wasn't added.");
             }
-            authService.registration(teacher);
         } catch (IllegalArgumentException e) {
             System.out.println("Error: " + e.getMessage());
         }

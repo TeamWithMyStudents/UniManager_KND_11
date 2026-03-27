@@ -1,6 +1,8 @@
 package ua.knd11.model;
 
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class User {
     private static int nextId = 1;
@@ -13,14 +15,25 @@ public abstract class User {
     public User(String name, String surname, String email, String password) {
         this.name = normalizer(name, "Name");
         this.surname = normalizer(surname, "Surname");
-        this.email = normalizer(email, "Email");
-        this.password = normalizer(password, "Password");
+        this.email = credentialsValidation(normalizer(email, "Email"), "Email");
+        this.password = credentialsValidation(normalizer(password, "Password"), "Password");
     }
 
-    public static String normalizer(String string, String query) {
-        Objects.requireNonNull(string, query + " must not be null");
-        if (string.isBlank()) throw new IllegalArgumentException(query + " must not be blank");
+    public static String normalizer(String string, String type) {
+        Objects.requireNonNull(string, type + " must not be null");
+        if (string.isBlank()) throw new IllegalArgumentException(type + " must not be blank");
         return string.trim();
+    }
+
+    public String credentialsValidation(String credential, String type) {
+        if (type.equals("Email")) {
+            String regex = "^(?=.{1,254}$)(?=.{1,64}@)[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(credential);
+            if (!matcher.matches()) throw new IllegalArgumentException("Invalid email address");
+        }
+        if (type.equals("Password") && credential.length() < 8) throw new IllegalArgumentException("Invalid password");
+        return credential;
     }
 
     public void assignId() {
@@ -57,7 +70,7 @@ public abstract class User {
     }
 
     public void setEmail(String email) {
-        this.email = normalizer(email, "Email");
+        this.email = credentialsValidation(normalizer(email, "Email"), "Email");
     }
 
     public String getPassword() {
@@ -65,7 +78,7 @@ public abstract class User {
     }
 
     public void setPassword(String password) {
-        this.password = normalizer(password, "Password");
+        this.password = credentialsValidation(normalizer(password, "Password"), "Password");
     }
 
     @Override
