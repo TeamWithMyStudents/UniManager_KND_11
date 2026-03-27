@@ -1,8 +1,6 @@
 package ua.knd11.model;
 
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public abstract class User {
     private static int nextId = 1;
@@ -15,24 +13,33 @@ public abstract class User {
     public User(String name, String surname, String email, String password) {
         this.name = normalizer(name, "Name");
         this.surname = normalizer(surname, "Surname");
-        this.email = credentialsValidation(normalizer(email, "Email"), "Email");
-        this.password = credentialsValidation(normalizer(password, "Password"), "Password");
+        this.email = credentialsValidation(email, "Email");
+        this.password = credentialsValidation(password, "Password");
     }
 
     public static String normalizer(String string, String type) {
         Objects.requireNonNull(string, type + " must not be null");
         if (string.isBlank()) throw new IllegalArgumentException(type + " must not be blank");
-        return string.trim();
+
+        String regex = "^(?=.{1,100}$)[A-Za-zА-Яа-яЁёЄєҐґЇїІі0-9_-]+$";
+        if (!string.matches(regex)) throw new IllegalArgumentException("invalid " + type);
+
+        string = string.trim();
+        return string;
     }
 
     public String credentialsValidation(String credential, String type) {
         if (type.equals("Email")) {
             String regex = "^(?=.{1,254}$)(?=.{1,64}@)[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
-            Pattern pattern = Pattern.compile(regex);
-            Matcher matcher = pattern.matcher(credential);
-            if (!matcher.matches()) throw new IllegalArgumentException("Invalid email address");
+            if (!credential.matches(regex))
+                throw new IllegalArgumentException("Invalid email address");
         }
-        if (type.equals("Password") && credential.length() < 8) throw new IllegalArgumentException("Invalid password");
+
+        if (type.equals("Password")) {
+            String regex = "^[!@#$%^&*.A-Za-z\\d]{8,}$";
+            if (!credential.matches(regex))
+                throw new IllegalArgumentException("Invalid password");
+        }
         return credential;
     }
 
