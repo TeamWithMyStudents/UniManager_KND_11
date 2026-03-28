@@ -1,8 +1,10 @@
 package ua.knd11.viewer;
-    import ua.knd11.controller.StudentController;
-    import ua.knd11.controller.TeacherController;
 
-    import java.util.Scanner;
+import ua.knd11.controller.StudentController;
+import ua.knd11.controller.TeacherController;
+import ua.knd11.service.impl.UserServiceImpl;
+
+import java.util.Scanner;
 
     public class ConsoleMenu {
         private final StudentController studentController = new StudentController();
@@ -10,6 +12,8 @@ package ua.knd11.viewer;
         private final Scanner sc = new Scanner(System.in);
 
         public void startMenu() {
+            UserServiceImpl userService = new UserServiceImpl();
+            userService.init();
             while (true) {
                 System.out.print(""" 
                       \n MAIN MENU

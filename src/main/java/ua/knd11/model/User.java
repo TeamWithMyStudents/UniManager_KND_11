@@ -53,6 +53,7 @@ public abstract class User {
         return email;
     }
 
+    @SuppressWarnings("unused")
     public void setEmail(String email) {
         this.email = credentialsValidation(normalizer(email, "Email"), "Email");
     }

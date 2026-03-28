@@ -38,6 +38,7 @@ public class AuthServiceImpl implements AuthService {
         return foundUser;
     }
 
+    @SuppressWarnings("unused")
     public ArrayList<User> getRegisteredUsers() {
         return new ArrayList<>(registeredUsers);
     }

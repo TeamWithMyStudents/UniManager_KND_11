@@ -5,6 +5,10 @@ import ua.knd11.model.User;
 import ua.knd11.service.TeacherService;
 
 public class TeacherServiceImpl extends UserServiceImpl implements TeacherService {
+    public TeacherServiceImpl() {
+        super();
+    }
+
     public void calculateTotalSalary() {
         double result = repository.stream().mapToDouble(user -> user instanceof Teacher t ? t.getSalary() : 0).sum();
         System.out.println("Total University Budget: " + result);

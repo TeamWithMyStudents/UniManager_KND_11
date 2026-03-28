@@ -2,7 +2,6 @@ package ua.knd11.controller;
 
 import ua.knd11.model.Student;
 import ua.knd11.model.User;
-
 import ua.knd11.security.AuthService;
 import ua.knd11.security.impl.AuthServiceImpl;
 import ua.knd11.service.StudentService;
@@ -56,12 +55,15 @@ public class StudentController {
 
     public void getAll() {
         List<User> students = service.getAll();
-        if (students == null || students.isEmpty()) {
-            System.out.println("No students found in the repository.");
-        } else {
-            for (User user : students) {
-                System.out.println(user);
+        boolean found = false;
+        for (User student : students) {
+            if (student instanceof Student) {
+                System.out.println(student);
+                found = true;
             }
+        }
+        if (!found) {
+            System.err.println("No students found in the repository.\n");
         }
     }
 }

@@ -1,16 +1,27 @@
 package ua.knd11.service.impl;
 
 import ua.knd11.model.User;
+import ua.knd11.security.AuthService;
+import ua.knd11.security.impl.AuthServiceImpl;
 import ua.knd11.service.UserService;
+import ua.knd11.util.UserFileHandler;
 
 import java.text.Collator;
 import java.util.*;
 
+import static ua.knd11.util.UserFileHandler.loadUsers;
+
 public class UserServiceImpl implements UserService {
+    private final AuthService authService = new AuthServiceImpl();
+
     protected static List<User> repository;
 
     public UserServiceImpl() {
         repository = new ArrayList<>();
+    }
+
+    public void init() {
+        repository = loadUsers();
     }
 
     public boolean add(User user) {
@@ -19,6 +30,8 @@ public class UserServiceImpl implements UserService {
         }
         user.assignId();
         repository.add(user);
+        authService.registration(user);
+        UserFileHandler.saveUser(user);
         return true;
     }
 
