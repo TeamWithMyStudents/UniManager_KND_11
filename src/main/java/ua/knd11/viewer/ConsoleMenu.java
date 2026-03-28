@@ -7,6 +7,8 @@ import java.util.Scanner;
 
 public class ConsoleMenu {
     private final Scanner sc = new Scanner(System.in);
+    private final StudentController studentController = new StudentController();
+    private final TeacherController teacherController = new TeacherController();
 
     public void startMenu() {
         while (true) {
@@ -37,9 +39,7 @@ public class ConsoleMenu {
     }
 
     private void studentSubMenu() {
-        StudentController studentController = new StudentController();
         boolean back = false;
-        //  label:
         while (!back) {
             System.out.print("""
                     \n STUDENT MANAGER:
@@ -86,7 +86,6 @@ public class ConsoleMenu {
                     System.out.println("returning to Main Menu ↺");
                     back = true;
                     break;
-                //  break label;
                 default:
                     System.out.println("Invalid option. Please try again.");
                     break;
@@ -95,7 +94,6 @@ public class ConsoleMenu {
     }
 
     private void teacherSubMenu() {
-        TeacherController teacherController = new TeacherController();
         boolean back = false;
         while (!back) {
             System.out.print("""

@@ -11,7 +11,7 @@ public class AuthServiceImpl implements AuthService {
     private final static ArrayList<User> registeredUsers = new ArrayList<>();
 
     public AuthServiceImpl() {
-        registeredUsers.addAll(UserFileHandler.getSavedList());
+        if (registeredUsers.isEmpty()) registeredUsers.addAll(UserFileHandler.getSavedList());
     }
 
     public void registration(User user) {
@@ -54,5 +54,9 @@ public class AuthServiceImpl implements AuthService {
     @SuppressWarnings("unused")
     public ArrayList<User> getRegisteredUsers() {
         return new ArrayList<>(registeredUsers);
+    }
+
+    public boolean removeUser(int id) {
+        return registeredUsers.removeIf(user -> user.getId() == id);
     }
 }

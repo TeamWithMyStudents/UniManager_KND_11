@@ -17,7 +17,7 @@ public class UserFileHandler {
     public static ArrayList<User> savedList = new ArrayList<>();
 
     public static ArrayList<User> getSavedList() {
-        if (savedList.isEmpty()) loadUsers();
+        if (savedList.isEmpty()) savedList.addAll(loadUsers());
         return new ArrayList<>(savedList);
     }
 
@@ -186,5 +186,4 @@ public class UserFileHandler {
         setSavedList(users);
         return users;
     }
-
 }

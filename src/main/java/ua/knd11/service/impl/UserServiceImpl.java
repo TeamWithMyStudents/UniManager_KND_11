@@ -16,21 +16,25 @@ import static ua.knd11.util.FieldValidators.isNullOrBlank;
 
 public class UserServiceImpl implements UserService {
     protected static List<User> repository = new ArrayList<>();
+    private static final AuthService authService = new AuthServiceImpl();
 
     public UserServiceImpl() {
-        repository.addAll(UserFileHandler.getSavedList());
+        if (repository.isEmpty()) repository.addAll(UserFileHandler.getSavedList());
     }
-
-    private final AuthService authService = new AuthServiceImpl();
 
     public boolean add(User user) {
         if (user == null || isNullOrBlank(user.getName(), "Name") || isNullOrBlank(user.getSurname(), "Surname")) {
             return false;
         }
-        user.assignId();
-        authService.registration(user);
-        repository.add(user);
-        return true;
+        try {
+            authService.registration(user);
+            user.assignId();
+            repository.add(user);
+            return true;
+        } catch (RuntimeException e) {
+            System.err.println("Failed to add user: " + e.getMessage());
+            return false;
+        }
     }
 
     public boolean delete(int id) {
