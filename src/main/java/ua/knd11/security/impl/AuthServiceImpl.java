@@ -3,22 +3,29 @@ package ua.knd11.security.impl;
 import ua.knd11.model.User;
 import ua.knd11.security.AuthService;
 import ua.knd11.security.UserSession;
+import ua.knd11.util.UserFileHandler;
 
 import java.util.ArrayList;
 
 public class AuthServiceImpl implements AuthService {
-    private final ArrayList<User> registeredUsers = new ArrayList<>();
+    private final static ArrayList<User> registeredUsers = new ArrayList<>();
+
+    public AuthServiceImpl() {
+        if (registeredUsers.isEmpty()) registeredUsers.addAll(UserFileHandler.getSavedList());
+    }
 
     public void registration(User user) {
         if (user == null) throw new IllegalArgumentException("User must not be null");
 
-        for (User registered : registeredUsers) {
-            if (registered.getEmail().equalsIgnoreCase(user.getEmail())) {
-                throw new IllegalArgumentException("User with this email already exists");
+        for (User existingUser : registeredUsers) {
+            if (existingUser.getEmail().equalsIgnoreCase(user.getEmail())) {
+                throw new IllegalArgumentException("Email already exists");
             }
         }
+
         user.setPassword(String.valueOf(user.getPassword().hashCode()));
         registeredUsers.add(user);
+        UserFileHandler.saveUsers(user);
     }
 
     public User login(String email, String password) {
@@ -44,7 +51,12 @@ public class AuthServiceImpl implements AuthService {
         return foundUser;
     }
 
+    @SuppressWarnings("unused")
     public ArrayList<User> getRegisteredUsers() {
         return new ArrayList<>(registeredUsers);
+    }
+
+    public boolean removeUser(int id) {
+        return registeredUsers.removeIf(user -> user.getId() == id);
     }
 }

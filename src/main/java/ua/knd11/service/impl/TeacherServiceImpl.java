@@ -4,7 +4,10 @@ import ua.knd11.model.Teacher;
 import ua.knd11.model.User;
 import ua.knd11.service.TeacherService;
 
+import static ua.knd11.util.FieldValidators.isNullOrBlank;
+
 public class TeacherServiceImpl extends UserServiceImpl implements TeacherService {
+
     public void calculateTotalSalary() {
         double result = repository.stream().mapToDouble(user -> user instanceof Teacher t ? t.getSalary() : 0).sum();
         System.out.println("Total University Budget: " + result);
@@ -32,20 +35,6 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
         if (!(user instanceof Teacher teacher)) {
             throw new IllegalArgumentException("User must be an instance of Teacher");
         }
-
-        if (isNullOrBlank(teacher.getName(), "Name") ||
-                isNullOrBlank(teacher.getSurname(), "Surname") ||
-                isNullOrBlank(teacher.getDepartment(), "Department") ||
-                isNullOrBlank(teacher.getDegree(), "Degree")) {
-            return false;
-
-        } else if (Double.isNaN(teacher.getSalary()) ||
-                Double.isInfinite(teacher.getSalary()) ||
-                teacher.getSalary() <= 0) {
-            System.out.println("Salary must be a positive finite number");
-            return false;
-        }
-
         return super.add(teacher);
     }
 }
