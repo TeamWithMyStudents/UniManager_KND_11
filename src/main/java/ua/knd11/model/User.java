@@ -16,7 +16,7 @@ public abstract class User {
     public User(String name, String surname, String email, String password) {
         this.name = normalizer(name, "Name");
         this.surname = normalizer(surname, "Surname");
-        this.email = Objects.requireNonNull(credentialsValidation(email, "Email"));
+        this.email = credentialsValidation(email, "Email");
         this.password = Objects.requireNonNull(credentialsValidation(password, "Password"));
     }
 
@@ -55,7 +55,7 @@ public abstract class User {
 
     @SuppressWarnings("unused")
     public void setEmail(String email) {
-        this.email = credentialsValidation(normalizer(email, "Email"), "Email");
+        this.email = credentialsValidation(email, "Email");
     }
 
     public String getPassword() {

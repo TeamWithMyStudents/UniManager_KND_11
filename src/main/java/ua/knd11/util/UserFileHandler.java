@@ -18,7 +18,7 @@ public class UserFileHandler {
     private static final File file = new File(FILE_PATH);
 
 
-    public static void saveUser(User u) {
+    public static void saveUsers(User u) {
 
         try {
             if (file.createNewFile()) {
@@ -75,47 +75,95 @@ public class UserFileHandler {
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
+            int lineNumber = 0;
             while ((line = reader.readLine()) != null) {
+                lineNumber++;
                 if (line.trim().isEmpty()) continue;
-                String[] parts = line.split(", ");
-                String type = parts[0];
-                if (type.equals("Student")) {
-//                1 Surname, 2 Name, 3 Lastname, 4 GROUP, 5 REGULAR, 6 Email@example.com, 7 1281629883
-                    String surname = parts[1];
-                    String name = parts[2];
-                    String lastname = parts[3];
-                    String group = parts[4];
-                    String email = parts[6];
-                    String password = parts[7];
 
-                    Student student = new Student(surname, name, lastname, group, email, password);
+                try {
+                    String[] parts = line.split(", ");
 
-                    String role = parts[5];
-                    if (role.equals("REGULAR")) {
-                        student.setRole(REGULAR);
-                    } else if (role.equals("HEAD_STUDENT")) {
-                        student.setRole(HEAD_STUDENT);
+                    if (parts.length < 1) {
+                        System.err.println("Warning: Line " + lineNumber + " is empty, skip");
+                        continue;
                     }
-                    student.assignId();
-                    authService.registration(student);
-                    student.setPassword(parts[7]);
-                    users.add(student);
-                }
-                if (type.equals("Teacher")) {
-//                1 Name, 2 Surname, 3 Dept, 4 Degree, 5 1.0, 6 Email2@example.com, 7 1281629883
-                    String name = parts[1];
-                    String surname = parts[2];
-                    String department = parts[3];
-                    String degree = parts[4];
-                    double salary = Double.parseDouble(parts[5]);
-                    String email = parts[6];
-                    String password = parts[7];
 
-                    Teacher teacher = new Teacher(name, surname, department, degree, salary, email, password);
-                    teacher.assignId();
-                    authService.registration(teacher);
-                    teacher.setPassword(parts[7]);
-                    users.add(teacher);
+                    String type = parts[0];
+
+                    if (type.equals("Student")) {
+                        if (parts.length != 8) {
+                            System.err.println("Warning: Line " + lineNumber + " has invalid Student format (expected 8 fields, got " + parts.length + "), skip");
+                            continue;
+                        }
+
+                        String surname = parts[1];
+                        String name = parts[2];
+                        String lastname = parts[3];
+                        String group = parts[4];
+                        String role = parts[5];
+                        String email = parts[6];
+                        String password = parts[7];
+
+                        Student student = new Student(surname, name, lastname, group, email, password);
+
+                        try {
+                            if (role.equals("REGULAR")) {
+                                student.setRole(REGULAR);
+                            } else if (role.equals("HEAD_STUDENT")) {
+                                student.setRole(HEAD_STUDENT);
+                            } else {
+                                System.err.println("Warning: Line " + lineNumber + " has invalid Student role '" + role + "', using REGULAR");
+                                student.setRole(REGULAR);
+                            }
+                        } catch (IllegalArgumentException e) {
+                            System.err.println("Warning: Line " + lineNumber + " has invalid Student role, using REGULAR" + e.getMessage());
+                            student.setRole(REGULAR);
+                        }
+
+                        student.assignId();
+                        authService.registration(student);
+                        student.setPassword(password);
+                        users.add(student);
+
+                    } else if (type.equals("Teacher")) {
+                        if (parts.length != 8) {
+                            System.err.println("Warning: Line " + lineNumber + " has invalid Teacher format (expected 8 fields, got " + parts.length + "), skip");
+                            continue;
+                        }
+
+                        String name = parts[1];
+                        String surname = parts[2];
+                        String department = parts[3];
+                        String degree = parts[4];
+                        String email = parts[6];
+                        String password = parts[7];
+
+                        double salary;
+                        try {
+                            salary = Double.parseDouble(parts[5]);
+                        } catch (NumberFormatException e) {
+                            System.err.println("Warning: Line " + lineNumber + " has invalid salary format, skipping: " + e.getMessage());
+                            continue;
+                        }
+
+                        Teacher teacher = new Teacher(name, surname, department, degree, salary, email, password);
+                        teacher.assignId();
+                        authService.registration(teacher);
+                        teacher.setPassword(password);
+                        users.add(teacher);
+
+                    } else {
+                        System.err.println("Warning: Line " + lineNumber + " has unknown user type '" + type + "', skip");
+                    }
+
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    System.err.println("Warning: Line " + lineNumber + " has insufficient fields, skipping: " + e.getMessage());
+                } catch (NumberFormatException e) {
+                    System.err.println("Warning: Line " + lineNumber + " has invalid number format, skipping: " + e.getMessage());
+                } catch (IllegalArgumentException e) {
+                    System.err.println("Warning: Line " + lineNumber + " has invalid data, skipping: " + e.getMessage());
+                } catch (Exception e) {
+                    System.err.println("Warning: Line " + lineNumber + " caused unexpected error, skipping: " + e.getMessage());
                 }
             }
         } catch (IOException e) {
