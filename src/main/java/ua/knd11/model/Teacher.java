@@ -1,7 +1,8 @@
 package ua.knd11.model;
 
-import static ua.knd11.service.impl.TeacherServiceImpl.normalizerSalary;
-import static ua.knd11.service.impl.UserServiceImpl.normalizer;
+import static ua.knd11.util.FieldValidators.normalizer;
+import static ua.knd11.util.FieldValidators.normalizerSalary;
+
 
 public class Teacher extends User {
     private String department;

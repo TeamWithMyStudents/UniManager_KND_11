@@ -7,7 +7,7 @@ import ua.knd11.security.UserSession;
 import java.util.ArrayList;
 
 public class AuthServiceImpl implements AuthService {
-    private final ArrayList<User> registeredUsers = new ArrayList<>();
+    private final static ArrayList<User> registeredUsers = new ArrayList<>();
 
     public void registration(User user) {
         if (user == null) throw new IllegalArgumentException("User must not be null");

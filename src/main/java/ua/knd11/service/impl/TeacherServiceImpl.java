@@ -4,14 +4,9 @@ import ua.knd11.model.Teacher;
 import ua.knd11.model.User;
 import ua.knd11.service.TeacherService;
 
-public class TeacherServiceImpl extends UserServiceImpl implements TeacherService {
+import static ua.knd11.util.FieldValidators.isNullOrBlank;
 
-    public static double normalizerSalary(double salary) {
-        if (Double.isNaN(salary) || Double.isInfinite(salary) || salary <= 0) {
-            throw new IllegalArgumentException("Salary must be a positive finite number");
-        }
-        return salary;
-    }
+public class TeacherServiceImpl extends UserServiceImpl implements TeacherService {
 
     public void calculateTotalSalary() {
         double result = repository.stream().mapToDouble(user -> user instanceof Teacher t ? t.getSalary() : 0).sum();

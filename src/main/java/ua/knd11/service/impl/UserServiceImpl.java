@@ -7,8 +7,12 @@ import ua.knd11.service.UserService;
 import ua.knd11.util.UserFileHandler;
 
 import java.text.Collator;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
 
+import static ua.knd11.util.FieldValidators.isNullOrBlank;
 import static ua.knd11.util.UserFileHandler.loadUsers;
 
 public class UserServiceImpl implements UserService {
@@ -17,35 +21,6 @@ public class UserServiceImpl implements UserService {
     @SuppressWarnings("FieldMayBeFinal")
     private static boolean initialized = false;
     private final AuthService authService = new AuthServiceImpl();
-
-    public static String normalizer(String string, String type) {
-        Objects.requireNonNull(string, type + " must not be null");
-        if (string.isBlank()) throw new IllegalArgumentException(type + " must not be blank");
-
-        String regex = "^(?=.{1,100}$)[A-Za-zА-Яа-яЁёЄєҐґЇїІі0-9_-]+$";
-        if (!string.matches(regex)) throw new IllegalArgumentException("invalid " + type);
-
-        string = string.trim();
-        return string;
-    }
-
-    public static String credentialsValidation(String credential, String type) {
-
-        if (type.equals("Email")) {
-            String regex = "^(?=.{1,254}$)(?=.{1,64}@)[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
-            if (!credential.matches(regex)) throw new IllegalArgumentException("Invalid email address");
-
-            for (User user : repository) {
-                if (user.getEmail().equals(credential)) throw new IllegalArgumentException("Email already exists");
-            }
-        }
-
-        if (type.equals("Password")) {
-            String regex = "^[-!@#$%^&*.A-Za-z\\d]{8,}$";
-            if (!credential.matches(regex)) throw new IllegalArgumentException("Invalid password");
-        }
-        return credential;
-    }
 
     public static void init() {
         if (initialized) return;
@@ -96,13 +71,5 @@ public class UserServiceImpl implements UserService {
         return "Users: \n" + repository.toString()
                 .replace("[", "")
                 .replace("]", "");
-    }
-
-    public boolean isNullOrBlank(String str, String query) {
-        if (str == null || str.isBlank()) {
-            System.out.println(query + " must not be null or blank");
-            return true;
-        }
-        return false;
     }
 }

@@ -74,8 +74,10 @@ public class UserFileHandler {
         }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            ArrayList<String> seenEmails = new ArrayList<>();
             String line;
             int lineNumber = 0;
+            loop:
             while ((line = reader.readLine()) != null) {
                 lineNumber++;
                 if (line.trim().isEmpty()) continue;
@@ -104,6 +106,14 @@ public class UserFileHandler {
                         String email = parts[6];
                         String password = parts[7];
 
+                        for (String seen_email : seenEmails) {
+                            if (seen_email.equals(email)) {
+                                System.err.println("Warning: Line " + lineNumber + " has duplicate email, skip");
+                                continue loop;
+                            }
+                        }
+                        seenEmails.add(email);
+
                         Student student = new Student(surname, name, lastname, group, email, password);
 
                         try {
@@ -119,6 +129,7 @@ public class UserFileHandler {
                             System.err.println("Warning: Line " + lineNumber + " has invalid Student role, using REGULAR" + e.getMessage());
                             student.setRole(REGULAR);
                         }
+
 
                         student.assignId();
                         authService.registration(student);

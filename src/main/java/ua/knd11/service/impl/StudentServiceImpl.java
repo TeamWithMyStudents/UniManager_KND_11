@@ -5,6 +5,8 @@ import ua.knd11.model.User;
 import ua.knd11.model.enums.StudentRole;
 import ua.knd11.service.StudentService;
 
+import static ua.knd11.util.FieldValidators.isNullOrBlank;
+
 public class StudentServiceImpl extends UserServiceImpl implements StudentService {
 
     @Override

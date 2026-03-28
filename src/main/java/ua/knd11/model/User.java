@@ -2,8 +2,8 @@ package ua.knd11.model;
 
 import java.util.Objects;
 
-import static ua.knd11.service.impl.UserServiceImpl.credentialsValidation;
-import static ua.knd11.service.impl.UserServiceImpl.normalizer;
+import static ua.knd11.util.FieldValidators.credentialsValidation;
+import static ua.knd11.util.FieldValidators.normalizer;
 
 public abstract class User {
     private static int nextId = 1;
