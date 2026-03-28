@@ -4,6 +4,8 @@ import ua.knd11.model.enums.StudentRole;
 
 import java.util.Locale;
 
+import static ua.knd11.service.impl.UserServiceImpl.normalizer;
+
 public class Student extends User {
     private String group;
     private String lastname;

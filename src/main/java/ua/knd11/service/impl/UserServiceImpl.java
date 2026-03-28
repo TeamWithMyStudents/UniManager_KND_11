@@ -7,18 +7,10 @@ import java.text.Collator;
 import java.util.*;
 
 public class UserServiceImpl implements UserService {
-    protected List<User> repository;
+    protected static List<User> repository;
 
     public UserServiceImpl() {
-        this.repository = new ArrayList<>();
-    }
-
-    public boolean isNullOrBlank(String str, String query) {
-        if (str == null || str.isBlank()){
-            System.out.println(query + " must not be null or blank");
-            return true;
-        }
-        return false;
+        repository = new ArrayList<>();
     }
 
     public boolean add(User user) {
@@ -62,5 +54,42 @@ public class UserServiceImpl implements UserService {
         return "Users: \n" + repository.toString()
                 .replace("[", "")
                 .replace("]", "");
+    }
+
+    public boolean isNullOrBlank(String str, String query) {
+        if (str == null || str.isBlank()) {
+            System.out.println(query + " must not be null or blank");
+            return true;
+        }
+        return false;
+    }
+
+    public static String normalizer(String string, String type) {
+        Objects.requireNonNull(string, type + " must not be null");
+        if (string.isBlank()) throw new IllegalArgumentException(type + " must not be blank");
+
+        String regex = "^(?=.{1,100}$)[A-Za-zА-Яа-яЁёЄєҐґЇїІі0-9_-]+$";
+        if (!string.matches(regex)) throw new IllegalArgumentException("invalid " + type);
+
+        string = string.trim();
+        return string;
+    }
+
+    public static String credentialsValidation(String credential, String type) {
+
+        if (type.equals("Email")) {
+            String regex = "^(?=.{1,254}$)(?=.{1,64}@)[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+            if (!credential.matches(regex)) throw new IllegalArgumentException("Invalid email address");
+
+            for (User user : repository) {
+                if (user.getEmail().equals(credential)) throw new IllegalArgumentException("Email already exists");
+            }
+        }
+
+        if (type.equals("Password")) {
+            String regex = "^[-!@#$%^&*.A-Za-z\\d]{8,}$";
+            if (!credential.matches(regex)) throw new IllegalArgumentException("Invalid password");
+        }
+        return credential;
     }
 }

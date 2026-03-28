@@ -1,5 +1,8 @@
 package ua.knd11.model;
 
+import static ua.knd11.service.impl.TeacherServiceImpl.normalizerSalary;
+import static ua.knd11.service.impl.UserServiceImpl.normalizer;
+
 public class Teacher extends User {
     private String department;
     private String degree;
@@ -10,13 +13,6 @@ public class Teacher extends User {
         this.department = normalizer(department, "Department");
         this.degree = normalizer(degree, "Degree");
         this.salary = normalizerSalary(salary);
-    }
-
-    private static double normalizerSalary(double salary) {
-        if (Double.isNaN(salary) || Double.isInfinite(salary) || salary <= 0) {
-            throw new IllegalArgumentException("Salary must be a positive finite number");
-        }
-        return salary;
     }
 
     public String getDepartment() {

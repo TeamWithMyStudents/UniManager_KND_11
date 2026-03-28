@@ -38,14 +38,19 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
                 isNullOrBlank(teacher.getDepartment(), "Department") ||
                 isNullOrBlank(teacher.getDegree(), "Degree")) {
             return false;
-
         } else if (Double.isNaN(teacher.getSalary()) ||
                 Double.isInfinite(teacher.getSalary()) ||
                 teacher.getSalary() <= 0) {
             System.out.println("Salary must be a positive finite number");
             return false;
         }
-
         return super.add(teacher);
+    }
+
+    public static double normalizerSalary(double salary) {
+        if (Double.isNaN(salary) || Double.isInfinite(salary) || salary <= 0) {
+            throw new IllegalArgumentException("Salary must be a positive finite number");
+        }
+        return salary;
     }
 }
