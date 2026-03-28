@@ -3,8 +3,6 @@ package ua.knd11.util;
 import ua.knd11.model.Student;
 import ua.knd11.model.Teacher;
 import ua.knd11.model.User;
-import ua.knd11.security.AuthService;
-import ua.knd11.security.impl.AuthServiceImpl;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -16,7 +14,16 @@ import static ua.knd11.model.enums.StudentRole.REGULAR;
 public class UserFileHandler {
     private static final String FILE_PATH = "users_db.txt";
     private static final File file = new File(FILE_PATH);
+    public static ArrayList<User> savedList = new ArrayList<>();
 
+    public static ArrayList<User> getSavedList() {
+        if (savedList.isEmpty()) loadUsers();
+        return new ArrayList<>(savedList);
+    }
+
+    public static void setSavedList(ArrayList<User> savedList) {
+        UserFileHandler.savedList = savedList;
+    }
 
     public static void saveUsers(User u) {
 
@@ -63,7 +70,6 @@ public class UserFileHandler {
 
     public static List<User> loadUsers() {
         ArrayList<User> users = new ArrayList<>();
-        AuthService authService = new AuthServiceImpl();
 
         try {
             if (file.createNewFile()) {
@@ -130,9 +136,7 @@ public class UserFileHandler {
                             student.setRole(REGULAR);
                         }
 
-
                         student.assignId();
-                        authService.registration(student);
                         student.setPassword(password);
                         users.add(student);
 
@@ -159,7 +163,6 @@ public class UserFileHandler {
 
                         Teacher teacher = new Teacher(name, surname, department, degree, salary, email, password);
                         teacher.assignId();
-                        authService.registration(teacher);
                         teacher.setPassword(password);
                         users.add(teacher);
 
@@ -180,7 +183,7 @@ public class UserFileHandler {
         } catch (IOException e) {
             System.err.println("Error loading users: " + e.getMessage());
         }
-
+        setSavedList(users);
         return users;
     }
 

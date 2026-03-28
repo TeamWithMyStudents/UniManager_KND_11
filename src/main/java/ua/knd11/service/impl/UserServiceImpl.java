@@ -13,29 +13,23 @@ import java.util.List;
 import java.util.Locale;
 
 import static ua.knd11.util.FieldValidators.isNullOrBlank;
-import static ua.knd11.util.UserFileHandler.loadUsers;
 
 public class UserServiceImpl implements UserService {
     protected static List<User> repository = new ArrayList<>();
 
-    @SuppressWarnings("FieldMayBeFinal")
-    private static boolean initialized = false;
-    private final AuthService authService = new AuthServiceImpl();
-
-    public static void init() {
-        if (initialized) return;
-        repository.addAll(loadUsers());
-        initialized = true;
+    public UserServiceImpl() {
+        repository.addAll(UserFileHandler.getSavedList());
     }
+
+    private final AuthService authService = new AuthServiceImpl();
 
     public boolean add(User user) {
         if (user == null || isNullOrBlank(user.getName(), "Name") || isNullOrBlank(user.getSurname(), "Surname")) {
             return false;
         }
         user.assignId();
-        repository.add(user);
         authService.registration(user);
-        UserFileHandler.saveUsers(user);
+        repository.add(user);
         return true;
     }
 
