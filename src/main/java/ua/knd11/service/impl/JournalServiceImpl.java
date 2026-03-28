@@ -14,7 +14,6 @@ public class JournalServiceImpl implements JournalService {
     public void assignGrade(int studentId, String subject, int score) {
         Grade newGrade = new Grade(studentId, subject, score);
         grades.add(newGrade);
-        System.out.println("Оцінку успішно додано до журналу!");
     }
 
     @Override
@@ -25,5 +24,33 @@ public class JournalServiceImpl implements JournalService {
 
                 .map(original -> new Grade(original.getStudentId(), original.getSubject(), original.getScore()))
                 .toList();
+    }
+
+    @Override
+    public String generateRecordBook(int studentId) {
+        List<Grade> studentGrades = getGradesForStudent(studentId);
+
+        if (studentGrades.isEmpty()) {
+            return "Оцінки поки що недоступні";
+        }
+
+        StringBuilder report = new StringBuilder();
+        report.append("--- Залікова книжка студента (ID: ").append(studentId).append(") ---\n");
+
+        int sum = 0;
+
+        for (Grade grade : studentGrades) {
+            report.append("Предмет: ").append(grade.getSubject())
+                    .append(" | Бал: ").append(grade.getScore())
+                    .append("\n");
+            sum += grade.getScore();
+        }
+
+        double average = (double) sum / studentGrades.size();
+
+        report.append("--------------------------------------\n");
+        report.append(String.format("Середній бал: %.2f\n", average));
+
+        return report.toString();
     }
 }
