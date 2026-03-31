@@ -13,6 +13,12 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
         System.out.println("Total University Budget: " + result);
     }
 
+    //A method that filters by teacher degree.
+    //If the desired degree is not found, the method terminates.
+    //Otherwise, a variable is created that stores a boolean value.
+    //All users are then iterated through, with only teachers selected.
+    //These users are compared with the desired degree, displayed, and true is set to the variable.
+    //If none are found, a message is displayed stating "No teachers with this degree were found."
     public void filterByDegree(String degreeQuery) {
         if (isNullOrBlank(degreeQuery, "Degree")) return;
 

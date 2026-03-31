@@ -6,11 +6,13 @@ import java.util.Locale;
 
 import static ua.knd11.util.FieldValidators.normalizer;
 
+//The student model that extends from the user
 public class Student extends User {
     private String group;
     private String lastname;
     private StudentRole role;
 
+    //Student constructor where super is used to access user class fields
     public Student(String surname, String name, String lastname, String group, String email, String password) {
         super(name, surname, email, password);
         this.group = normalizer(group, "Group").toUpperCase(Locale.ROOT);
@@ -44,6 +46,7 @@ public class Student extends User {
         this.role = role;
     }
 
+    //toString for normal output
     @Override
     public String toString() {
         return "Id: " + getId() +

@@ -3,12 +3,13 @@ package ua.knd11.model;
 import static ua.knd11.util.FieldValidators.normalizer;
 import static ua.knd11.util.FieldValidators.normalizerSalary;
 
-
+//The teacher model that extends from the user
 public class Teacher extends User {
     private String department;
     private String degree;
     private double salary;
 
+    //Teacher constructor where super is used to access user class fields
     public Teacher(String name, String surname, String department, String degree, double salary, String email, String password) {
         super(name, surname, email, password);
         this.department = normalizer(department, "Department");
@@ -43,6 +44,7 @@ public class Teacher extends User {
         this.salary = normalizerSalary(salary);
     }
 
+    //toString for normal output
     @Override
     public String toString() {
         return "Id: " + getId() +

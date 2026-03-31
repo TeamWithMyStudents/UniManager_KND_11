@@ -3,13 +3,22 @@ package ua.knd11.model;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 
-
+//Basic lesson model for creating a lesson schedule
 public class Lesson {
     private DayOfWeek dayOfWeek;
     private LocalTime time;
     private String subject;
     private String teacherSurname;
 
+    //Constructor for lesson
+    public Lesson(DayOfWeek dayOfWeek, LocalTime time, String subject, String teacherSurname) {
+        this.dayOfWeek = dayOfWeek;
+        this.time = time;
+        this.subject = subject;
+        this.teacherSurname = teacherSurname;
+    }
+
+    //Basic getters and setters for fields
     public DayOfWeek getDayOfWeek() {
         return dayOfWeek;
     }
@@ -42,7 +51,7 @@ public class Lesson {
         this.teacherSurname = teacherSurname;
     }
 
-
+    //toString for normal output
     @Override
     public String toString() {
         return "Lesson{" +
@@ -51,14 +60,5 @@ public class Lesson {
                 ", subject='" + subject + '\'' +
                 ", teacherSurname='" + teacherSurname + '\'' +
                 '}';
-    }
-
-    public Lesson(DayOfWeek dayOfWeek, LocalTime time, String subject, String teacherSurname) {
-        this.dayOfWeek = dayOfWeek;
-        this.time = time;
-        this.subject = subject;
-        this.teacherSurname = teacherSurname;
-
-
     }
 }
