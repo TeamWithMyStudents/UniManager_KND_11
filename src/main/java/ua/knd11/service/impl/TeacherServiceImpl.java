@@ -8,6 +8,8 @@ import static ua.knd11.util.FieldValidators.isNullOrBlank;
 
 public class TeacherServiceImpl extends UserServiceImpl implements TeacherService {
 
+    //A method that calculates teachers' salaries using the Stream API
+    //It determines the number of teachers from a list and returns their salaries, which are then summed up.
     public void calculateTotalSalary() {
         double result = repository.stream().mapToDouble(user -> user instanceof Teacher t ? t.getSalary() : 0).sum();
         System.out.println("Total University Budget: " + result);
@@ -36,6 +38,9 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
         }
     }
 
+    //The method that adds a teacher.
+    //If the user being added isn't a teacher, an exception is thrown.
+    //Otherwise, the add method from the user class is called.
     @Override
     public boolean add(User user) {
         if (!(user instanceof Teacher teacher)) {
