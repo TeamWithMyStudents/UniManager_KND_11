@@ -14,8 +14,10 @@ public abstract class User {
     private String email;
     private String password;
 
-    //Constructor for model with normalizer method
-    //read about normalizer can on FieldValidators class
+    /**
+     * Constructor for model with normalizer method
+     * read about normalizer can on {@link ua.knd11.util.FieldValidators} class
+     */
     public User(String name, String surname, String email, String password) {
         this.name = normalizer(name, "Name");
         this.surname = normalizer(surname, "Surname");
