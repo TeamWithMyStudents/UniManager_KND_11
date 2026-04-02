@@ -6,14 +6,33 @@ import java.util.Locale;
 
 import static ua.knd11.util.FieldValidators.normalizer;
 
-//The student model that extends from the user
+/**
+ * <p>The student model that extends from the {@link User}
+ * <p>has unique fields group, lastname, and role
+ *
+ * @see User
+ */
 public class Student extends User {
     private String group;
     private String lastname;
     private StudentRole role;
 
-    //Student constructor where super is used to access user class fields
-    public Student(String surname, String name, String lastname, String group, String email, String password) {
+    /**
+     * <p>Constructs a new Student instance.
+     * <p>Constructor uses normalization and validation methods
+     * to ensure that provided data is valid. Also, it invokes the
+     * parent {@link User} constructor to initialize user-related fields.
+     *
+     * @param name     name
+     * @param surname  surname
+     * @param lastname lastname
+     * @param group    group
+     * @param email    email
+     * @param password password
+     * @throws IllegalArgumentException if any argument fails validation
+     * @throws NullPointerException     if any required argument is null
+     */
+    public Student(String name, String surname, String lastname, String group, String email, String password) {
         super(name, surname, email, password);
         this.group = normalizer(group, "Group").toUpperCase(Locale.ROOT);
         this.lastname = normalizer(lastname, "Lastname");

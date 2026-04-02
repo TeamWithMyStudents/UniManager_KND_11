@@ -11,8 +11,9 @@ public class StudentServiceImpl extends UserServiceImpl implements StudentServic
     /**
      * The method searches for students by group name and outputs in the console.
      * The search is performed by partial matching and is case-insensitive.
+     *
      * @param groupQuery is the string to search for the group (e.g., "KND-11").
-     * If a string is empty or null, the method terminates.
+     *                   If a string is empty or null, the method terminates.
      */
     @Override
     public void findByGroup(String groupQuery) {
@@ -21,14 +22,18 @@ public class StudentServiceImpl extends UserServiceImpl implements StudentServic
         repository.stream().filter(user -> user instanceof Student st &&
                 st.getGroup().contains(groupQuery.toUpperCase())).forEach(System.out::println);
     }
+
     /**
      * The method assigns a student by ID as the Head Student of their group.
      * Logic:
-     * >Searches for a student by ID. If not found, returns an error.
-     * >Checks if the current Head Student is in the found student's group.
-     * >If another Head Student exists in the group, they are removed from their position (converted to REGULAR).
-     * >If the target student is already the Head Student, returns a message and terminates.
-     * >Assigns a new Head Student and outputs in the console.
+     * <ul>
+     * <li>Searches for a student by ID. If not found, returns an error.</li>
+     * <li>Checks if the current Head Student is in the found student's group.</li>
+     * <li>If another Head Student exists in the group, they are removed from their position (converted to REGULAR).</li>
+     * <li>If the target student is already the Head Student, returns a message and terminates.</li>
+     * <li>Assigns a new Head Student and outputs in the console.</li>
+     * </ul>
+     *
      * @param studentId is the unique ID of the student to be assigned as the Head Student.
      */
     @Override
@@ -65,14 +70,7 @@ public class StudentServiceImpl extends UserServiceImpl implements StudentServic
         System.out.println("Student " + newHeadStudent.getName() + " " + newHeadStudent.getSurname() + " " + newHeadStudent.getLastname() +
                 "\nis now the Head Student of group " + targetGroup + "!");
     }
-    /**
-     * The method adds a new student user to the system after all checks.
-     * The method checks that the object is an instance of the {@code Student} class, validates the fields (not empty/null).
-     * @param user is the user object to add.
-     * @return {@code true} if the student was successfully checked and added;
-     * {@code false} if one of the fields is empty.
-     * @throws IllegalArgumentException if the passed object is not a student (not {@code instanceof Student}).
-     */
+
     @Override
     public boolean add(User user) {
         if (!(user instanceof Student student)) {

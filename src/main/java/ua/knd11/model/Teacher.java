@@ -3,13 +3,33 @@ package ua.knd11.model;
 import static ua.knd11.util.FieldValidators.normalizer;
 import static ua.knd11.util.FieldValidators.normalizerSalary;
 
-//The teacher model that extends from the user
+/**
+ * <p>The teacher model that extends from the {@link User}
+ * <p>has unique fields for department, degree, and salary
+ *
+ * @see User
+ */
 public class Teacher extends User {
     private String department;
     private String degree;
     private double salary;
 
-    //Teacher constructor where super is used to access user class fields
+    /**
+     * <p>Constructs a new Teacher instance.
+     * <p>Constructor uses normalization and validation methods
+     * to ensure that provided data is valid. Also, it invokes the
+     * parent {@link User} constructor to initialize user-related fields.
+     *
+     * @param name       name
+     * @param surname    surname
+     * @param department department
+     * @param degree     degree or academic qualification of the teacher
+     * @param salary     salary
+     * @param email      email
+     * @param password   password
+     * @throws IllegalArgumentException if any argument fails validation
+     * @throws NullPointerException     if any required argument is null
+     */
     public Teacher(String name, String surname, String department, String degree, double salary, String email, String password) {
         super(name, surname, email, password);
         this.department = normalizer(department, "Department");
