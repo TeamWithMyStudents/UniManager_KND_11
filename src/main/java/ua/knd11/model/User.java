@@ -1,9 +1,7 @@
 package ua.knd11.model;
 
-import java.util.Objects;
 
-import static ua.knd11.util.FieldValidators.credentialsValidation;
-import static ua.knd11.util.FieldValidators.normalizer;
+import ua.knd11.util.FieldValidator;
 
 /**
  * <p>The basic user model from which others are built
@@ -29,11 +27,15 @@ public abstract class User {
      * @param password password
      * @throws IllegalArgumentException if any of the provided parameters are null, blank, or invalid
      */
-    public User(String name, String surname, String email, String password) {
-        this.name = normalizer(name, "Name");
-        this.surname = normalizer(surname, "Surname");
-        this.email = credentialsValidation(email, "Email");
-        this.password = Objects.requireNonNull(credentialsValidation(password, "Password"));
+    public User(String name, String surname, String email, String password) throws IllegalArgumentException {
+        FieldValidator.validateAlphabeticString("Name", name);
+        FieldValidator.validateAlphabeticString("Surname", surname);
+        FieldValidator.validateEmail(email);
+        FieldValidator.validatePassword(password);
+        this.name = name;
+        this.surname = surname;
+        this.email = email;
+        this.password = password;
     }
 
     /**
@@ -41,50 +43,103 @@ public abstract class User {
      *
      * @throws IllegalStateException if the ID has already been assigned
      */
-    public void assignId() {
+    public void assignId() throws IllegalStateException {
         if (this.id != 0) {
             throw new IllegalStateException("Id has already been assigned");
         }
         this.id = nextId++;
     }
 
+    /**
+     * Gets id.
+     *
+     * @return user's unique ID
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     * Gets name.
+     *
+     * @return the name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Sets name.
+     *
+     * @param name the name
+     * @throws IllegalArgumentException the illegal argument exception
+     */
     @SuppressWarnings("unused")
-    public void setName(String name) {
-        this.name = normalizer(name, "Name");
+    public void setName(String name) throws IllegalArgumentException {
+        FieldValidator.validateAlphabeticString("Name", name);
+        this.name = name;
     }
 
+    /**
+     * Gets surname.
+     *
+     * @return the surname
+     */
     public String getSurname() {
         return surname;
     }
 
+    /**
+     * Sets surname.
+     *
+     * @param surname the surname
+     * @throws IllegalArgumentException the illegal argument exception
+     */
     @SuppressWarnings("unused")
-    public void setSurname(String surname) {
-        this.surname = normalizer(surname, "Surname");
+    public void setSurname(String surname) throws IllegalArgumentException {
+        FieldValidator.validateAlphabeticString("Surname", surname);
+        this.surname = surname;
     }
 
+    /**
+     * Gets email.
+     *
+     * @return the email
+     */
     public String getEmail() {
         return email;
     }
 
+    /**
+     * Sets email.
+     *
+     * @param email the email
+     * @throws IllegalArgumentException the illegal argument exception
+     */
     @SuppressWarnings("unused")
-    public void setEmail(String email) {
-        this.email = credentialsValidation(email, "Email");
+    public void setEmail(String email) throws IllegalArgumentException {
+        FieldValidator.validateEmail(email);
+        this.email = email;
     }
 
+    /**
+     * Gets password.
+     *
+     * @return the password
+     */
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = credentialsValidation(normalizer(password, "Password"), "Password");
+    /**
+     * Sets password.
+     *
+     * @param password the password
+     * @throws IllegalArgumentException the illegal argument exception
+     */
+    public void setPassword(String password) throws IllegalArgumentException {
+        FieldValidator.validatePassword(password);
+        this.password = password;
     }
 
     @Override

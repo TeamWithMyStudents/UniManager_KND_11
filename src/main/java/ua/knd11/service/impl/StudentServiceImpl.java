@@ -4,23 +4,25 @@ import ua.knd11.model.Student;
 import ua.knd11.model.User;
 import ua.knd11.model.enums.StudentRole;
 import ua.knd11.service.StudentService;
+import ua.knd11.util.FieldValidator;
 
-import static ua.knd11.util.FieldValidators.isNullOrBlank;
-
+/**
+ * The type Student service.
+ */
 public class StudentServiceImpl extends UserServiceImpl implements StudentService {
     /**
      * The method searches for students by group name and outputs in the console.
      * The search is performed by partial matching and is case-insensitive.
      *
-     * @param groupQuery is the string to search for the group (e.g., "KND-11").
-     *                   If a string is empty or null, the method terminates.
+     * @param groupName is the string to search for the group (e.g., "KND-11").
+     *                  If a string is empty or null, the method terminates.
      */
     @Override
-    public void findByGroup(String groupQuery) {
-        if (isNullOrBlank(groupQuery, "Group")) return;
+    public void findByGroup(String groupName) {
+        FieldValidator.validateGroup(groupName);
 
         repository.stream().filter(user -> user instanceof Student st &&
-                st.getGroup().contains(groupQuery.toUpperCase())).forEach(System.out::println);
+                st.getGroup().contains(groupName.toUpperCase())).forEach(System.out::println);
     }
 
     /**
@@ -76,12 +78,7 @@ public class StudentServiceImpl extends UserServiceImpl implements StudentServic
         if (!(user instanceof Student student)) {
             throw new IllegalArgumentException("User must be an instance of Student");
         }
-        if (isNullOrBlank(student.getName(), "Name") ||
-                isNullOrBlank(student.getSurname(), "Surname") ||
-                isNullOrBlank(student.getLastname(), "Lastname") ||
-                isNullOrBlank(student.getGroup(), "Group")) {
-            return false;
-        } else return super.add(student);
+        return super.add(student);
     }
 }
 

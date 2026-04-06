@@ -12,8 +12,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-import static ua.knd11.util.FieldValidators.isNullOrBlank;
 
+/**
+ * The type User service.
+ */
 public class UserServiceImpl implements UserService {
     private static final AuthService authService = new AuthServiceImpl();
     /**
@@ -21,6 +23,9 @@ public class UserServiceImpl implements UserService {
      */
     protected static List<User> repository = new ArrayList<>();
 
+    /**
+     * Instantiates a new User service.
+     */
     public UserServiceImpl() {
         if (repository.isEmpty()) repository.addAll(UserFileHandler.getSavedList());
     }
@@ -32,18 +37,15 @@ public class UserServiceImpl implements UserService {
      *
      * @return true if the user was added successfully, false otherwise
      * @throws IllegalArgumentException if the user is null or the first and last name are not specified
-     * @throws RuntimeException         if the user could not be added
      */
-    public boolean add(User user) {
-        if (user == null || isNullOrBlank(user.getName(), "Name") || isNullOrBlank(user.getSurname(), "Surname")) {
-            return false;
-        }
+    public boolean add(User user) throws NullPointerException {
+        if (user == null) throw new NullPointerException("User must not be null");
         try {
-            authService.registration(user);
             user.assignId();
+            authService.registration(user);
             repository.add(user);
             return true;
-        } catch (RuntimeException e) {
+        } catch (IllegalArgumentException e) {
             System.err.println("Failed to add user: " + e.getMessage());
             return false;
         }

@@ -3,9 +3,11 @@ package ua.knd11.service.impl;
 import ua.knd11.model.Teacher;
 import ua.knd11.model.User;
 import ua.knd11.service.TeacherService;
+import ua.knd11.util.FieldValidator;
 
-import static ua.knd11.util.FieldValidators.isNullOrBlank;
-
+/**
+ * The type Teacher service.
+ */
 public class TeacherServiceImpl extends UserServiceImpl implements TeacherService {
 
     /**
@@ -29,16 +31,16 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
      * These users are compared with the desired degree, displayed, and true is set to the variable.
      * If not found, a message is displayed stating, "No teachers with this degree were found."
      *
-     * @param degreeQuery the degree to search for.
+     * @param degree the degree to search for.
      * @throws IllegalArgumentException if the degree is null or empty.
      */
-    public void filterByDegree(String degreeQuery) {
-        if (isNullOrBlank(degreeQuery, "Degree")) return;
+    public void filterByDegree(String degree) throws IllegalArgumentException {
+        FieldValidator.validateAlphabeticString("Degree", degree);
 
         boolean found = false;
         for (User user : repository) {
             if (user instanceof Teacher t) {
-                if (t.getDegree().toLowerCase().contains(degreeQuery.toLowerCase())) {
+                if (t.getDegree().toLowerCase().contains(degree.toLowerCase())) {
                     System.out.println(t);
                     found = true;
                 }
@@ -57,7 +59,7 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
      * @throws IllegalArgumentException if the user is not an instance of Teacher
      */
     @Override
-    public boolean add(User user) {
+    public boolean add(User user) throws IllegalArgumentException {
         if (!(user instanceof Teacher teacher)) {
             throw new IllegalArgumentException("User must be an instance of Teacher");
         }

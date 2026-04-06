@@ -8,6 +8,7 @@ import java.util.Scanner;
 /**
  * Application management via the console.
  * This class allows the user to navigate between the student and teacher management sections.
+ *
  * @see StudentController
  * @see TeacherController
  */
@@ -49,10 +50,12 @@ public class ConsoleMenu {
             }
         }
     }
-/**Submenu for managing student data.
- * Allows you to add, show,delete, assign sb as a Head Student or go back to main menu.
- * Checks the correctness of the input of int data (ID)
- */
+
+    /**
+     * Submenu for managing student data.
+     * Allows you to add, show,delete, assign sb as a Head Student or go back to main menu.
+     * Checks the correctness of the input of int data (ID)
+     */
     private void studentSubMenu() {
         boolean back = false;
         while (!back) {
@@ -107,8 +110,9 @@ public class ConsoleMenu {
             }
         }
     }
-/**Submenu for managing teacher data.
- * Allows you to add, show, delete, calculate budget, filter by degree or go back to main menu.
+
+    /**Submenu for managing teacher data.
+     * Allows you to add, show, delete, calculate budget, filter by degree or go back to main menu.
  */
     private void teacherSubMenu() {
         boolean back = false;

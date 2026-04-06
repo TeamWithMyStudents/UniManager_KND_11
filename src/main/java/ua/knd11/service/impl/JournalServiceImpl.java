@@ -67,17 +67,17 @@ public class JournalServiceImpl implements JournalService {
 
         // Handle the case where the student has no recorded grades
         if (studentGrades.isEmpty()) {
-            return "Оцінки поки що недоступні";
+            return "Grades are not yet available";
         }
 
         StringBuilder report = new StringBuilder();
-        report.append("--- Залікова книжка студента (ID: ").append(studentId).append(") ---\n");
+        report.append("--- Student record book (ID: ").append(studentId).append(") ---\n");
 
         int sum = 0;
 
         for (Grade grade : studentGrades) {
-            report.append("Предмет: ").append(grade.getSubject())
-                    .append(" | Бал: ").append(grade.getScore())
+            report.append("subject: ").append(grade.getSubject())
+                    .append(" | score: ").append(grade.getScore())
                     .append("\n");
             sum += grade.getScore();
         }
@@ -86,7 +86,7 @@ public class JournalServiceImpl implements JournalService {
         double average = (double) sum / studentGrades.size();
 
         report.append("--------------------------------------\n");
-        report.append(String.format("Середній бал: %.2f\n", average));
+        report.append(String.format("Average score: %.2f\n", average));
 
         return report.toString();
     }

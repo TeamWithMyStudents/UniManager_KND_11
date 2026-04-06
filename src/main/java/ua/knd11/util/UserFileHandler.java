@@ -11,22 +11,43 @@ import java.util.List;
 import static ua.knd11.model.enums.StudentRole.HEAD_STUDENT;
 import static ua.knd11.model.enums.StudentRole.REGULAR;
 
+/**
+ * Handles file operations for persisting user data.
+ */
 public class UserFileHandler {
     private static final String FILE_PATH = "users_db.txt";
     private static final File file = new File(FILE_PATH);
+    /**
+     * The constant savedList.
+     */
     public static ArrayList<User> savedList = new ArrayList<>();
 
+    /**
+     * Gets saved list.
+     *
+     * @return cached list of saved users, loading from file if empty
+     */
     public static ArrayList<User> getSavedList() {
         if (savedList.isEmpty()) savedList.addAll(loadUsers());
         return new ArrayList<>(savedList);
     }
 
+    /**
+     * Sets saved list.
+     *
+     * @param savedList the saved list
+     */
     public static void setSavedList(ArrayList<User> savedList) {
         UserFileHandler.savedList = savedList;
     }
 
-    public static void saveUsers(User u) {
-
+    /**
+     * Save users.
+     *
+     * @param u the u
+     * @throws IOException the io exception
+     */
+    public static void saveUsers(User u) throws IOException {
         try {
             if (file.createNewFile()) {
                 System.err.println("No DB found\nCreating new DB");
@@ -68,6 +89,11 @@ public class UserFileHandler {
         }
     }
 
+    /**
+     * Load users list.
+     *
+     * @return the list
+     */
     public static List<User> loadUsers() {
         ArrayList<User> users = new ArrayList<>();
 

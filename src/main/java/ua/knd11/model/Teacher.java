@@ -1,7 +1,6 @@
 package ua.knd11.model;
 
-import static ua.knd11.util.FieldValidators.normalizer;
-import static ua.knd11.util.FieldValidators.normalizerSalary;
+import ua.knd11.util.FieldValidator;
 
 /**
  * <p>The teacher model that extends from the {@link User}
@@ -27,44 +26,82 @@ public class Teacher extends User {
      * @param salary     salary
      * @param email      email
      * @param password   password
-     * @throws IllegalArgumentException if any argument fails validation
-     * @throws NullPointerException     if any required argument is null
+     * @throws IllegalArgumentException if any field is invalid
      */
-    public Teacher(String name, String surname, String department, String degree, double salary, String email, String password) {
+    public Teacher(String name, String surname, String department, String degree, double salary, String email, String password)
+            throws IllegalArgumentException {
         super(name, surname, email, password);
-        this.department = normalizer(department, "Department");
-        this.degree = normalizer(degree, "Degree");
-        this.salary = normalizerSalary(salary);
+        FieldValidator.validateAlphabeticString("Department", department);
+        FieldValidator.validateAlphabeticString("Degree", degree);
+        FieldValidator.validateSalary(salary);
+        this.department = department;
+        this.degree = degree;
+        this.salary = salary;
     }
 
+    /**
+     * Gets department.
+     *
+     * @return the department
+     */
     public String getDepartment() {
         return department;
     }
 
+    /**
+     * Sets department.
+     *
+     * @param department the department
+     * @throws IllegalArgumentException the illegal argument exception
+     */
     @SuppressWarnings("unused")
-    public void setDepartment(String department) {
-        this.department = normalizer(department, "Department");
+    public void setDepartment(String department) throws IllegalArgumentException {
+        FieldValidator.validateAlphabeticString("Department", department);
+        this.department = department;
     }
 
+    /**
+     * Gets degree.
+     *
+     * @return the degree
+     */
     public String getDegree() {
         return degree;
     }
 
+    /**
+     * Sets degree.
+     *
+     * @param degree the degree
+     * @throws IllegalArgumentException the illegal argument exception
+     */
     @SuppressWarnings("unused")
-    public void setDegree(String degree) {
-        this.degree = normalizer(degree, "Degree");
+    public void setDegree(String degree) throws IllegalArgumentException {
+        FieldValidator.validateAlphabeticString("Degree", degree);
+        this.degree = degree;
     }
 
+    /**
+     * Gets salary.
+     *
+     * @return the salary
+     */
     public double getSalary() {
         return salary;
     }
 
+    /**
+     * Sets salary.
+     *
+     * @param salary the salary
+     * @throws IllegalArgumentException the illegal argument exception
+     */
     @SuppressWarnings("unused")
-    public void setSalary(double salary) {
-        this.salary = normalizerSalary(salary);
+    public void setSalary(double salary) throws IllegalArgumentException {
+        FieldValidator.validateSalary(salary);
+        this.salary = salary;
     }
 
-    //toString for normal output
     @Override
     public String toString() {
         return "Id: " + getId() +

@@ -1,10 +1,9 @@
 package ua.knd11.model;
 
 import ua.knd11.model.enums.StudentRole;
+import ua.knd11.util.FieldValidator;
 
 import java.util.Locale;
-
-import static ua.knd11.util.FieldValidators.normalizer;
 
 /**
  * <p>The student model that extends from the {@link User}
@@ -19,7 +18,7 @@ public class Student extends User {
 
     /**
      * <p>Constructs a new Student instance.
-     * <p>Constructor uses normalization and validation methods
+     * <p>Constructor uses validation methods
      * to ensure that provided data is valid. Also, it invokes the
      * parent {@link User} constructor to initialize user-related fields.
      *
@@ -29,43 +28,78 @@ public class Student extends User {
      * @param group    group
      * @param email    email
      * @param password password
-     * @throws IllegalArgumentException if any argument fails validation
-     * @throws NullPointerException     if any required argument is null
+     * @throws IllegalArgumentException if any field is invalid
      */
-    public Student(String name, String surname, String lastname, String group, String email, String password) {
+    public Student(String name, String surname, String lastname, String group, String email, String password)
+            throws IllegalArgumentException {
         super(name, surname, email, password);
-        this.group = normalizer(group, "Group").toUpperCase(Locale.ROOT);
-        this.lastname = normalizer(lastname, "Lastname");
+        FieldValidator.validateAlphabeticString("Group", group);
+        FieldValidator.validateAlphabeticString("Lastname", lastname);
+        this.group = group.toUpperCase(Locale.ROOT);
+        this.lastname = lastname;
         this.role = StudentRole.REGULAR;
     }
 
+    /**
+     * Gets group.
+     *
+     * @return the group
+     */
     public String getGroup() {
         return group;
     }
 
+    /**
+     * Sets group.
+     *
+     * @param group the group
+     * @throws IllegalArgumentException the illegal argument exception
+     */
     @SuppressWarnings("unused")
-    public void setGroup(String group) {
-        this.group = normalizer(group, "Group").toUpperCase(Locale.ROOT);
+    public void setGroup(String group) throws IllegalArgumentException {
+        FieldValidator.validateGroup(group);
+        this.group = group.toUpperCase(Locale.ROOT);
     }
 
+    /**
+     * Gets lastname.
+     *
+     * @return the lastname
+     */
     public String getLastname() {
         return lastname;
     }
 
+    /**
+     * Sets lastname.
+     *
+     * @param lastname the lastname
+     * @throws IllegalArgumentException the illegal argument exception
+     */
     @SuppressWarnings("unused")
-    public void setLastname(String lastname) {
-        this.lastname = normalizer(lastname, "Lastname");
+    public void setLastname(String lastname) throws IllegalArgumentException {
+        FieldValidator.validateAlphabeticString("Lastname", lastname);
+        this.lastname = lastname;
     }
 
+    /**
+     * Gets role.
+     *
+     * @return the role
+     */
     public StudentRole getRole() {
         return role;
     }
 
+    /**
+     * Sets role.
+     *
+     * @param role the role
+     */
     public void setRole(StudentRole role) {
         this.role = role;
     }
 
-    //toString for normal output
     @Override
     public String toString() {
         return "Id: " + getId() +
