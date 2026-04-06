@@ -15,9 +15,9 @@ public class Teacher extends User {
 
     /**
      * <p>Constructs a new Teacher instance.
-     * <p>Constructor uses normalization and validation methods
-     * to ensure that provided data is valid. Also, it invokes the
-     * parent {@link User} constructor to initialize user-related fields.
+     * <p>Constructor invokes the parent {@link User} constructor to initialize user-related fields,
+     * validates department and degree via FieldValidator.validateAlphabeticString, and salary via
+     * FieldValidator.validateSalary, then assigns the fields. No normalization is performed.
      *
      * @param name       name
      * @param surname    surname

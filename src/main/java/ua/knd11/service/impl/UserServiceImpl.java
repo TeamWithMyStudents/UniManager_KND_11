@@ -6,6 +6,7 @@ import ua.knd11.security.impl.AuthServiceImpl;
 import ua.knd11.service.UserService;
 import ua.knd11.util.UserFileHandler;
 
+import java.io.IOException;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -41,11 +42,11 @@ public class UserServiceImpl implements UserService {
     public boolean add(User user) throws NullPointerException {
         if (user == null) throw new NullPointerException("User must not be null");
         try {
-            user.assignId();
             authService.registration(user);
+            user.assignId();
             repository.add(user);
             return true;
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IOException e) {
             System.err.println("Failed to add user: " + e.getMessage());
             return false;
         }
@@ -59,7 +60,11 @@ public class UserServiceImpl implements UserService {
      * @return true if the user was removed successfully, false otherwise
      */
     public boolean delete(int id) {
-        return repository.removeIf(user -> user.getId() == id);
+        boolean removedFromRepository = repository.removeIf(user -> user.getId() == id);
+        if (removedFromRepository) {
+            authService.removeUser(id);
+        }
+        return removedFromRepository;
     }
 
     /**

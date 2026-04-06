@@ -29,9 +29,9 @@ public class TeacherController {
      * @param input a raw string containing the teacher's details.
      */
     public void create(String input) {
-        //a variable that replaces spaces with commas
+        //normalize commas to spaces and trim whitespace
         String normalized = input.trim().replace(",", " ");
-        //an array that divides the values entered by the user and stores them in cells
+        //array that splits user input into tokens and stores them in elements
         String[] parts = normalized.split("\\s+");
 
         if (parts.length != 7) {
@@ -39,7 +39,7 @@ public class TeacherController {
             return;
         }
 
-        //assigning variables to specific array cells
+        //assigning variables to specific array indexes
         String name = parts[0];
         String surname = parts[1];
         String department = parts[2];
@@ -49,7 +49,7 @@ public class TeacherController {
         String password = parts[6];
 
         //A new teacher is created, into which the previously created variables are entered.
-        //The add method from the user class is used to add the teacher.
+        //Calls service.add() implemented in TeacherServiceImpl to add the teacher
         try {
             salary = Double.parseDouble(parts[4]);
             Teacher teacher = new Teacher(name, surname, department, degree, salary, email, password);
@@ -87,7 +87,7 @@ public class TeacherController {
     }
 
     /**
-     * Calculates the total salary of all relevant personnel.
+     * Calculates the total salary of all teachers.
      * <p>
      * This method delegates the calculation logic to the underlying service layer.
      * The result is typically processed or printed to the console by the service.
@@ -97,12 +97,12 @@ public class TeacherController {
     }
 
     /**
-     * Filters and retrieves personnel based on their academic degree.
+     * Filters and retrieves teachers based on their academic degree.
      * <p>
      * This method delegates the filtering operation to the underlying service layer,
      * which processes the request and typically outputs the filtered list.
      *
-     * @param degree the academic degree to filter by (e.g., "Master", "PhD", or "Doctor of Science").
+     * @param degree the teacher degree to filter by (e.g., "Master", "PhD", or "Doctor of Science").
      */
     public void filterByDegree(String degree) {
         service.filterByDegree(degree);

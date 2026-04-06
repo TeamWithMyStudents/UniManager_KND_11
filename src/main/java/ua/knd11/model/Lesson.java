@@ -25,6 +25,8 @@ public class Lesson {
      */
     public Lesson(DayOfWeek dayOfWeek, LocalTime time, String subject, String teacherSurname)
             throws IllegalArgumentException {
+        if (dayOfWeek == null) throw new IllegalArgumentException("DayOfWeek must not be null");
+        if (time == null) throw new IllegalArgumentException("Time must not be null");
         FieldValidator.validateAlphabeticString("Subject", subject);
         FieldValidator.validateAlphabeticString("Teacher Surname", teacherSurname);
         this.dayOfWeek = dayOfWeek;
@@ -46,8 +48,10 @@ public class Lesson {
      * Sets day of week.
      *
      * @param dayOfWeek the day of week
+     * @throws IllegalArgumentException if dayOfWeek is null
      */
     public void setDayOfWeek(DayOfWeek dayOfWeek) {
+        if (dayOfWeek == null) throw new IllegalArgumentException("DayOfWeek must not be null");
         this.dayOfWeek = dayOfWeek;
     }
 
@@ -64,8 +68,10 @@ public class Lesson {
      * Sets time.
      *
      * @param time the time
+     * @throws IllegalArgumentException if time is null
      */
     public void setTime(LocalTime time) {
+        if (time == null) throw new IllegalArgumentException("Time must not be null");
         this.time = time;
     }
 

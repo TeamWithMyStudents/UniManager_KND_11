@@ -53,7 +53,7 @@ public class ConsoleMenu {
 
     /**
      * Submenu for managing student data.
-     * Allows you to add, show,delete, assign sb as a Head Student or go back to main menu.
+     * Allows you to add, show, delete or assign a user as a Head Student, or go back to the main menu.
      * Checks the correctness of the input of int data (ID)
      */
     private void studentSubMenu() {
@@ -111,9 +111,10 @@ public class ConsoleMenu {
         }
     }
 
-    /**Submenu for managing teacher data.
-     * Allows you to add, show, delete, calculate budget, filter by degree or go back to main menu.
- */
+    /**
+     * Submenu for managing teacher data.
+     * Allows you to add, show, delete, calculate budget, filter by degree, or go back to the main menu.
+     */
     private void teacherSubMenu() {
         boolean back = false;
         while (!back) {

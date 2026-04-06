@@ -33,7 +33,7 @@ public class Student extends User {
     public Student(String name, String surname, String lastname, String group, String email, String password)
             throws IllegalArgumentException {
         super(name, surname, email, password);
-        FieldValidator.validateAlphabeticString("Group", group);
+        FieldValidator.validateGroup(group);
         FieldValidator.validateAlphabeticString("Lastname", lastname);
         this.group = group.toUpperCase(Locale.ROOT);
         this.lastname = lastname;

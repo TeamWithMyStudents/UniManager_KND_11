@@ -15,12 +15,11 @@ public class StudentServiceImpl extends UserServiceImpl implements StudentServic
      * The search is performed by partial matching and is case-insensitive.
      *
      * @param groupName is the string to search for the group (e.g., "KND-11").
-     *                  If a string is empty or null, the method terminates.
+     * @throws IllegalArgumentException if the {@code groupName} is invalid
      */
     @Override
-    public void findByGroup(String groupName) {
+    public void findByGroup(String groupName) throws IllegalArgumentException {
         FieldValidator.validateGroup(groupName);
-
         repository.stream().filter(user -> user instanceof Student st &&
                 st.getGroup().contains(groupName.toUpperCase())).forEach(System.out::println);
     }

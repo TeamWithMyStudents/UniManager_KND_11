@@ -23,9 +23,9 @@ public class UserFileHandler {
     public static ArrayList<User> savedList = new ArrayList<>();
 
     /**
-     * Gets saved list.
+     * Gets a saved list.
      *
-     * @return cached list of saved users, loading from file if empty
+     * @return cached list of saved users, loading from a file if empty
      */
     public static ArrayList<User> getSavedList() {
         if (savedList.isEmpty()) savedList.addAll(loadUsers());
@@ -44,53 +44,50 @@ public class UserFileHandler {
     /**
      * Save users.
      *
-     * @param u the u
-     * @throws IOException the io exception
+     * @param u the User object to persist to file
+     * @throws IOException if an I/O error occurs
      */
     public static void saveUsers(User u) throws IOException {
-        try {
-            if (file.createNewFile()) {
-                System.err.println("No DB found\nCreating new DB");
-            }
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
-                if (u instanceof Student s) {
-                    String[] parts = {
-//                            String surname, String name, String lastname, String group, String email, String password
-                            "Student",
-                            s.getSurname(),
-                            s.getName(),
-                            s.getLastname(),
-                            s.getGroup(),
-                            String.valueOf(s.getRole()),
-                            s.getEmail(),
-                            s.getPassword()
-                    };
-                    writer.write(String.join(", ", parts));
-                }
-                if (u instanceof Teacher t) {
-
-                    String[] parts = {
-//                            Teacher(String name, String surname, String department, String degree, double salary, String email, String password)
-                            "Teacher",
-                            t.getName(),
-                            t.getSurname(),
-                            t.getDepartment(),
-                            t.getDegree(),
-                            String.valueOf(t.getSalary()),
-                            t.getEmail(),
-                            t.getPassword()
-                    };
-                    writer.write(String.join(", ", parts));
-                }
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            System.err.println("Error saving user: " + e.getMessage());
+        if (file.createNewFile()) {
+            System.err.println("No DB found\nCreating new DB");
         }
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
+            if (u instanceof Student s) {
+                String[] parts = {
+//                            String surname, String name, String lastname, String group, String email, String password
+                        "Student",
+                        s.getSurname(),
+                        s.getName(),
+                        s.getLastname(),
+                        s.getGroup(),
+                        String.valueOf(s.getRole()),
+                        s.getEmail(),
+                        s.getPassword()
+                };
+                writer.write(String.join(", ", parts));
+            }
+            if (u instanceof Teacher t) {
+
+                String[] parts = {
+//                            Teacher(String name, String surname, String department, String degree, double salary, String email, String password)
+                        "Teacher",
+                        t.getName(),
+                        t.getSurname(),
+                        t.getDepartment(),
+                        t.getDegree(),
+                        String.valueOf(t.getSalary()),
+                        t.getEmail(),
+                        t.getPassword()
+                };
+                writer.write(String.join(", ", parts));
+            }
+            writer.newLine();
+        }
+
     }
 
     /**
-     * Load users list.
+     * Load the users list.
      *
      * @return the list
      */

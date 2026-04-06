@@ -23,10 +23,11 @@ public class AuthServiceImpl implements AuthService {
 
     /**
      * Registers a new user in the system.
+     *
      * @param user the user to register
      * @throws IllegalArgumentException if user is null or email already exists
      */
-    public void registration(User user) throws IllegalArgumentException {
+    public void registration(User user) throws IllegalArgumentException, IOException {
         if (user == null) throw new IllegalArgumentException("User must not be null");
 
         for (User existingUser : registeredUsers) {
@@ -36,18 +37,14 @@ public class AuthServiceImpl implements AuthService {
         }
 
         user.setPassword(String.valueOf(user.getPassword().hashCode()));
-        try {
-            registeredUsers.add(user);
-            UserFileHandler.saveUsers(user);
-        } catch (IOException e) {
-            registeredUsers.remove(user);
-            throw new IllegalArgumentException("Failed to save user to file, user not registered");
-        }
+        UserFileHandler.saveUsers(user);
+        registeredUsers.add(user);
     }
 
     /**
      * Authenticates a user with email and password.
-     * @param email user's email address
+     *
+     * @param email    user's email address
      * @param password user's password
      * @return authenticated user
      * @throws IllegalArgumentException if authentication fails or user already logged in
@@ -73,11 +70,6 @@ public class AuthServiceImpl implements AuthService {
         UserSession.login(foundUser);
         System.out.println("Login successful");
         return foundUser;
-    }
-
-    public void unregister(User user) throws IllegalArgumentException {
-        if (user == null) throw new IllegalArgumentException("User must not be null");
-        registeredUsers.remove(user);
     }
 
     /**

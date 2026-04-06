@@ -61,8 +61,9 @@ public class Grade {
      * Sets subject.
      *
      * @param subject the subject
+     * @throws IllegalArgumentException if the subject is not alphabetic writed
      */
-    public void setSubject(String subject) {
+    public void setSubject(String subject) throws IllegalArgumentException {
         FieldValidator.validateAlphabeticString("Subject", subject);
         this.subject = subject;
     }
@@ -80,8 +81,9 @@ public class Grade {
      * Sets score.
      *
      * @param score the score
+     * @throws IllegalArgumentException if the score is not in range 0-100
      */
-    public void setScore(int score) {
+    public void setScore(int score) throws IllegalArgumentException {
         FieldValidator.validateScore(score);
         this.score = score;
     }

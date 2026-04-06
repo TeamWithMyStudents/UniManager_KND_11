@@ -7,8 +7,8 @@ public enum StudentRole {
 
     /**
      * The Head student.
+     * Each group can only have one active Head Student.
      */
-//Each group can only have one active Head Student
     HEAD_STUDENT("Head Student"),
     /**
      * The Deputy head student.

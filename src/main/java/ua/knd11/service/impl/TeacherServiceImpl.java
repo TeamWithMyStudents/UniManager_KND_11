@@ -13,10 +13,6 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
     /**
      * A method that calculates teachers' salaries using the Stream API
      * It determines the number of teachers from a list and returns their salaries, which are then summed up.
-     *
-     * @throws IllegalArgumentException if the user is not an instance of Teacher
-     * @throws IllegalStateException    if the repository is empty
-     *
      */
     public void calculateTotalSalary() {
         double result = repository.stream().mapToDouble(user -> user instanceof Teacher t ? t.getSalary() : 0).sum();

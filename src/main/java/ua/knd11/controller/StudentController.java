@@ -32,24 +32,24 @@ public class StudentController {
      * @throws IllegalArgumentException if the data is not validated in the {@link Student} model.
      */
     public void create(String input) {
-        //a variable that replaces spaces with commas
+        //normalize input by replacing commas with spaces and trimming whitespace
         String normalized = input.trim().replace(",", " ");
-        //an array that divides the values entered by the user and stores them in cells
+        //array that splits the normalized string on whitespace into tokens
         String[] parts = normalized.split("\\s+");
         if (parts.length != 6) {
             System.out.println("Error: Expected 6 fields (Surname Name Lastname Group Email@example.com Password).");
             return;
         }
 //assigning variables to specific array cells
-        String surname = parts[0];
-        String name = parts[1];
+        String name = parts[0];
+        String surname = parts[1];
         String lastname = parts[2];
         String group = parts[3];
         String email = parts[4];
         String password = parts[5];
 
         try {
-            Student student = new Student(surname, name, lastname, group, email, password);
+            Student student = new Student(name, surname, lastname, group, email, password);
             if (service.add(student)) {
                 System.out.println("Student added successfully!");
             } else {

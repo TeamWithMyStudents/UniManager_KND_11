@@ -11,6 +11,10 @@ public final class FieldValidator {
         }
     }
 
+    private FieldValidator() {
+        throw new UnsupportedOperationException("Utility class");
+    }
+
     /**
      * Validates that a string contains only alphabetic characters.
      *
@@ -21,9 +25,9 @@ public final class FieldValidator {
     public static void validateAlphabeticString(String field, String value) throws IllegalArgumentException {
         validateNonEmptyString(field, value);
 
-        // regex matches only English and Ukrainian characters, numbers, and special characters
-        // Used in fields that doesn't need too much attention
-        String regex = "^(?=.{1,100}$)[A-Za-zА-Яа-яЁёЄєҐґЇїІі]+$";
+        // regex matches only English and Ukrainian characters
+        // Used in fields that don't need too much attention
+        String regex = "^(?=.{1,100}$)[A-Za-zА-Яа-яЁёЄєҐґЇїІі][A-Za-zА-Яа-яЁёЄєҐґЇїІі\\s'\\-]*$";
         if (!value.matches(regex)) throw new IllegalArgumentException(field + " has invalid characters");
     }
 
@@ -31,7 +35,7 @@ public final class FieldValidator {
      * Validates academic group name format.
      *
      * @param value the group name to validate
-     * @throws IllegalArgumentException if group name is invalid
+     * @throws IllegalArgumentException if the group name is invalid
      */
     public static void validateGroup(String value) throws IllegalArgumentException {
         validateNonEmptyString("Group", value);
@@ -63,7 +67,7 @@ public final class FieldValidator {
      * Validates password strength and format.
      *
      * @param value the password to validate
-     * @throws IllegalArgumentException if password is invalid
+     * @throws IllegalArgumentException if the password is invalid
      */
     public static void validatePassword(String value) throws IllegalArgumentException {
         validateNonEmptyString("Password", value);
