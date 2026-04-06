@@ -6,6 +6,9 @@ import ua.knd11.service.TeacherService;
 
 import static ua.knd11.util.FieldValidators.isNullOrBlank;
 
+/**
+ * The type Teacher service.
+ */
 public class TeacherServiceImpl extends UserServiceImpl implements TeacherService {
 
     /**
@@ -29,16 +32,16 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
      * These users are compared with the desired degree, displayed, and true is set to the variable.
      * If not found, a message is displayed stating, "No teachers with this degree were found."
      *
-     * @param degreeQuery the degree to search for.
+     * @param degree the degree to search for.
      * @throws IllegalArgumentException if the degree is null or empty.
      */
-    public void filterByDegree(String degreeQuery) {
-        if (isNullOrBlank(degreeQuery, "Degree")) return;
+    public void filterByDegree(String degree) {
+        if (isNullOrBlank(degree, "Degree")) return;
 
         boolean found = false;
         for (User user : repository) {
             if (user instanceof Teacher t) {
-                if (t.getDegree().toLowerCase().contains(degreeQuery.toLowerCase())) {
+                if (t.getDegree().toLowerCase().contains(degree.toLowerCase())) {
                     System.out.println(t);
                     found = true;
                 }
@@ -53,6 +56,7 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
      * The method that adds a teacher.
      * Add method from the user class is called.
      *
+     * @param user the user to be added
      * @return true if the user was added successfully, false otherwise
      * @throws IllegalArgumentException if the user is not an instance of Teacher
      */

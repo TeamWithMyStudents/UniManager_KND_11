@@ -48,41 +48,86 @@ public abstract class User {
         this.id = nextId++;
     }
 
+    /**
+     * Gets id.
+     *
+     * @return the id
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     * Gets name.
+     *
+     * @return the name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Sets name.
+     *
+     * @param name the name
+     */
     @SuppressWarnings("unused")
     public void setName(String name) {
         this.name = normalizer(name, "Name");
     }
 
+    /**
+     * Gets surname.
+     *
+     * @return the surname
+     */
     public String getSurname() {
         return surname;
     }
 
+    /**
+     * Sets surname.
+     *
+     * @param surname the surname
+     */
     @SuppressWarnings("unused")
     public void setSurname(String surname) {
         this.surname = normalizer(surname, "Surname");
     }
 
+    /**
+     * Gets email.
+     *
+     * @return the email
+     */
     public String getEmail() {
         return email;
     }
 
+    /**
+     * Sets email.
+     *
+     * @param email the email
+     */
     @SuppressWarnings("unused")
     public void setEmail(String email) {
         this.email = credentialsValidation(email, "Email");
     }
 
+    /**
+     * Gets password.
+     *
+     * @return the password
+     */
     public String getPassword() {
         return password;
     }
 
+    /**
+     * Sets password.
+     *
+     * @param password the password
+     */
     public void setPassword(String password) {
         this.password = credentialsValidation(normalizer(password, "Password"), "Password");
     }

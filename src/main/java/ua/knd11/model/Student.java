@@ -39,33 +39,62 @@ public class Student extends User {
         this.role = StudentRole.REGULAR;
     }
 
+    /**
+     * Gets group.
+     *
+     * @return the group
+     */
     public String getGroup() {
         return group;
     }
 
+    /**
+     * Sets group.
+     *
+     * @param group the group
+     */
     @SuppressWarnings("unused")
     public void setGroup(String group) {
         this.group = normalizer(group, "Group").toUpperCase(Locale.ROOT);
     }
 
+    /**
+     * Gets lastname.
+     *
+     * @return the lastname
+     */
     public String getLastname() {
         return lastname;
     }
 
+    /**
+     * Sets lastname.
+     *
+     * @param lastname the lastname
+     */
     @SuppressWarnings("unused")
     public void setLastname(String lastname) {
         this.lastname = normalizer(lastname, "Lastname");
     }
 
+    /**
+     * Gets role.
+     *
+     * @return the role
+     */
     public StudentRole getRole() {
         return role;
     }
 
+    /**
+     * Sets role.
+     *
+     * @param role the role
+     */
     public void setRole(StudentRole role) {
         this.role = role;
     }
 
-    //toString for normal output
     @Override
     public String toString() {
         return "Id: " + getId() +

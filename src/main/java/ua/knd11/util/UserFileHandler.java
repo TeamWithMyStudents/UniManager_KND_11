@@ -11,20 +11,44 @@ import java.util.List;
 import static ua.knd11.model.enums.StudentRole.HEAD_STUDENT;
 import static ua.knd11.model.enums.StudentRole.REGULAR;
 
+/**
+ * Handles the persistence of user data to and from file storage.
+ * Provides methods for saving users to a text file and loading them back into memory.
+ * Supports both Student and Teacher user types with proper serialization.
+ */
 public class UserFileHandler {
     private static final String FILE_PATH = "users_db.txt";
     private static final File file = new File(FILE_PATH);
+    /**
+     * In-memory cache of loaded users for performance optimization.
+     */
     public static ArrayList<User> savedList = new ArrayList<>();
 
+    /**
+     * Gets the cached list of users, loading from the file if necessary.
+     *
+     * @return a copy of the cached user list
+     */
     public static ArrayList<User> getSavedList() {
         if (savedList.isEmpty()) savedList.addAll(loadUsers());
         return new ArrayList<>(savedList);
     }
 
+    /**
+     * Sets the cached user list.
+     *
+     * @param savedList the new user list to cache
+     */
     public static void setSavedList(ArrayList<User> savedList) {
         UserFileHandler.savedList = savedList;
     }
 
+    /**
+     * Saves a user to the persistent storage file.
+     * Appends the user data in CSV format to the user database file.
+     *
+     * @param u the user to save
+     */
     public static void saveUsers(User u) {
 
         try {
@@ -68,6 +92,12 @@ public class UserFileHandler {
         }
     }
 
+    /**
+     * Loads all users from the persistent storage file.
+     * Handles file creation, parsing, and error recovery.
+     *
+     * @return a list of loaded users
+     */
     public static List<User> loadUsers() {
         ArrayList<User> users = new ArrayList<>();
 

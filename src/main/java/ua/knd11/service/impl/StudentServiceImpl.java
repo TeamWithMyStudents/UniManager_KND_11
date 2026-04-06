@@ -7,34 +7,39 @@ import ua.knd11.service.StudentService;
 
 import static ua.knd11.util.FieldValidators.isNullOrBlank;
 
+/**
+ * Implementation of StudentService interface.
+ * Extends UserServiceImpl with student-specific functionality.
+ */
 public class StudentServiceImpl extends UserServiceImpl implements StudentService {
     /**
-     * The method searches for students by group name and outputs in the console.
-     * The search is performed by partial matching and is case-insensitive.
+     * Searches for students by group name and displays the results.
+     * Uses partial matching and is case-insensitive.
      *
-     * @param groupQuery is the string to search for the group (e.g., "KND-11").
-     *                   If a string is empty or null, the method terminates.
+     * @param groupName the group name to search for (e.g., "KND-11")
+     * @throws IllegalArgumentException if the group name is null or empty
      */
     @Override
-    public void findByGroup(String groupQuery) {
-        if (isNullOrBlank(groupQuery, "Group")) return;
+    public void findByGroup(String groupName) {
+        if (isNullOrBlank(groupName, "Group")) return;
 
         repository.stream().filter(user -> user instanceof Student st &&
-                st.getGroup().contains(groupQuery.toUpperCase())).forEach(System.out::println);
+                st.getGroup().contains(groupName.toUpperCase())).forEach(System.out::println);
     }
 
     /**
-     * The method assigns a student by ID as the Head Student of their group.
-     * Logic:
+     * Assigns a student as the Head Student of their group.
+     * <p>
+     * The method follows this logic:
      * <ul>
-     * <li>Searches for a student by ID. If not found, returns an error.</li>
-     * <li>Checks if the current Head Student is in the found student's group.</li>
-     * <li>If another Head Student exists in the group, they are removed from their position (converted to REGULAR).</li>
-     * <li>If the target student is already the Head Student, returns a message and terminates.</li>
-     * <li>Assigns a new Head Student and outputs in the console.</li>
+     * <li>Searches for a student by ID. If not found, displays an error.</li>
+     * <li>Checks if the current Head Student is in the same group.</li>
+     * <li>If another Head Student exists in the group, they are demoted to REGULAR.</li>
+     * <li>If the target student is already Head Student, displays a message and returns.</li>
+     * <li>Assigns the new Head Student role and displays confirmation.</li>
      * </ul>
      *
-     * @param studentId is the unique ID of the student to be assigned as the Head Student.
+     * @param studentId the unique ID of the student to be assigned as Head Student
      */
     @Override
     public void assignHeadStudent(int studentId) {
@@ -71,17 +76,20 @@ public class StudentServiceImpl extends UserServiceImpl implements StudentServic
                 "\nis now the Head Student of group " + targetGroup + "!");
     }
 
+    /**
+     * Adds a student to the repository after type validation.
+     * Ensures only Student instances can be added through this service.
+     *
+     * @param user the user to be added (must be a Student)
+     * @return true if the student was added successfully, false otherwise
+     * @throws IllegalArgumentException if the user is not an instance of Student
+     */
     @Override
     public boolean add(User user) {
         if (!(user instanceof Student student)) {
             throw new IllegalArgumentException("User must be an instance of Student");
         }
-        if (isNullOrBlank(student.getName(), "Name") ||
-                isNullOrBlank(student.getSurname(), "Surname") ||
-                isNullOrBlank(student.getLastname(), "Lastname") ||
-                isNullOrBlank(student.getGroup(), "Group")) {
-            return false;
-        } else return super.add(student);
+        return super.add(student);
     }
 }
 

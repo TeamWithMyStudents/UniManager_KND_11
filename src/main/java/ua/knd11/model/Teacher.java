@@ -37,34 +37,63 @@ public class Teacher extends User {
         this.salary = normalizerSalary(salary);
     }
 
+    /**
+     * Gets department.
+     *
+     * @return the department
+     */
     public String getDepartment() {
         return department;
     }
 
+    /**
+     * Sets department.
+     *
+     * @param department the department
+     */
     @SuppressWarnings("unused")
     public void setDepartment(String department) {
         this.department = normalizer(department, "Department");
     }
 
+    /**
+     * Gets degree.
+     *
+     * @return the degree
+     */
     public String getDegree() {
         return degree;
     }
 
+    /**
+     * Sets degree.
+     *
+     * @param degree the degree
+     */
     @SuppressWarnings("unused")
     public void setDegree(String degree) {
         this.degree = normalizer(degree, "Degree");
     }
 
+    /**
+     * Gets salary.
+     *
+     * @return the salary
+     */
     public double getSalary() {
         return salary;
     }
 
+    /**
+     * Sets salary.
+     *
+     * @param salary the salary
+     */
     @SuppressWarnings("unused")
     public void setSalary(double salary) {
         this.salary = normalizerSalary(salary);
     }
 
-    //toString for normal output
     @Override
     public String toString() {
         return "Id: " + getId() +

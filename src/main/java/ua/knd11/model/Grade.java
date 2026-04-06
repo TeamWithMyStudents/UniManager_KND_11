@@ -6,20 +6,8 @@ package ua.knd11.model;
  * and whenever fields are updated.
  */
 public class Grade {
-
-    /**
-     * The unique identifier of the student.
-     */
     private int studentId;
-
-    /**
-     * The name of the subject.
-     */
     private String subject;
-
-    /**
-     * The numeric score achieved by the student (0 to 100).
-     */
     private int score;
 
     /**
@@ -32,18 +20,15 @@ public class Grade {
      * @throws IllegalArgumentException if the ID is invalid, the subject is empty, or the score is out of bounds
      */
     public Grade(int studentId, String subject, int score) {
-        validateId(studentId);
-        validateSubject(subject);
-        validateScore(score);
-        this.studentId = studentId;
-        this.subject = subject;
-        this.score = score;
+        this.studentId = validateId(studentId);
+        this.subject = validateSubject(subject);
+        this.score = validateScore(score);
     }
 
     /**
      * Gets the student's unique identifier.
      *
-     * @return the student ID
+     * @return the student id
      */
     public int getStudentId() {
         return studentId;
@@ -56,8 +41,7 @@ public class Grade {
      * @throws IllegalArgumentException if the ID is less than or equal to zero
      */
     public void setStudentId(int studentId) {
-        validateId(studentId);
-        this.studentId = studentId;
+        this.studentId = validateId(studentId);
     }
 
     /**
@@ -76,14 +60,13 @@ public class Grade {
      * @throws IllegalArgumentException if the subject is null or contains only whitespace
      */
     public void setSubject(String subject) {
-        validateSubject(subject);
-        this.subject = subject;
+        this.subject = validateSubject(subject);
     }
 
     /**
      * Gets the student's score.
      *
-     * @return the numeric score
+     * @return the score
      */
     public int getScore() {
         return score;
@@ -96,8 +79,7 @@ public class Grade {
      * @throws IllegalArgumentException if the score is not between 0 and 100
      */
     public void setScore(int score) {
-        validateScore(score);
-        this.score = score;
+        this.score = validateScore(score);
     }
 
     /**
@@ -106,10 +88,11 @@ public class Grade {
      * @param id the ID to validate
      * @throws IllegalArgumentException if the ID is not a positive number
      */
-    private void validateId(int id) {
+    private int validateId(int id) {
         if (id <= 0) {
-            throw new IllegalArgumentException("ID студента має бути додатнім числом.");
+            throw new IllegalArgumentException("The student ID must be a positive number.");
         }
+        return id;
     }
 
     /**
@@ -118,10 +101,11 @@ public class Grade {
      * @param subj the subject string to validate
      * @throws IllegalArgumentException if the string is null or empty
      */
-    private void validateSubject(String subj) {
+    private String validateSubject(String subj) {
         if (subj == null || subj.trim().isEmpty()) {
-            throw new IllegalArgumentException("Назва предмету не може бути порожньою.");
+            throw new IllegalArgumentException("The name of the item cannot be empty.");
         }
+        return subj;
     }
 
     /**
@@ -130,19 +114,15 @@ public class Grade {
      * @param sc the score to validate
      * @throws IllegalArgumentException if the score is outside the 0-100 range
      */
-    private void validateScore(int sc) {
+    private int validateScore(int sc) {
         if (sc < 0 || sc > 100) {
-            throw new IllegalArgumentException("Оцінка повинна бути в межах від 0 до 100.");
+            throw new IllegalArgumentException("The score should be between 0 and 100.");
         }
+        return sc;
     }
 
-    /**
-     * Returns a string representation of the grade, formatted in Ukrainian.
-     *
-     * @return a formatted string containing the student ID, subject, and score
-     */
     @Override
     public String toString() {
-        return String.format("Оцінка [ID студента: %d, Предмет: '%s', Бал: %d]", studentId, subject, score);
+        return String.format("Grade [Student ID: %d, subject: '%s', score: %d]", studentId, subject, score);
     }
 }

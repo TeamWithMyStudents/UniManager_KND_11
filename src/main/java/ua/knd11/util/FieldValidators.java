@@ -3,17 +3,18 @@ package ua.knd11.util;
 import java.util.Objects;
 
 /**
- * Field validators is a utility class for validating user inputs and fields for models
- * has static methods for validating fields in models and user inputs
+ * Utility class for validating and normalizing user input fields.
+ * Provides static methods for field validation in models and user inputs.
+ * This class cannot be instantiated.
  */
 public final class FieldValidators {
 
     /**
-     * Normalizer method used basically for validating fields in models
-     * Fields such as "Name", "Surname", "Department", "Degree", etc.
+     * Validates and normalizes text fields in models.
+     * Used for fields like "Name", "Surname", "Department", "Degree", etc.
      *
      * @param string the string to be validated
-     * @param type   the type of the field to be validated for error messages
+     * @param type   the field type used for error messages
      * @return the normalized string
      * @throws IllegalArgumentException if the string is null or blank
      */
@@ -33,13 +34,13 @@ public final class FieldValidators {
     }
 
     /**
-     * Credentials validation method used for validating user inputs
-     * Fields such as "Email", "Password"
+     * Validates user credentials like email and password.
+     * Applies specific validation rules based on the credential type.
      *
-     * @param credential the string to be validated (email or password)
-     * @param type       the type of the field to be validated for error messages
-     * @return the normalized string
-     * @throws IllegalArgumentException if the string is null or blank or invalid
+     * @param credential the credential string to validate (email or password)
+     * @param type       the credential type for validation rules
+     * @return the validated credential string
+     * @throws IllegalArgumentException if the credential is null, blank, or invalid
      */
     public static String credentialsValidation(String credential, String type) {
         Objects.requireNonNull(credential, type + " must not be null");
@@ -64,10 +65,11 @@ public final class FieldValidators {
     }
 
     /**
-     * <p>Normalizer for salary checks if salary in {@link ua.knd11.model.Teacher} is a positive finite number
+     * Validates and normalizes salary values for teachers.
+     * Ensures the salary is a positive finite number.
      *
-     * @param salary саляри #easter_egg
-     * @return salary
+     * @param salary the salary value to validate
+     * @return the validated salary
      * @throws IllegalArgumentException if salary is not a positive finite number
      */
     public static double normalizerSalary(double salary) {
@@ -78,11 +80,11 @@ public final class FieldValidators {
     }
 
     /**
-     * is a null or blank checks if a string is null or blank
-     * and returns true if the string is null or blank, false otherwise
+     * Checks if a string is null or blank and displays an error message.
+     * Used for input validation in console applications.
      *
-     * @param str   the string to be checked
-     * @param query the query to be checked
+     * @param str   the string to check
+     * @param query the context description for error messages
      * @return true if the string is invalid, false otherwise
      */
     public static boolean isNullOrBlank(String str, String query) {
