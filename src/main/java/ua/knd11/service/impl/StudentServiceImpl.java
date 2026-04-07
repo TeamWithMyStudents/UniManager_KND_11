@@ -4,19 +4,37 @@ import ua.knd11.model.Student;
 import ua.knd11.model.User;
 import ua.knd11.model.enums.StudentRole;
 import ua.knd11.service.StudentService;
+import ua.knd11.util.FieldValidator;
 
-import static ua.knd11.util.FieldValidators.isNullOrBlank;
-
+/**
+ * The type Student service.
+ */
 public class StudentServiceImpl extends UserServiceImpl implements StudentService {
-
+    /**
+     * Prints students whose group contains the given group name (case-insensitive, partial match).
+     * <p>
+     * Validates `groupName` before searching; each matching `Student` is printed to standard output.
+     *
+     * @param groupName the group substring to match (e.g., "KND-11")
+     * @throws IllegalArgumentException if `groupName` is invalid
+     */
     @Override
-    public void findByGroup(String groupQuery) {
-        if (isNullOrBlank(groupQuery, "Group")) return;
-
+    public void findByGroup(String groupName) throws IllegalArgumentException {
+        FieldValidator.validateGroup(groupName);
         repository.stream().filter(user -> user instanceof Student st &&
-                st.getGroup().contains(groupQuery.toUpperCase())).forEach(System.out::println);
+                st.getGroup().contains(groupName.toUpperCase())).forEach(System.out::println);
     }
 
+    /**
+     * Assigns the specified student as the head student for their group.
+     * <p>
+     * If another student in the same group currently holds the head role, that student is demoted to `StudentRole.REGULAR`.
+     * If the student with the given ID is not found or is not a `Student`, the method prints a message and returns without changes.
+     * If the student is already the head of their group, the method prints a message and returns without changes.
+     * On successful assignment, the student's role is set to `StudentRole.HEAD_STUDENT` and a confirmation is printed.
+     *
+     * @param studentId the unique ID of the student to assign as head student
+     */
     @Override
     public void assignHeadStudent(int studentId) {
         Student newHeadStudent = null;
@@ -52,17 +70,19 @@ public class StudentServiceImpl extends UserServiceImpl implements StudentServic
                 "\nis now the Head Student of group " + targetGroup + "!");
     }
 
+    /**
+     * Adds the given user to the underlying repository as a Student.
+     *
+     * @param user the user to add; must be an instance of {@code Student}
+     * @return {@code true} if the student was added, {@code false} otherwise
+     * @throws IllegalArgumentException if {@code user} is not an instance of {@code Student}
+     */
     @Override
     public boolean add(User user) {
         if (!(user instanceof Student student)) {
             throw new IllegalArgumentException("User must be an instance of Student");
         }
-        if (isNullOrBlank(student.getName(), "Name") ||
-                isNullOrBlank(student.getSurname(), "Surname") ||
-                isNullOrBlank(student.getLastname(), "Lastname") ||
-                isNullOrBlank(student.getGroup(), "Group")) {
-            return false;
-        } else return super.add(student);
+        return super.add(student);
     }
 }
 

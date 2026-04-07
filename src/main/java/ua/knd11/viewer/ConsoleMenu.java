@@ -5,11 +5,24 @@ import ua.knd11.controller.TeacherController;
 
 import java.util.Scanner;
 
+/**
+ * Application management via the console.
+ * This class allows the user to navigate between the student and teacher management sections.
+ *
+ * @see StudentController
+ * @see TeacherController
+ */
 public class ConsoleMenu {
     private final Scanner sc = new Scanner(System.in);
     private final StudentController studentController = new StudentController();
     private final TeacherController teacherController = new TeacherController();
 
+    /**
+     * Method starts the application's main loop.
+     * Displays the root menu and directs the user to the appropriate
+     * submenus depending on the number entered.
+     * Terminates the program when the "0" option is selected.
+     */
     public void startMenu() {
         while (true) {
             System.out.print(""" 
@@ -38,6 +51,14 @@ public class ConsoleMenu {
         }
     }
 
+    /**
+     * Display and handle the interactive Student Manager submenu.
+     * <p>
+     * Presents options to add a student, list all students, delete a student by ID,
+     * assign a head student by ID, or return to the main menu. User selections are
+     * read from the class Scanner; ID inputs for delete and assign are validated as
+     * integers and invalid token input is consumed and reported.
+     */
     private void studentSubMenu() {
         boolean back = false;
         while (!back) {
@@ -53,7 +74,7 @@ public class ConsoleMenu {
             String choice = sc.nextLine().trim();
             switch (choice) {
                 case "1":
-                    System.out.println("Please enter Student data (Surname Name Lastname Group Email@example.com Password):");
+                    System.out.println("Please enter Student data (Name Surname Lastname Group Email@example.com Password):");
                     String input = sc.nextLine();
                     studentController.create(input);
                     break;
@@ -79,7 +100,7 @@ public class ConsoleMenu {
                         studentController.assignHeadStudent(assignId);
                     } else {
                         System.out.println("Error, ID must be a number!");
-                        sc.nextLine();
+                        sc.nextLine(); // Clearing error input
                     }
                     break;
                 case "0":
@@ -93,6 +114,12 @@ public class ConsoleMenu {
         }
     }
 
+    /**
+     * Display and handle the teacher management submenu.
+     * <p>
+     * Presents options to add a teacher, show all teachers, calculate total salary,
+     * filter teachers by degree, or return to the main menu.
+     */
     private void teacherSubMenu() {
         boolean back = false;
         while (!back) {

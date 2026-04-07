@@ -2,6 +2,7 @@ package ua.knd11.service.impl;
 
 import ua.knd11.model.Lesson;
 import ua.knd11.service.ScheduleService;
+
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
@@ -9,10 +10,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Implementation of the {@link ScheduleService}.
+ * Manages the lesson schedule using an in-memory list. Handles data validation,
+ * parsing of bilingual day names (English/Ukrainian), and time formatting.
+ */
 public class ScheduleServiceImpl implements ScheduleService {
 
+    /**
+     * In-memory repository storing all scheduled lessons.
+     */
     private final List<Lesson> lessons = new ArrayList<>();
 
+    /**
+     * Adds a new lesson to the schedule after validating and parsing the input data.
+     *
+     * @param day            the day of the week as a string (e.g., "Monday" or "Понеділок")
+     * @param time           the starting time of the lesson in 24-hour format (e.g., "14:30")
+     * @param subject        the name of the subject
+     * @param teacherSurname the surname of the teacher
+     * @throws IllegalArgumentException if the day or time is null, empty, or cannot be parsed
+     */
     @Override
     public void addLesson(String day, String time, String subject, String teacherSurname) {
 
@@ -20,7 +38,6 @@ public class ScheduleServiceImpl implements ScheduleService {
             throw new IllegalArgumentException("День та час не можуть бути порожніми.");
         }
         try {
-
             DayOfWeek dayOfWeekEnum = parseDayOfWeek(day);
             LocalTime localTime = LocalTime.parse(time.trim());
 
@@ -33,6 +50,12 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
     }
 
+    /**
+     * Retrieves lessons scheduled for the specified day.
+     *
+     * @param dayOfWeek the DayOfWeek to select lessons for
+     * @return a list of Lesson objects scheduled on the specified day
+     */
     @Override
     public List<Lesson> getLessonsByDay(DayOfWeek dayOfWeek) {
         return lessons.stream()
@@ -40,7 +63,13 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .collect(Collectors.toList());
     }
 
-
+    /**
+     * Parses an English or Ukrainian day name into the corresponding {@link DayOfWeek}.
+     *
+     * @param day the day name in English or Ukrainian (case and surrounding whitespace are ignored)
+     * @return the corresponding {@link DayOfWeek}
+     * @throws IllegalArgumentException if the provided string does not match any supported day
+     */
     private DayOfWeek parseDayOfWeek(String day) {
         String normalizedDay = day.trim().toUpperCase();
         return switch (normalizedDay) {
