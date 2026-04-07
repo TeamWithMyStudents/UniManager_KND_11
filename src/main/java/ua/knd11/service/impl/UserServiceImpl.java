@@ -33,11 +33,12 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Adds a user to the list (repository).
-     * If the user is null, or the first and last name are not specified, it returns false.
-     * Otherwise, the user is registered, assigned an ID, added to the list, and returns true.
+     * The user is registered, assigned an ID, added to the list, and returns true.
      *
      * @return true if the user was added successfully, false otherwise
-     * @throws IllegalArgumentException if the user is null or the first and last name are not specified
+     * @throws IllegalArgumentException if the user is null or the first and last name is not specified
+     * @throws NullPointerException     if the user is null
+     * @throws IllegalStateException    if the user ID is already taken (User is registered)
      */
     public boolean add(User user) throws NullPointerException {
         if (user == null) throw new NullPointerException("User must not be null");
@@ -46,7 +47,7 @@ public class UserServiceImpl implements UserService {
             user.assignId();
             repository.add(user);
             return true;
-        } catch (IllegalArgumentException | IOException e) {
+        } catch (IllegalArgumentException | IOException | IllegalStateException e) {
             System.err.println("Failed to add user: " + e.getMessage());
             return false;
         }

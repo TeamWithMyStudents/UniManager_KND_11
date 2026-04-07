@@ -6,6 +6,7 @@ import ua.knd11.model.User;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static ua.knd11.model.enums.StudentRole.HEAD_STUDENT;
@@ -54,10 +55,10 @@ public class UserFileHandler {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
             if (u instanceof Student s) {
                 String[] parts = {
-//                            String surname, String name, String lastname, String group, String email, String password
+//                            String name, String surname, String lastname, String group, String email, String password
                         "Student",
-                        s.getSurname(),
                         s.getName(),
+                        s.getSurname(),
                         s.getLastname(),
                         s.getGroup(),
                         String.valueOf(s.getRole()),
@@ -103,10 +104,9 @@ public class UserFileHandler {
         }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            ArrayList<String> seenEmails = new ArrayList<>();
+            HashMap<String, Boolean> seenEmails = new HashMap<>();
             String line;
             int lineNumber = 0;
-            loop:
             while ((line = reader.readLine()) != null) {
                 lineNumber++;
                 if (line.trim().isEmpty()) continue;
@@ -127,42 +127,29 @@ public class UserFileHandler {
                             continue;
                         }
 
-                        String surname = parts[1];
-                        String name = parts[2];
+                        String name = parts[1];
+                        String surname = parts[2];
                         String lastname = parts[3];
                         String group = parts[4];
                         String role = parts[5];
                         String email = parts[6];
                         String password = parts[7];
 
-                        for (String seen_email : seenEmails) {
-                            if (seen_email.equals(email)) {
-                                System.err.println("Warning: Line " + lineNumber + " has duplicate email, skip");
-                                continue loop;
-                            }
-                        }
-                        seenEmails.add(email);
-
-                        Student student = new Student(surname, name, lastname, group, email, password);
-
+                        if (Boolean.FALSE.equals(seenEmails.put(email, true))) continue;
                         try {
-                            if (role.equals("REGULAR")) {
-                                student.setRole(REGULAR);
-                            } else if (role.equals("HEAD_STUDENT")) {
+                            Student student = new Student(name, surname, lastname, group, email, password);
+                            if (role.equals("HEAD_STUDENT")) {
                                 student.setRole(HEAD_STUDENT);
                             } else {
                                 System.err.println("Warning: Line " + lineNumber + " has invalid Student role '" + role + "', using REGULAR");
                                 student.setRole(REGULAR);
                             }
+                            student.assignId();
+                            student.setPassword(password);
+                            users.add(student);
                         } catch (IllegalArgumentException e) {
                             System.err.println("Warning: Line " + lineNumber + " has invalid Student role, using REGULAR" + e.getMessage());
-                            student.setRole(REGULAR);
                         }
-
-                        student.assignId();
-                        student.setPassword(password);
-                        users.add(student);
-
                     } else if (type.equals("Teacher")) {
                         if (parts.length != 8) {
                             System.err.println("Warning: Line " + lineNumber + " has invalid Teacher format (expected 8 fields, got " + parts.length + "), skip");
