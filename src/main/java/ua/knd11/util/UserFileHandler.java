@@ -44,7 +44,7 @@ public class UserFileHandler {
 
     /**
      * Append a user's record to the backing users_db.txt file.
-     *
+     * <p>
      * Serializes the provided User as a single comma-and-space separated line and appends it to the file.
      * If the file does not exist it will be created. Supported runtime types and their serialized field
      * orders are:
@@ -95,7 +95,7 @@ public class UserFileHandler {
 
     /**
      * Loads users from the backing file "users_db.txt" into a new list.
-     *
+     * <p>
      * Parses each line as either a Student or Teacher record, skips malformed records and duplicate
      * emails (keeps the first occurrence), assigns IDs and restores passwords on created objects,
      * updates the in-memory cache via setSavedList, and returns the parsed users.
@@ -150,6 +150,8 @@ public class UserFileHandler {
                             Student student = new Student(name, surname, lastname, group, email, password);
                             if (role.equals("HEAD_STUDENT")) {
                                 student.setRole(HEAD_STUDENT);
+                            } else if (role.equals("REGULAR")) {
+                                student.setRole(REGULAR);
                             } else {
                                 System.err.println("Warning: Line " + lineNumber + " has invalid Student role '" + role + "', using REGULAR");
                                 student.setRole(REGULAR);

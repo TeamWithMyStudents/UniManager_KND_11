@@ -52,7 +52,7 @@ public class Student extends User {
 
     /**
      * Set the student's group code.
-     *
+     * <p>
      * The provided group is validated and then stored in uppercase using Locale.ROOT.
      *
      * @param group the group code to assign; may be normalized to uppercase

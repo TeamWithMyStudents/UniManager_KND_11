@@ -26,7 +26,7 @@ public class StudentController {
 
     /**
      * Creates and adds a new Student parsed from a single-line input string.
-     *
+     * <p>
      * The input must contain exactly six fields in this order: name, surname, lastname, group, email, password.
      * Fields may be separated by spaces or commas; surrounding whitespace is ignored.
      *
@@ -76,7 +76,7 @@ public class StudentController {
 
     /**
      * Prints all stored Student instances to standard output.
-     *
+     * <p>
      * Retrieves all users from the service and prints each object that is an instance of {@code Student}. If no students are present, prints a message to {@link System#err}.
      */
     public void getAll() {

@@ -12,13 +12,13 @@ import java.util.List;
 public interface ScheduleService {
 
     /**
- * Add a lesson to the schedule for a specific day and start time.
- *
- * @param day            day of the week as a full name (e.g., "Monday")
- * @param time           lesson start time in 24-hour "HH:mm" format (e.g., "08:30")
- * @param subject        subject or course name
- * @param teacherSurname teacher's surname
- */
+     * Add a lesson to the schedule for a specific day and start time.
+     *
+     * @param day            day of the week as a full name (e.g., "Monday")
+     * @param time           lesson start time in 24-hour "HH:mm" format (e.g., "08:30")
+     * @param subject        subject or course name
+     * @param teacherSurname teacher's surname
+     */
     void addLesson(String day, String time, String subject, String teacherSurname);
 
     /**

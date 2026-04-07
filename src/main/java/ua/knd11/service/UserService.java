@@ -1,4 +1,5 @@
 package ua.knd11.service;
+
 import ua.knd11.model.User;
 
 import java.util.List;
@@ -8,26 +9,26 @@ import java.util.List;
  */
 public interface UserService {
     /**
- * Adds a user to the system.
- *
- * @param u the user to add
- * @return `true` if the user was added successfully, `false` otherwise
- */
+     * Adds a user to the system.
+     *
+     * @param u the user to add
+     * @return `true` if the user was added successfully, `false` otherwise
+     */
     boolean add(User u);
 
     /**
- * Deletes the user with the specified id.
- *
- * @param id the user's identifier
- * @return `true` if a user with the id was deleted, `false` otherwise
- */
+     * Deletes the user with the specified id.
+     *
+     * @param id the user's identifier
+     * @return `true` if a user with the id was deleted, `false` otherwise
+     */
     boolean delete(int id);
 
     /**
- * Retrieve all users.
- *
- * @return a list of all User objects; empty list if no users exist
- */
+     * Retrieve all users.
+     *
+     * @return a list of all User objects; empty list if no users exist
+     */
     List<User> getAll();
 
     /**

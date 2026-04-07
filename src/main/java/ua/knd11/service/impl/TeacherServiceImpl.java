@@ -12,9 +12,9 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
 
     /**
      * Calculates and prints the sum of salaries for all Teacher entries in the repository.
-     *
+     * <p>
      * Iterates the repository, adds each Teacher's salary to a running total, and prints
-     * the result to standard output as "Total University Budget: " followed by the sum.
+     * the result to standard output as "Total University Budget": followed by the sum.
      */
     public void calculateTotalSalary() {
         double result = repository.stream().mapToDouble(user -> user instanceof Teacher t ? t.getSalary() : 0).sum();

@@ -12,7 +12,7 @@ import ua.knd11.util.FieldValidator;
 public class StudentServiceImpl extends UserServiceImpl implements StudentService {
     /**
      * Prints students whose group contains the given group name (case-insensitive, partial match).
-     *
+     * <p>
      * Validates `groupName` before searching; each matching `Student` is printed to standard output.
      *
      * @param groupName the group substring to match (e.g., "KND-11")
@@ -26,15 +26,15 @@ public class StudentServiceImpl extends UserServiceImpl implements StudentServic
     }
 
     /**
-         * Assigns the specified student as the head student for their group.
-         *
-         * If another student in the same group currently holds the head role, that student is demoted to `StudentRole.REGULAR`.
-         * If the student with the given ID is not found or is not a `Student`, the method prints a message and returns without changes.
-         * If the student is already the head of their group, the method prints a message and returns without changes.
-         * On successful assignment, the student's role is set to `StudentRole.HEAD_STUDENT` and a confirmation is printed.
-         *
-         * @param studentId the unique ID of the student to assign as head student
-         */
+     * Assigns the specified student as the head student for their group.
+     * <p>
+     * If another student in the same group currently holds the head role, that student is demoted to `StudentRole.REGULAR`.
+     * If the student with the given ID is not found or is not a `Student`, the method prints a message and returns without changes.
+     * If the student is already the head of their group, the method prints a message and returns without changes.
+     * On successful assignment, the student's role is set to `StudentRole.HEAD_STUDENT` and a confirmation is printed.
+     *
+     * @param studentId the unique ID of the student to assign as head student
+     */
     @Override
     public void assignHeadStudent(int studentId) {
         Student newHeadStudent = null;

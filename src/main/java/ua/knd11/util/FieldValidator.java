@@ -6,6 +6,18 @@ package ua.knd11.util;
 public final class FieldValidator {
 
     /**
+     * Prevents instantiation of this utility class.
+     *
+     * <p>This private constructor always throws an {@link UnsupportedOperationException} to
+     * enforce non-instantiability.
+     *
+     * @throws UnsupportedOperationException always thrown to prevent creating an instance
+     */
+    private FieldValidator() {
+        throw new UnsupportedOperationException("Utility class");
+    }
+
+    /**
      * Ensures the provided string is neither null nor blank.
      *
      * @param field the label of the validated field used in the exception message
@@ -16,18 +28,6 @@ public final class FieldValidator {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException(field + " is null or empty");
         }
-    }
-
-    /**
-     * Prevents instantiation of this utility class.
-     *
-     * <p>This private constructor always throws an {@link UnsupportedOperationException} to
-     * enforce non-instantiability.
-     *
-     * @throws UnsupportedOperationException always thrown to prevent creating an instance
-     */
-    private FieldValidator() {
-        throw new UnsupportedOperationException("Utility class");
     }
 
     /**

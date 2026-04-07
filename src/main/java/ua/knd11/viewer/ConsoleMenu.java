@@ -53,7 +53,7 @@ public class ConsoleMenu {
 
     /**
      * Display and handle the interactive Student Manager submenu.
-     *
+     * <p>
      * Presents options to add a student, list all students, delete a student by ID,
      * assign a head student by ID, or return to the main menu. User selections are
      * read from the class Scanner; ID inputs for delete and assign are validated as
@@ -116,7 +116,7 @@ public class ConsoleMenu {
 
     /**
      * Display and handle the teacher management submenu.
-     *
+     * <p>
      * Presents options to add a teacher, show all teachers, calculate total salary,
      * filter teachers by degree, or return to the main menu.
      */

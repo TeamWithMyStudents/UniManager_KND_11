@@ -19,13 +19,13 @@ public class Teacher extends User {
      * <p>Validates the department and degree as alphabetic strings and validates the salary value;
      * throws IllegalArgumentException on validation failure.
      *
-     * @param name     the teacher's given name
-     * @param surname  the teacher's family name
+     * @param name       the teacher's given name
+     * @param surname    the teacher's family name
      * @param department the teacher's department or faculty
-     * @param degree   the teacher's academic degree or qualification
-     * @param salary   the teacher's salary
-     * @param email    the teacher's email address
-     * @param password the teacher's account password
+     * @param degree     the teacher's academic degree or qualification
+     * @param salary     the teacher's salary
+     * @param email      the teacher's email address
+     * @param password   the teacher's account password
      * @throws IllegalArgumentException if any provided field fails validation
      */
     public Teacher(String name, String surname, String department, String degree, double salary, String email, String password)
@@ -70,11 +70,11 @@ public class Teacher extends User {
     }
 
     /**
-         * Sets the teacher's academic degree or qualification.
-         *
-         * @param degree the degree or qualification (e.g., "PhD", "Master") to assign
-         * @throws IllegalArgumentException if {@code degree} is null, empty, or contains non-alphabetic characters
-         */
+     * Sets the teacher's academic degree or qualification.
+     *
+     * @param degree the degree or qualification (e.g., "PhD", "Master") to assign
+     * @throws IllegalArgumentException if {@code degree} is null, empty, or contains non-alphabetic characters
+     */
     @SuppressWarnings("unused")
     public void setDegree(String degree) throws IllegalArgumentException {
         FieldValidator.validateAlphabeticString("Degree", degree);

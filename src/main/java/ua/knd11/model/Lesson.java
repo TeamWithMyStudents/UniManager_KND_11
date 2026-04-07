@@ -66,11 +66,11 @@ public class Lesson {
     }
 
     /**
-         * Set the lesson start time.
-         *
-         * @param time the lesson start time; must not be null
-         * @throws IllegalArgumentException if {@code time} is null
-         */
+     * Set the lesson start time.
+     *
+     * @param time the lesson start time; must not be null
+     * @throws IllegalArgumentException if {@code time} is null
+     */
     public void setTime(LocalTime time) {
         if (time == null) throw new IllegalArgumentException("Time must not be null");
         this.time = time;

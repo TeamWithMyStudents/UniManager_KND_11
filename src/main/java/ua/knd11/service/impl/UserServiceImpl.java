@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Remove the user with the given id from the in-memory repository.
-     *
+     * <p>
      * If a user is removed, the method also invokes the shared AuthService to remove the user from authentication state.
      *
      * @param id the identifier of the user to remove
@@ -107,7 +107,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Sorts the internal user repository in-place by users' surname using Ukrainian locale collation.
-     *
+     * <p>
      * Comparison treats null surnames as greater than any non-null surname so users with null surnames are placed last.
      */
     public void sortBySurname() {

@@ -16,7 +16,7 @@ public class AuthServiceImpl implements AuthService {
 
     /**
      * Populates the in-memory registered users list from persistent storage when it is empty.
-     *
+     * <p>
      * If the shared {@code registeredUsers} list contains no entries, loads saved users and adds them to it.
      */
     public AuthServiceImpl() {
@@ -24,13 +24,13 @@ public class AuthServiceImpl implements AuthService {
     }
 
     /**
-         * Registers a new user: validates input, replaces the user's password with its hash,
-         * persists the user to storage, and adds the user to the in-memory registry.
-         *
-         * @param user the user to register; must be non-null, must have an email not already present (case-insensitive), and will have its password replaced with the password's hash
-         * @throws IllegalArgumentException if {@code user} is null or a user with the same email already exists
-         * @throws IOException if persisting the user to storage fails
-         */
+     * Registers a new user: validates input, replaces the user's password with its hash,
+     * persists the user to storage, and adds the user to the in-memory registry.
+     *
+     * @param user the user to register; must be non-null, must have an email not already present (case-insensitive), and will have its password replaced with the password's hash
+     * @throws IllegalArgumentException if {@code user} is null or a user with the same email already exists
+     * @throws IOException              if persisting the user to storage fails
+     */
     public void registration(User user) throws IllegalArgumentException, IOException {
         if (user == null) throw new IllegalArgumentException("User must not be null");
 
