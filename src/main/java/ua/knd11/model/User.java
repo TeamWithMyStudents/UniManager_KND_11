@@ -19,13 +19,13 @@ public abstract class User {
     private String password;
 
     /**
-     * Constructs a User instance with the specified name, surname, email, and password.
+     * Create a User with the given name, surname, email, and password.
      *
-     * @param name     name
-     * @param surname  surname
-     * @param email    email
-     * @param password password
-     * @throws IllegalArgumentException if any of the provided parameters are null, blank, or invalid
+     * @param name     the user's first name; must pass alphabetic validation
+     * @param surname  the user's surname; must pass alphabetic validation
+     * @param email    the user's email; must pass email validation
+     * @param password the user's password; must pass password validation
+     * @throws IllegalArgumentException if any parameter fails its validation
      */
     public User(String name, String surname, String email, String password) throws IllegalArgumentException {
         FieldValidator.validateAlphabeticString("Name", name);
@@ -51,28 +51,28 @@ public abstract class User {
     }
 
     /**
-     * Gets id.
+     * Retrieve the user's unique identifier.
      *
-     * @return user's unique ID
+     * @return the user's unique ID, or 0 if an ID has not been assigned
      */
     public int getId() {
         return id;
     }
 
     /**
-     * Gets name.
+     * Returns the user's first name.
      *
-     * @return the name
+     * @return the user's first name
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Sets name.
+     * Update the user's given name.
      *
-     * @param name the name
-     * @throws IllegalArgumentException the illegal argument exception
+     * @param name the new given name; must contain only alphabetic characters
+     * @throws IllegalArgumentException if `name` is null, empty, or contains non-alphabetic characters
      */
     @SuppressWarnings("unused")
     public void setName(String name) throws IllegalArgumentException {
@@ -90,10 +90,10 @@ public abstract class User {
     }
 
     /**
-     * Sets surname.
+     * Update the user's surname after validating it contains only alphabetic characters.
      *
-     * @param surname the surname
-     * @throws IllegalArgumentException the illegal argument exception
+     * @param surname the new surname to set; must be a non-empty alphabetic string
+     * @throws IllegalArgumentException if the provided surname fails validation
      */
     @SuppressWarnings("unused")
     public void setSurname(String surname) throws IllegalArgumentException {
@@ -102,19 +102,19 @@ public abstract class User {
     }
 
     /**
-     * Gets email.
+     * Retrieve the user's email address.
      *
-     * @return the email
+     * @return the user's email address
      */
     public String getEmail() {
         return email;
     }
 
     /**
-     * Sets email.
+     * Update the user's email to the provided value after validating its format.
      *
-     * @param email the email
-     * @throws IllegalArgumentException the illegal argument exception
+     * @param email the new email address
+     * @throws IllegalArgumentException if the email format is invalid
      */
     @SuppressWarnings("unused")
     public void setEmail(String email) throws IllegalArgumentException {
@@ -123,25 +123,32 @@ public abstract class User {
     }
 
     /**
-     * Gets password.
+     * Retrieves the user's password.
      *
-     * @return the password
+     * @return the user's password
      */
     public String getPassword() {
         return password;
     }
 
     /**
-     * Sets password.
+     * Update the user's password after validating it.
      *
-     * @param password the password
-     * @throws IllegalArgumentException the illegal argument exception
+     * @param password the new password to assign; must meet the user's password requirements
+     * @throws IllegalArgumentException if the provided password is invalid
      */
     public void setPassword(String password) throws IllegalArgumentException {
         FieldValidator.validatePassword(password);
         this.password = password;
     }
 
+    /**
+     * Provides a string representation containing the user's id, name, surname, and email.
+     *
+     * <p>Does not include the user's password.</p>
+     *
+     * @return a string formatted as "Id: {id}, Name: {name}, Surname: {surname}, Email: {email}".
+     */
     @Override
     public String toString() {
         return "Id: " + getId() +

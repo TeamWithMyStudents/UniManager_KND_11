@@ -15,18 +15,22 @@ public class AuthServiceImpl implements AuthService {
     private final static ArrayList<User> registeredUsers = new ArrayList<>();
 
     /**
-     * Initializes AuthService and loads existing users from file.
+     * Populates the in-memory registered users list from persistent storage when it is empty.
+     *
+     * If the shared {@code registeredUsers} list contains no entries, loads saved users and adds them to it.
      */
     public AuthServiceImpl() {
         if (registeredUsers.isEmpty()) registeredUsers.addAll(UserFileHandler.getSavedList());
     }
 
     /**
-     * Registers a new user in the system.
-     *
-     * @param user the user to register
-     * @throws IllegalArgumentException if user is null or email already exists
-     */
+         * Registers a new user: validates input, replaces the user's password with its hash,
+         * persists the user to storage, and adds the user to the in-memory registry.
+         *
+         * @param user the user to register; must be non-null, must have an email not already present (case-insensitive), and will have its password replaced with the password's hash
+         * @throws IllegalArgumentException if {@code user} is null or a user with the same email already exists
+         * @throws IOException if persisting the user to storage fails
+         */
     public void registration(User user) throws IllegalArgumentException, IOException {
         if (user == null) throw new IllegalArgumentException("User must not be null");
 
@@ -42,12 +46,12 @@ public class AuthServiceImpl implements AuthService {
     }
 
     /**
-     * Authenticates a user with email and password.
+     * Authenticate a user by email and password and establish a user session.
      *
-     * @param email    user's email address
-     * @param password user's password
-     * @return authenticated user
-     * @throws IllegalArgumentException if authentication fails or user already logged in
+     * @param email    the user's email address (case-insensitive)
+     * @param password the user's plain-text password
+     * @return the authenticated {@code User}
+     * @throws IllegalArgumentException if a user is already logged in, no matching email is found, or the password is incorrect
      */
     public User login(String email, String password) {
 
@@ -73,9 +77,9 @@ public class AuthServiceImpl implements AuthService {
     }
 
     /**
-     * Gets registered users.
+     * Returns a defensive copy of the list of registered users.
      *
-     * @return the registered users
+     * @return a new ArrayList containing all currently registered users
      */
     @SuppressWarnings("unused")
     public ArrayList<User> getRegisteredUsers() {
@@ -83,10 +87,10 @@ public class AuthServiceImpl implements AuthService {
     }
 
     /**
-     * Remove user boolean.
+     * Removes the user with the specified id from the registered users list.
      *
-     * @param id the id
-     * @return the boolean
+     * @param id the id of the user to remove
+     * @return `true` if a user with the given id was removed, `false` otherwise
      */
     public boolean removeUser(int id) {
         return registeredUsers.removeIf(user -> user.getId() == id);

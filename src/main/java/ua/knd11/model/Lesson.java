@@ -15,13 +15,14 @@ public class Lesson {
     private String teacherSurname;
 
     /**
-     * Constructs a new Lesson with validated information.
+     * Create a Lesson with validated day, time, subject, and teacher surname.
      *
-     * @param dayOfWeek      day of the week
-     * @param time           lesson start time
-     * @param subject        subject name
-     * @param teacherSurname teacher's surname
-     * @throws IllegalArgumentException if subject or teacher name is invalid
+     * @param dayOfWeek      the scheduled day of the lesson; must not be null
+     * @param time           the lesson start time; must not be null
+     * @param subject        the subject name; must be an alphabetic, non-empty string
+     * @param teacherSurname the teacher's surname; must be an alphabetic, non-empty string
+     * @throws IllegalArgumentException if {@code dayOfWeek} or {@code time} is null, or if {@code subject}
+     *                                  or {@code teacherSurname} fails alphabetic validation
      */
     public Lesson(DayOfWeek dayOfWeek, LocalTime time, String subject, String teacherSurname)
             throws IllegalArgumentException {
@@ -45,10 +46,10 @@ public class Lesson {
     }
 
     /**
-     * Sets day of week.
+     * Sets the lesson's day of week.
      *
-     * @param dayOfWeek the day of week
-     * @throws IllegalArgumentException if dayOfWeek is null
+     * @param dayOfWeek the new day of week
+     * @throws IllegalArgumentException if {@code dayOfWeek} is null
      */
     public void setDayOfWeek(DayOfWeek dayOfWeek) {
         if (dayOfWeek == null) throw new IllegalArgumentException("DayOfWeek must not be null");
@@ -56,39 +57,39 @@ public class Lesson {
     }
 
     /**
-     * Gets time.
+     * Get the lesson's scheduled start time.
      *
-     * @return the time
+     * @return the scheduled start time of this lesson
      */
     public LocalTime getTime() {
         return time;
     }
 
     /**
-     * Sets time.
-     *
-     * @param time the time
-     * @throws IllegalArgumentException if time is null
-     */
+         * Set the lesson start time.
+         *
+         * @param time the lesson start time; must not be null
+         * @throws IllegalArgumentException if {@code time} is null
+         */
     public void setTime(LocalTime time) {
         if (time == null) throw new IllegalArgumentException("Time must not be null");
         this.time = time;
     }
 
     /**
-     * Gets subject.
+     * Gets the lesson subject.
      *
-     * @return the subject
+     * @return the lesson subject
      */
     public String getSubject() {
         return subject;
     }
 
     /**
-     * Sets subject.
+     * Set the lesson's subject after validating its value.
      *
-     * @param subject the subject
-     * @throws IllegalArgumentException the illegal argument exception
+     * @param subject the subject name; must contain only alphabetic characters
+     * @throws IllegalArgumentException if {@code subject} is {@code null} or contains non-alphabetic characters
      */
     public void setSubject(String subject) throws IllegalArgumentException {
         FieldValidator.validateAlphabeticString("Subject", subject);
@@ -105,16 +106,21 @@ public class Lesson {
     }
 
     /**
-     * Sets teacher surname.
+     * Sets the teacher's surname after validating it contains only alphabetic characters.
      *
-     * @param teacherSurname the teacher surname
-     * @throws IllegalArgumentException the illegal argument exception
+     * @param teacherSurname the teacher's surname; must contain only alphabetic characters
+     * @throws IllegalArgumentException if `teacherSurname` is null, empty, or contains non-alphabetic characters
      */
     public void setTeacherSurname(String teacherSurname) throws IllegalArgumentException {
         FieldValidator.validateAlphabeticString("Teacher Surname", teacherSurname);
         this.teacherSurname = teacherSurname;
     }
 
+    /**
+     * Produce a string representation of the lesson containing its day of week, time, subject, and teacher surname.
+     *
+     * @return a string in the form Lesson{dayOfWeek=..., time=..., subject='...', teacherSurname='...'}
+     */
     @Override
     public String toString() {
         return "Lesson{" +

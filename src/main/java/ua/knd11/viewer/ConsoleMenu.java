@@ -52,9 +52,12 @@ public class ConsoleMenu {
     }
 
     /**
-     * Submenu for managing student data.
-     * Allows you to add, show, delete or assign a user as a Head Student, or go back to the main menu.
-     * Checks the correctness of the input of int data (ID)
+     * Display and handle the interactive Student Manager submenu.
+     *
+     * Presents options to add a student, list all students, delete a student by ID,
+     * assign a head student by ID, or return to the main menu. User selections are
+     * read from the class Scanner; ID inputs for delete and assign are validated as
+     * integers and invalid token input is consumed and reported.
      */
     private void studentSubMenu() {
         boolean back = false;
@@ -112,8 +115,10 @@ public class ConsoleMenu {
     }
 
     /**
-     * Submenu for managing teacher data.
-     * Allows you to add, show, delete, calculate budget, filter by degree, or go back to the main menu.
+     * Display and handle the teacher management submenu.
+     *
+     * Presents options to add a teacher, show all teachers, calculate total salary,
+     * filter teachers by degree, or return to the main menu.
      */
     private void teacherSubMenu() {
         boolean back = false;

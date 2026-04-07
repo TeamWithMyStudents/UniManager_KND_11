@@ -25,20 +25,21 @@ public class UserServiceImpl implements UserService {
     protected static List<User> repository = new ArrayList<>();
 
     /**
-     * Instantiates a new User service.
+     * Initializes a new UserServiceImpl and populates the shared in-memory repository from storage if it is empty.
+     *
+     * <p>If the static repository contains no users, entries returned by {@code UserFileHandler.getSavedList()}
+     * are added to it.</p>
      */
     public UserServiceImpl() {
         if (repository.isEmpty()) repository.addAll(UserFileHandler.getSavedList());
     }
 
     /**
-     * Adds a user to the list (repository).
-     * The user is registered, assigned an ID, added to the list, and returns true.
+     * Adds the specified user to the in-memory repository after registering the user and assigning an ID.
      *
-     * @return true if the user was added successfully, false otherwise
-     * @throws IllegalArgumentException if the user is null or the first and last name is not specified
-     * @throws NullPointerException     if the user is null
-     * @throws IllegalStateException    if the user ID is already taken (User is registered)
+     * @param user the user to register and persist; must not be {@code null}
+     * @return {@code true} if the user was added to the repository, {@code false} otherwise
+     * @throws NullPointerException if {@code user} is {@code null}
      */
     public boolean add(User user) throws NullPointerException {
         if (user == null) throw new NullPointerException("User must not be null");
@@ -54,11 +55,12 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Removes a user from the list (repository)
-     * Where the user is compared with the received ID and removed if there is a match.
+     * Remove the user with the given id from the in-memory repository.
      *
-     * @param id id of the user to be removed
-     * @return true if the user was removed successfully, false otherwise
+     * If a user is removed, the method also invokes the shared AuthService to remove the user from authentication state.
+     *
+     * @param id the identifier of the user to remove
+     * @return true if a user with the given id was removed, false otherwise
      */
     public boolean delete(int id) {
         boolean removedFromRepository = repository.removeIf(user -> user.getId() == id);
@@ -69,20 +71,19 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * returns a list of all users stored in the repository.
+     * Retrieve all users currently stored in the repository.
      *
-     * @return a new list containing all users from the repository.
+     * @return a new List containing the repository's users (modifications to the returned list do not affect the internal repository)
      */
     public List<User> getAll() {
         return new ArrayList<>(repository);
     }
 
     /**
-     * Searches for a user by name.
-     * If the request is empty, an exception is thrown.
-     * In another case, the Stream API is used to find users, where the user is compared with the received request and, if there is a match, the result is displayed.
+     * Prints users whose name equals the given query, using case-insensitive comparison.
      *
-     * @param query is the string to search for the user by name.
+     * @param query the name to match (case-insensitive)
+     * @throws IllegalArgumentException if {@code query} is {@code null}
      */
     public void findByName(String query) {
         if (query == null) {
@@ -92,11 +93,10 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * A method that searches for a user by surname.
-     * If the request is empty, an exception is thrown.
-     * In another case, the Stream API is used to find users, where the user is compared with the received request and, if there is a match, the result is displayed.
+     * Prints users whose surname matches the given query, using a case-insensitive comparison.
      *
-     * @param query is the string to search for the user by surname.
+     * @param query surname to match (case-insensitive)
+     * @throws IllegalArgumentException if {@code query} is null
      */
     public void findBySurname(String query) {
         if (query == null) {
@@ -106,8 +106,9 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Method that sorts Users (Students or Teachers) by surname
-     * used class Collator for correct comparison using the Ukrainian locale
+     * Sorts the internal user repository in-place by users' surname using Ukrainian locale collation.
+     *
+     * Comparison treats null surnames as greater than any non-null surname so users with null surnames are placed last.
      */
     public void sortBySurname() {
         Collator uaCollator = Collator.getInstance(new Locale("uk", "UA"));

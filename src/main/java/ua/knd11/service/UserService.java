@@ -8,40 +8,40 @@ import java.util.List;
  */
 public interface UserService {
     /**
-     * Add boolean.
-     *
-     * @param u the u
-     * @return the boolean
-     */
+ * Adds a user to the system.
+ *
+ * @param u the user to add
+ * @return `true` if the user was added successfully, `false` otherwise
+ */
     boolean add(User u);
 
     /**
-     * Delete boolean.
-     *
-     * @param id the id
-     * @return the boolean
-     */
+ * Deletes the user with the specified id.
+ *
+ * @param id the user's identifier
+ * @return `true` if a user with the id was deleted, `false` otherwise
+ */
     boolean delete(int id);
 
     /**
-     * Gets all.
-     *
-     * @return the all
-     */
+ * Retrieve all users.
+ *
+ * @return a list of all User objects; empty list if no users exist
+ */
     List<User> getAll();
 
     /**
-     * Find by name.
+     * Search for users whose given name matches the provided query.
      *
-     * @param query the query
+     * @param query the search string used to match a user's given name
      */
     @SuppressWarnings("unused")
     void findByName(String query);
 
     /**
-     * Find by surname.
+     * Search for users whose surname matches the supplied query.
      *
-     * @param query the query
+     * @param query the surname or substring to match against user surnames
      */
     @SuppressWarnings("unused")
     void findBySurname(String query);

@@ -12,9 +12,9 @@ public interface StudentService extends UserService {
     void findByGroup(String groupName);
 
     /**
-     * Assigns head student role to a student.
-     *
-     * @param studentId the student's unique ID
-     */
+ * Assigns the head-student role to the student with the given identifier.
+ *
+ * @param studentId the student's identifier (e.g., database primary key)
+ */
     void assignHeadStudent(int studentId);
 }

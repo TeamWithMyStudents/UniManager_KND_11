@@ -11,11 +11,12 @@ import ua.knd11.util.FieldValidator;
  */
 public class StudentServiceImpl extends UserServiceImpl implements StudentService {
     /**
-     * The method searches for students by group name and outputs in the console.
-     * The search is performed by partial matching and is case-insensitive.
+     * Prints students whose group contains the given group name (case-insensitive, partial match).
      *
-     * @param groupName is the string to search for the group (e.g., "KND-11").
-     * @throws IllegalArgumentException if the {@code groupName} is invalid
+     * Validates `groupName` before searching; each matching `Student` is printed to standard output.
+     *
+     * @param groupName the group substring to match (e.g., "KND-11")
+     * @throws IllegalArgumentException if `groupName` is invalid
      */
     @Override
     public void findByGroup(String groupName) throws IllegalArgumentException {
@@ -25,18 +26,15 @@ public class StudentServiceImpl extends UserServiceImpl implements StudentServic
     }
 
     /**
-     * The method assigns a student by ID as the Head Student of their group.
-     * Logic:
-     * <ul>
-     * <li>Searches for a student by ID. If not found, returns an error.</li>
-     * <li>Checks if the current Head Student is in the found student's group.</li>
-     * <li>If another Head Student exists in the group, they are removed from their position (converted to REGULAR).</li>
-     * <li>If the target student is already the Head Student, returns a message and terminates.</li>
-     * <li>Assigns a new Head Student and outputs in the console.</li>
-     * </ul>
-     *
-     * @param studentId is the unique ID of the student to be assigned as the Head Student.
-     */
+         * Assigns the specified student as the head student for their group.
+         *
+         * If another student in the same group currently holds the head role, that student is demoted to `StudentRole.REGULAR`.
+         * If the student with the given ID is not found or is not a `Student`, the method prints a message and returns without changes.
+         * If the student is already the head of their group, the method prints a message and returns without changes.
+         * On successful assignment, the student's role is set to `StudentRole.HEAD_STUDENT` and a confirmation is printed.
+         *
+         * @param studentId the unique ID of the student to assign as head student
+         */
     @Override
     public void assignHeadStudent(int studentId) {
         Student newHeadStudent = null;
@@ -72,6 +70,13 @@ public class StudentServiceImpl extends UserServiceImpl implements StudentServic
                 "\nis now the Head Student of group " + targetGroup + "!");
     }
 
+    /**
+     * Adds the given user to the underlying repository as a Student.
+     *
+     * @param user the user to add; must be an instance of {@code Student}
+     * @return {@code true} if the student was added, {@code false} otherwise
+     * @throws IllegalArgumentException if {@code user} is not an instance of {@code Student}
+     */
     @Override
     public boolean add(User user) {
         if (!(user instanceof Student student)) {

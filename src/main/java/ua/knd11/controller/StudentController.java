@@ -15,21 +15,22 @@ public class StudentController {
     private final StudentService service = new StudentServiceImpl();
 
     /**
-     * Method assigns a student as a head student by ID.
+     * Assigns the student with the given ID as head student.
      *
-     * @param id is the student's unique ID.
-     * @see StudentService#assignHeadStudent(int) StudentService#assignHeadStudent(int)
+     * @param id the student's unique identifier
+     * @see StudentService#assignHeadStudent(int)
      */
     public void assignHeadStudent(int id) {
         service.assignHeadStudent(id);
     }
 
     /**
-     * Method creates and adds a new student based on the input string.
-     * The method normalizes the string, expects 6 fields, removes spaces.
+     * Creates and adds a new Student parsed from a single-line input string.
      *
-     * @param input string with student data.
-     * @throws IllegalArgumentException if the data is not validated in the {@link Student} model.
+     * The input must contain exactly six fields in this order: name, surname, lastname, group, email, password.
+     * Fields may be separated by spaces or commas; surrounding whitespace is ignored.
+     *
+     * @param input single-line student data with six fields in the order: name, surname, lastname, group, email, password
      */
     public void create(String input) {
         //normalize input by replacing commas with spaces and trimming whitespace
@@ -61,9 +62,9 @@ public class StudentController {
     }
 
     /**
-     * Method removes a student from the system by their ID.
+     * Removes the student with the given identifier from the system.
      *
-     * @param id - ID of the student to remove.
+     * @param id the identifier of the student to remove
      */
     public void delete(int id) {
         if (service.delete(id)) {
@@ -74,8 +75,9 @@ public class StudentController {
     }
 
     /**
-     * Method gets a list of all users and outputs only those who are students to the console.
-     * If the list is empty or no students found, outputs {@link System#err}.
+     * Prints all stored Student instances to standard output.
+     *
+     * Retrieves all users from the service and prints each object that is an instance of {@code Student}. If no students are present, prints a message to {@link System#err}.
      */
     public void getAll() {
         List<User> students = service.getAll();

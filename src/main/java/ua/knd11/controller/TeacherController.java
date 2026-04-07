@@ -88,21 +88,15 @@ public class TeacherController {
 
     /**
      * Calculates the total salary of all teachers.
-     * <p>
-     * This method delegates the calculation logic to the underlying service layer.
-     * The result is typically processed or printed to the console by the service.
      */
     public void calculateTotalSalary() {
         service.calculateTotalSalary();
     }
 
     /**
-     * Filters and retrieves teachers based on their academic degree.
-     * <p>
-     * This method delegates the filtering operation to the underlying service layer,
-     * which processes the request and typically outputs the filtered list.
+     * Filters teachers by academic degree and displays matching results.
      *
-     * @param degree the teacher degree to filter by (e.g., "Master", "PhD", or "Doctor of Science").
+     * @param degree the academic degree to filter by (e.g., "Master", "PhD", "Doctor of Science")
      */
     public void filterByDegree(String degree) {
         service.filterByDegree(degree);

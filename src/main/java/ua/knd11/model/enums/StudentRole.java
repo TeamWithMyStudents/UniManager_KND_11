@@ -21,14 +21,19 @@ public enum StudentRole {
     //normal name to output in console
     private final String displayName;
 
+    /**
+     * Create a StudentRole with the given display name.
+     *
+     * @param displayName the label to use for this role when shown to users or in logs
+     */
     StudentRole(String displayName) {
         this.displayName = displayName;
     }
 
     /**
-     * Gets display name.
+     * Returns the human-readable label associated with this student role.
      *
-     * @return the display name
+     * @return the display name for this enum constant
      */
     public String getDisplayName() {
         return displayName;

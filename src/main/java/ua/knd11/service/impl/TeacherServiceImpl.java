@@ -11,8 +11,10 @@ import ua.knd11.util.FieldValidator;
 public class TeacherServiceImpl extends UserServiceImpl implements TeacherService {
 
     /**
-     * A method that calculates teachers' salaries using the Stream API
-     * It determines the number of teachers from a list and returns their salaries, which are then summed up.
+     * Calculates and prints the sum of salaries for all Teacher entries in the repository.
+     *
+     * Iterates the repository, adds each Teacher's salary to a running total, and prints
+     * the result to standard output as "Total University Budget: " followed by the sum.
      */
     public void calculateTotalSalary() {
         double result = repository.stream().mapToDouble(user -> user instanceof Teacher t ? t.getSalary() : 0).sum();
@@ -20,15 +22,10 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
     }
 
     /**
-     * A method that filters by teacher degree.
-     * If the desired degree is not found, the method terminates.
-     * Otherwise, a variable is created that stores a boolean value.
-     * All users are then iterated through, with only teachers selected.
-     * These users are compared with the desired degree, displayed, and true is set to the variable.
-     * If not found, a message is displayed stating, "No teachers with this degree were found."
+     * Prints all teachers whose degree contains the given degree string (case-insensitive).
      *
-     * @param degree the degree to search for.
-     * @throws IllegalArgumentException if the degree is null or empty.
+     * @param degree substring to match against teacher degrees (case-insensitive)
+     * @throws IllegalArgumentException if `degree` is null, empty, or contains non-alphabetic characters
      */
     public void filterByDegree(String degree) throws IllegalArgumentException {
         FieldValidator.validateAlphabeticString("Degree", degree);
@@ -48,11 +45,11 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
     }
 
     /**
-     * The method that adds a teacher.
-     * Add method from the user class is called.
+     * Adds a teacher to the underlying repository.
      *
+     * @param user the user to add; must be a {@code Teacher} instance
      * @return true if the user was added successfully, false otherwise
-     * @throws IllegalArgumentException if the user is not an instance of Teacher
+     * @throws IllegalArgumentException if {@code user} is not an instance of {@code Teacher}
      */
     @Override
     public boolean add(User user) throws IllegalArgumentException {

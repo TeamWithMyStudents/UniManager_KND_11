@@ -14,19 +14,19 @@ public class Teacher extends User {
     private double salary;
 
     /**
-     * <p>Constructs a new Teacher instance.
-     * <p>Constructor invokes the parent {@link User} constructor to initialize user-related fields,
-     * validates department and degree via FieldValidator.validateAlphabeticString, and salary via
-     * FieldValidator.validateSalary, then assigns the fields. No normalization is performed.
+     * Creates a Teacher with the specified personal, contact, and professional details.
      *
-     * @param name       name
-     * @param surname    surname
-     * @param department department
-     * @param degree     degree or academic qualification of the teacher
-     * @param salary     salary
-     * @param email      email
-     * @param password   password
-     * @throws IllegalArgumentException if any field is invalid
+     * <p>Validates the department and degree as alphabetic strings and validates the salary value;
+     * throws IllegalArgumentException on validation failure.
+     *
+     * @param name     the teacher's given name
+     * @param surname  the teacher's family name
+     * @param department the teacher's department or faculty
+     * @param degree   the teacher's academic degree or qualification
+     * @param salary   the teacher's salary
+     * @param email    the teacher's email address
+     * @param password the teacher's account password
+     * @throws IllegalArgumentException if any provided field fails validation
      */
     public Teacher(String name, String surname, String department, String degree, double salary, String email, String password)
             throws IllegalArgumentException {
@@ -40,19 +40,19 @@ public class Teacher extends User {
     }
 
     /**
-     * Gets department.
+     * Department of the teacher.
      *
-     * @return the department
+     * @return the teacher's department
      */
     public String getDepartment() {
         return department;
     }
 
     /**
-     * Sets department.
+     * Set the teacher's department after validating it contains only alphabetic characters.
      *
-     * @param department the department
-     * @throws IllegalArgumentException the illegal argument exception
+     * @param department the department name; must contain only alphabetic characters
+     * @throws IllegalArgumentException if the department is null, empty, or contains non-alphabetic characters
      */
     @SuppressWarnings("unused")
     public void setDepartment(String department) throws IllegalArgumentException {
@@ -61,20 +61,20 @@ public class Teacher extends User {
     }
 
     /**
-     * Gets degree.
+     * Retrieves the teacher's academic degree.
      *
-     * @return the degree
+     * @return the teacher's academic degree
      */
     public String getDegree() {
         return degree;
     }
 
     /**
-     * Sets degree.
-     *
-     * @param degree the degree
-     * @throws IllegalArgumentException the illegal argument exception
-     */
+         * Sets the teacher's academic degree or qualification.
+         *
+         * @param degree the degree or qualification (e.g., "PhD", "Master") to assign
+         * @throws IllegalArgumentException if {@code degree} is null, empty, or contains non-alphabetic characters
+         */
     @SuppressWarnings("unused")
     public void setDegree(String degree) throws IllegalArgumentException {
         FieldValidator.validateAlphabeticString("Degree", degree);
@@ -82,19 +82,19 @@ public class Teacher extends User {
     }
 
     /**
-     * Gets salary.
+     * Get the teacher's salary.
      *
-     * @return the salary
+     * @return the current salary of the teacher
      */
     public double getSalary() {
         return salary;
     }
 
     /**
-     * Sets salary.
+     * Updates the teacher's salary.
      *
-     * @param salary the salary
-     * @throws IllegalArgumentException the illegal argument exception
+     * @param salary the salary amount
+     * @throws IllegalArgumentException if the salary fails validation
      */
     @SuppressWarnings("unused")
     public void setSalary(double salary) throws IllegalArgumentException {
@@ -102,6 +102,11 @@ public class Teacher extends User {
         this.salary = salary;
     }
 
+    /**
+     * Produces a single-line string representation of the teacher including id, name, surname, department, degree, and salary.
+     *
+     * @return a formatted string containing the teacher's id, name, surname, department, degree, and salary
+     */
     @Override
     public String toString() {
         return "Id: " + getId() +

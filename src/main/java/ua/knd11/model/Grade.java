@@ -29,19 +29,19 @@ public class Grade {
     }
 
     /**
-     * Gets student id.
+     * Retrieve the student's identifier.
      *
-     * @return the student id
+     * @return the student's ID
      */
     public int getStudentId() {
         return studentId;
     }
 
     /**
-     * Sets student id.
+     * Sets the student's identifier.
      *
-     * @param studentId the student id
-     * @throws IllegalArgumentException the illegal argument exception
+     * @param studentId the student's identifier; must be a positive integer
+     * @throws IllegalArgumentException if the provided `studentId` is invalid
      */
     public void setStudentId(int studentId) throws IllegalArgumentException {
         FieldValidator.validateId(studentId);
@@ -49,19 +49,19 @@ public class Grade {
     }
 
     /**
-     * Gets subject.
+     * Subject name associated with this grade.
      *
-     * @return the subject
+     * @return the subject name
      */
     public String getSubject() {
         return subject;
     }
 
     /**
-     * Sets subject.
+     * Set the subject name for this grade.
      *
-     * @param subject the subject
-     * @throws IllegalArgumentException if the subject is not alphabetic writed
+     * @param subject the subject name consisting only of alphabetic characters
+     * @throws IllegalArgumentException if `subject` is null, empty, or contains non-alphabetic characters
      */
     public void setSubject(String subject) throws IllegalArgumentException {
         FieldValidator.validateAlphabeticString("Subject", subject);
@@ -69,25 +69,30 @@ public class Grade {
     }
 
     /**
-     * Gets score.
+     * Retrieves the student's score for the subject.
      *
-     * @return the score
+     * @return the student's score
      */
     public int getScore() {
         return score;
     }
 
     /**
-     * Sets score.
+     * Sets the grade's score.
      *
-     * @param score the score
-     * @throws IllegalArgumentException if the score is not in range 0-100
+     * @param score the score value (0-100)
+     * @throws IllegalArgumentException if the score is less than 0 or greater than 100
      */
     public void setScore(int score) throws IllegalArgumentException {
         FieldValidator.validateScore(score);
         this.score = score;
     }
 
+    /**
+     * Produces a single-line textual representation of this grade.
+     *
+     * @return a string formatted as "Grade [Student ID: %d, subject: '%s', score: %d]" containing this grade's studentId, subject, and score
+     */
     @Override
     public String toString() {
         return String.format("Grade [Student ID: %d, subject: '%s', score: %d]", studentId, subject, score);

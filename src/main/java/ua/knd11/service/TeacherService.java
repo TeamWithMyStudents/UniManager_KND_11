@@ -5,14 +5,14 @@ package ua.knd11.service;
  */
 public interface TeacherService extends UserService {
     /**
-     * Calculate total salary.
-     */
+ * Calculate and update the total salary for teachers.
+ */
     void calculateTotalSalary();
 
     /**
-     * Filter by degree.
-     *
-     * @param degree the degree
-     */
+ * Restrict the service's teacher set to those that match the specified academic degree.
+ *
+ * @param degree the academic degree to filter by (for example: "PhD", "MSc")
+ */
     void filterByDegree(String degree);
 }

@@ -24,9 +24,9 @@ public class UserFileHandler {
     public static ArrayList<User> savedList = new ArrayList<>();
 
     /**
-     * Gets a saved list.
+     * Get a copy of the cached users, populating the in-memory cache from the storage file if it is empty.
      *
-     * @return cached list of saved users, loading from a file if empty
+     * @return a new ArrayList containing the saved users; the in-memory cache is loaded from disk first when empty
      */
     public static ArrayList<User> getSavedList() {
         if (savedList.isEmpty()) savedList.addAll(loadUsers());
@@ -34,19 +34,25 @@ public class UserFileHandler {
     }
 
     /**
-     * Sets saved list.
+     * Replace the in-memory cached list of users with the provided list.
      *
-     * @param savedList the saved list
+     * @param savedList the list to use as the new in-memory cache of users
      */
     public static void setSavedList(ArrayList<User> savedList) {
         UserFileHandler.savedList = savedList;
     }
 
     /**
-     * Save users.
+     * Append a user's record to the backing users_db.txt file.
      *
-     * @param u the User object to persist to file
-     * @throws IOException if an I/O error occurs
+     * Serializes the provided User as a single comma-and-space separated line and appends it to the file.
+     * If the file does not exist it will be created. Supported runtime types and their serialized field
+     * orders are:
+     * - Student: "Student, name, surname, lastname, group, role, email, password"
+     * - Teacher: "Teacher, name, surname, department, degree, salary, email, password"
+     *
+     * @param u the User to persist; expected to be a Student or Teacher and will be serialized accordingly
+     * @throws IOException if creating or writing to the backing file fails
      */
     public static void saveUsers(User u) throws IOException {
         if (file.createNewFile()) {
@@ -88,9 +94,13 @@ public class UserFileHandler {
     }
 
     /**
-     * Load the users list.
+     * Loads users from the backing file "users_db.txt" into a new list.
      *
-     * @return the list
+     * Parses each line as either a Student or Teacher record, skips malformed records and duplicate
+     * emails (keeps the first occurrence), assigns IDs and restores passwords on created objects,
+     * updates the in-memory cache via setSavedList, and returns the parsed users.
+     *
+     * @return the list of parsed User objects; entries with duplicate emails after the first occurrence are omitted
      */
     public static List<User> loadUsers() {
         ArrayList<User> users = new ArrayList<>();

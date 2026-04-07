@@ -51,11 +51,10 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     /**
-     * Retrieves a list of lessons scheduled for a specific day.
-     * Uses Java Streams to filter the internal list.
+     * Retrieves lessons scheduled for the specified day.
      *
-     * @param dayOfWeek the specific {@link DayOfWeek} enum to filter by
-     * @return a list of {@link Lesson} objects scheduled for the requested day
+     * @param dayOfWeek the DayOfWeek to select lessons for
+     * @return a list of Lesson objects scheduled on the specified day
      */
     @Override
     public List<Lesson> getLessonsByDay(DayOfWeek dayOfWeek) {
@@ -65,12 +64,11 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     /**
-     * Helper method that parses a string representation of a day of the week
-     * into a standard Java {@link DayOfWeek} enum. Supports both English and Ukrainian inputs.
+     * Parses an English or Ukrainian day name into the corresponding {@link DayOfWeek}.
      *
-     * @param day the string representation of the day
-     * @return the corresponding {@link DayOfWeek} enum value
-     * @throws IllegalArgumentException if the provided string does not match any known day
+     * @param day the day name in English or Ukrainian (case and surrounding whitespace are ignored)
+     * @return the corresponding {@link DayOfWeek}
+     * @throws IllegalArgumentException if the provided string does not match any supported day
      */
     private DayOfWeek parseDayOfWeek(String day) {
         String normalizedDay = day.trim().toUpperCase();

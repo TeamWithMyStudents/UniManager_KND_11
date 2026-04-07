@@ -17,18 +17,19 @@ public class Student extends User {
     private StudentRole role;
 
     /**
-     * <p>Constructs a new Student instance.
-     * <p>Constructor uses validation methods
-     * to ensure that provided data is valid. Also, it invokes the
-     * parent {@link User} constructor to initialize user-related fields.
+     * Creates a Student with the given personal and authentication data after validating inputs.
      *
-     * @param name     name
-     * @param surname  surname
-     * @param lastname lastname
-     * @param group    group
-     * @param email    email
-     * @param password password
-     * @throws IllegalArgumentException if any field is invalid
+     * <p>Validates `group` and `lastname`, initializes user fields via {@link User#User(String, String, String, String)},
+     * stores `group` in uppercase (Locale.ROOT), assigns `lastname` as provided, and sets the initial role to
+     * {@link StudentRole#REGULAR}.
+     *
+     * @param name     given name
+     * @param surname  family name
+     * @param lastname family middle/last name; must contain only alphabetic characters
+     * @param group    group identifier; validated and stored in uppercase
+     * @param email    email address
+     * @param password account password
+     * @throws IllegalArgumentException if any validation fails
      */
     public Student(String name, String surname, String lastname, String group, String email, String password)
             throws IllegalArgumentException {
@@ -41,19 +42,21 @@ public class Student extends User {
     }
 
     /**
-     * Gets group.
+     * Retrieves the student's group identifier.
      *
-     * @return the group
+     * @return the student's group identifier in uppercase using Locale.ROOT
      */
     public String getGroup() {
         return group;
     }
 
     /**
-     * Sets group.
+     * Set the student's group code.
      *
-     * @param group the group
-     * @throws IllegalArgumentException the illegal argument exception
+     * The provided group is validated and then stored in uppercase using Locale.ROOT.
+     *
+     * @param group the group code to assign; may be normalized to uppercase
+     * @throws IllegalArgumentException if the group value is invalid
      */
     @SuppressWarnings("unused")
     public void setGroup(String group) throws IllegalArgumentException {
@@ -62,19 +65,19 @@ public class Student extends User {
     }
 
     /**
-     * Gets lastname.
+     * Retrieves the student's lastname.
      *
-     * @return the lastname
+     * @return the student's lastname
      */
     public String getLastname() {
         return lastname;
     }
 
     /**
-     * Sets lastname.
+     * Set the student's lastname after validating it contains only alphabetic characters.
      *
-     * @param lastname the lastname
-     * @throws IllegalArgumentException the illegal argument exception
+     * @param lastname the student's family name
+     * @throws IllegalArgumentException if the lastname is null, empty, or contains non-alphabetic characters
      */
     @SuppressWarnings("unused")
     public void setLastname(String lastname) throws IllegalArgumentException {
@@ -83,18 +86,18 @@ public class Student extends User {
     }
 
     /**
-     * Gets role.
+     * Gets the student's role.
      *
-     * @return the role
+     * @return the student's role
      */
     public StudentRole getRole() {
         return role;
     }
 
     /**
-     * Sets role.
+     * Assigns the student's role.
      *
-     * @param role the role
+     * @param role the role to assign to the student
      */
     public void setRole(StudentRole role) {
         this.role = role;

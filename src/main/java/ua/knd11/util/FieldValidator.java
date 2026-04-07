@@ -5,22 +5,37 @@ package ua.knd11.util;
  */
 public final class FieldValidator {
 
+    /**
+     * Ensures the provided string is neither null nor blank.
+     *
+     * @param field the label of the validated field used in the exception message
+     * @param value the string value to validate
+     * @throws IllegalArgumentException if {@code value} is null or contains only whitespace; the exception message is "{@code <field> is null or empty}"
+     */
     private static void validateNonEmptyString(String field, String value) throws IllegalArgumentException {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException(field + " is null or empty");
         }
     }
 
+    /**
+     * Prevents instantiation of this utility class.
+     *
+     * <p>This private constructor always throws an {@link UnsupportedOperationException} to
+     * enforce non-instantiability.
+     *
+     * @throws UnsupportedOperationException always thrown to prevent creating an instance
+     */
     private FieldValidator() {
         throw new UnsupportedOperationException("Utility class");
     }
 
     /**
-     * Validates that a string contains only alphabetic characters.
+     * Ensures the named field value is non-empty and contains only English or Ukrainian letters, spaces, apostrophes, or hyphens.
      *
-     * @param field field name for error messages
-     * @param value the string to validate
-     * @throws IllegalArgumentException if value is invalid
+     * @param field name used in thrown exception messages
+     * @param value value to validate
+     * @throws IllegalArgumentException if value is null, blank, or contains invalid characters
      */
     public static void validateAlphabeticString(String field, String value) throws IllegalArgumentException {
         validateNonEmptyString(field, value);
@@ -32,10 +47,15 @@ public final class FieldValidator {
     }
 
     /**
-     * Validates academic group name format.
+     * Validates an academic group name.
+     *
+     * <p>The name must be 1–100 characters long and may contain English and Ukrainian letters,
+     * digits, underscores (`_`), and hyphens (`-`). The value must not be `null` or blank.
      *
      * @param value the group name to validate
-     * @throws IllegalArgumentException if the group name is invalid
+     * @throws IllegalArgumentException if the value is `null` or blank, longer than 100 characters,
+     *                                  or contains characters other than English/Ukrainian letters,
+     *                                  digits, underscore, or hyphen
      */
     public static void validateGroup(String value) throws IllegalArgumentException {
         validateNonEmptyString("Group", value);
@@ -47,10 +67,10 @@ public final class FieldValidator {
     }
 
     /**
-     * Validates email address format.
+     * Checks that the provided email address is non-empty and conforms to the required email format.
      *
-     * @param value the email to validate
-     * @throws IllegalArgumentException if email is invalid
+     * @param value the email address to validate
+     * @throws IllegalArgumentException if the email is null, blank, or does not match the required format
      */
     public static void validateEmail(String value) throws IllegalArgumentException {
         validateNonEmptyString("Email", value);
@@ -64,10 +84,14 @@ public final class FieldValidator {
     }
 
     /**
-     * Validates password strength and format.
+     * Ensures the password is not blank and meets the validator's format rules.
+     *
+     * <p>The password must be at least 8 characters long and contain only English letters,
+     * digits, and the special characters - ! @ # $ % ^ & * .</p>
      *
      * @param value the password to validate
-     * @throws IllegalArgumentException if the password is invalid
+     * @throws IllegalArgumentException if the password is null, blank, shorter than 8 characters,
+     *                                  or contains characters outside the allowed set
      */
     public static void validatePassword(String value) throws IllegalArgumentException {
         validateNonEmptyString("Password", value);
@@ -80,10 +104,10 @@ public final class FieldValidator {
     }
 
     /**
-     * Validate salary.
+     * Ensures the salary is a positive finite number.
      *
-     * @param value the value
-     * @throws IllegalArgumentException the illegal argument exception
+     * @param value the salary amount to validate
+     * @throws IllegalArgumentException if `value` is NaN, infinite, or less than or equal to zero
      */
     public static void validateSalary(double value) throws IllegalArgumentException {
         if (Double.isNaN(value) || Double.isInfinite(value) || value <= 0) {
@@ -92,10 +116,10 @@ public final class FieldValidator {
     }
 
     /**
-     * Validate id.
+     * Ensure an identifier is a positive integer.
      *
-     * @param value the value
-     * @throws IllegalArgumentException the illegal argument exception
+     * @param value the identifier to validate
+     * @throws IllegalArgumentException if {@code value} is less than or equal to zero
      */
     public static void validateId(int value) throws IllegalArgumentException {
         if (value <= 0) {
@@ -104,10 +128,10 @@ public final class FieldValidator {
     }
 
     /**
-     * Validate score.
+     * Ensures the provided score is within the inclusive range 0 to 100.
      *
-     * @param value the value
-     * @throws IllegalArgumentException the illegal argument exception
+     * @param value the score to validate (expected 0–100)
+     * @throws IllegalArgumentException if {@code value} is less than 0 or greater than 100
      */
     public static void validateScore(int value) throws IllegalArgumentException {
         if (value < 0 || value > 100) {

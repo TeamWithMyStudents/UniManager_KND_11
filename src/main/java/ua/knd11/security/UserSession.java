@@ -12,10 +12,10 @@ public class UserSession {
     private static User currentUser = null;
 
     /**
-     * Logs in a user and sets current session.
+     * Sets the global current user session to the provided user, replacing any existing session in a thread-safe manner.
      *
-     * @param user the user to log in
-     * @throws NullPointerException if user is null
+     * @param user the user to set as the current session; must not be null
+     * @throws NullPointerException if {@code user} is null
      */
     public static void login(User user) {
         Objects.requireNonNull(user, "User cannot be null");
@@ -40,9 +40,9 @@ public class UserSession {
     }
 
     /**
-     * Gets current user.
+     * Retrieves the currently logged-in user.
      *
-     * @return the currently logged-in user, or null if none
+     * @return the currently logged-in User, or `null` if no user is authenticated
      */
     public static User getCurrentUser() {
         synchronized (lock) {
@@ -51,9 +51,9 @@ public class UserSession {
     }
 
     /**
-     * Is authenticated boolean.
+     * Checks whether a user session is active.
      *
-     * @return true if a user is currently logged in
+     * @return true if a user is currently logged in, false otherwise
      */
     public static boolean isAuthenticated() {
         synchronized (lock) {

@@ -53,13 +53,10 @@ public class JournalServiceImpl implements JournalService {
     }
 
     /**
-     * Generates a formatted text report (record book/transcript) for a specific student.
-     * The report includes a list of all subjects with their respective scores and
-     * calculates the overall average score.
+     * Generate a formatted record-book report for a student listing subjects, scores, and the overall average.
      *
-     * @param studentId the unique identifier of the student
-     * @return a formatted string representing the student's record book,
-     * or a message indicating that no grades are available if the list is empty
+     * @param studentId the student's unique identifier
+     * @return the formatted record-book string; if the student has no grades, returns "Grades are not yet available"
      */
     @Override
     public String generateRecordBook(int studentId) {
