@@ -87,7 +87,7 @@ public final class FieldValidator {
      * Ensures the password is not blank and meets the validator's format rules.
      *
      * <p>The password must be at least 8 characters long and contain only English letters,
-     * digits, and the special characters - ! @ # $ % ^ & * .</p>
+     * digits, and the special characters -! @ # $ % ^ & * .</p>
      *
      * @param value the password to validate
      * @throws IllegalArgumentException if the password is null, blank, shorter than 8 characters,
@@ -95,12 +95,27 @@ public final class FieldValidator {
      */
     public static void validatePassword(String value) throws IllegalArgumentException {
         validateNonEmptyString("Password", value);
+        if (isPasswordProtected(value)) return;
 
         // regex matches passwords that have length of at least 8 characters,
         // allows only English characters
         // numbers, and special characters that can be used in passwords
-        String regex = "^[-!@#$%^&*.A-Za-z\\d]{8,}$";
-        if (!value.matches(regex)) throw new IllegalArgumentException("Invalid password");
+        String charactersRegex = "^[-!@#$%^&*.A-Za-z\\d]{8,}$";
+        if (!(value.length() >= 8)) throw new IllegalArgumentException("Too short password!");
+        if (!value.matches(charactersRegex)) throw new IllegalArgumentException("Invalid characters in password");
+    }
+
+    /**
+     * Checks if the given string value represents a password-protected entity.
+     * The method verifies that the string is exactly 44 characters long
+     * and ends with the '=' character.
+     *
+     * @param value the string to check for password protection; cannot be null
+     * @return {@code true} if the string is 44 characters long and ends with '=', otherwise {@code false}
+     */
+    public static Boolean isPasswordProtected(String value) {
+        validateNonEmptyString("Password", value);
+        return value.length() == 44 && value.endsWith("=");
     }
 
     /**

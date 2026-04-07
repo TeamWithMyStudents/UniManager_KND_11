@@ -15,7 +15,7 @@ public class StudentController {
     private final StudentService service = new StudentServiceImpl();
 
     /**
-     * Assigns the student with the given ID as head student.
+     * Assigns the student with the given ID as a head student.
      *
      * @param id the student's unique identifier
      * @see StudentService#assignHeadStudent(int)
@@ -38,7 +38,7 @@ public class StudentController {
         //array that splits the normalized string on whitespace into tokens
         String[] parts = normalized.split("\\s+");
         if (parts.length != 6) {
-            System.out.println("Error: Expected 6 fields (Surname Name Lastname Group Email@example.com Password).");
+            System.out.println("Error: Expected 6 fields (Name Surname Lastname Group Email@example.com Password).");
             return;
         }
 //assigning variables to specific array cells

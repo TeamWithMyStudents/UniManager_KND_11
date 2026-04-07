@@ -31,7 +31,7 @@ public abstract class User {
         FieldValidator.validateAlphabeticString("Name", name);
         FieldValidator.validateAlphabeticString("Surname", surname);
         FieldValidator.validateEmail(email);
-        FieldValidator.validatePassword(password);
+        if (!FieldValidator.isPasswordProtected(password)) FieldValidator.validatePassword(password);
         this.name = name;
         this.surname = surname;
         this.email = email;
@@ -138,8 +138,21 @@ public abstract class User {
      * @throws IllegalArgumentException if the provided password is invalid
      */
     public void setPassword(String password) throws IllegalArgumentException {
+
         FieldValidator.validatePassword(password);
         this.password = password;
+    }
+
+    /**
+     * Update the user's password after validating it.
+     *
+     * @param value the new password to assign; must meet the user's password requirements
+     * @throws IllegalArgumentException if the provided password is not protected
+     */
+    public void setProtectedPassword(String value) throws IllegalArgumentException {
+        if (!FieldValidator.isPasswordProtected(value))
+            throw new IllegalArgumentException("Cannot set unprotected password");
+        this.password = value;
     }
 
     /**
@@ -147,7 +160,7 @@ public abstract class User {
      *
      * <p>Does not include the user's password.</p>
      *
-     * @return a string formatted as "Id: {id}, Name: {name}, Surname: {surname}, Email: {email}".
+     * @return a string formatted as "ID: {id}, Name: {name}, Surname: {surname}, Email: {email}".
      */
     @Override
     public String toString() {

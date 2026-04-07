@@ -47,7 +47,7 @@ public class Student extends User {
      * @return the student's group identifier in uppercase using Locale.ROOT
      */
     public String getGroup() {
-        return group;
+        return group.toUpperCase(Locale.ROOT);
     }
 
     /**

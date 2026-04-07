@@ -6,8 +6,7 @@ import ua.knd11.model.User;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 
 import static ua.knd11.model.enums.StudentRole.HEAD_STUDENT;
 import static ua.knd11.model.enums.StudentRole.REGULAR;
@@ -18,10 +17,11 @@ import static ua.knd11.model.enums.StudentRole.REGULAR;
 public class UserFileHandler {
     private static final String FILE_PATH = "users_db.txt";
     private static final File file = new File(FILE_PATH);
+
     /**
      * The constant savedList.
      */
-    public static ArrayList<User> savedList = new ArrayList<>();
+    private static ArrayList<User> savedList = new ArrayList<>();
 
     /**
      * Get a copy of the cached users, populating the in-memory cache from the storage file if it is empty.
@@ -29,7 +29,7 @@ public class UserFileHandler {
      * @return a new ArrayList containing the saved users; the in-memory cache is loaded from disk first when empty
      */
     public static ArrayList<User> getSavedList() {
-        if (savedList.isEmpty()) savedList.addAll(loadUsers());
+        if (savedList.isEmpty()) loadUsers();
         return new ArrayList<>(savedList);
     }
 
@@ -46,7 +46,7 @@ public class UserFileHandler {
      * Append a user's record to the backing users_db.txt file.
      * <p>
      * Serializes the provided User as a single comma-and-space separated line and appends it to the file.
-     * If the file does not exist it will be created. Supported runtime types and their serialized field
+     * If the file does not exist, it will be created. Supported runtime types and their serialized field
      * orders are:
      * - Student: "Student, name, surname, lastname, group, role, email, password"
      * - Teacher: "Teacher, name, surname, department, degree, salary, email, password"
@@ -72,8 +72,8 @@ public class UserFileHandler {
                         s.getPassword()
                 };
                 writer.write(String.join(", ", parts));
-            }
-            if (u instanceof Teacher t) {
+                writer.newLine();
+            } else if (u instanceof Teacher t) {
 
                 String[] parts = {
 //                            Teacher(String name, String surname, String department, String degree, double salary, String email, String password)
@@ -87,9 +87,12 @@ public class UserFileHandler {
                         t.getPassword()
                 };
                 writer.write(String.join(", ", parts));
+                writer.newLine();
+            } else {
+                throw new IllegalArgumentException("Unsupported user type: " + u.getClass().getName());
             }
-            writer.newLine();
         }
+
 
     }
 
@@ -99,10 +102,8 @@ public class UserFileHandler {
      * Parses each line as either a Student or Teacher record, skips malformed records and duplicate
      * emails (keeps the first occurrence), assigns IDs and restores passwords on created objects,
      * updates the in-memory cache via setSavedList, and returns the parsed users.
-     *
-     * @return the list of parsed User objects; entries with duplicate emails after the first occurrence are omitted
      */
-    public static List<User> loadUsers() {
+    public static void loadUsers() {
         ArrayList<User> users = new ArrayList<>();
 
         try {
@@ -114,7 +115,7 @@ public class UserFileHandler {
         }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            HashMap<String, Boolean> seenEmails = new HashMap<>();
+            HashSet<String> seenEmails = new HashSet<>();
             String line;
             int lineNumber = 0;
             while ((line = reader.readLine()) != null) {
@@ -145,7 +146,10 @@ public class UserFileHandler {
                         String email = parts[6];
                         String password = parts[7];
 
-                        if (Boolean.FALSE.equals(seenEmails.put(email, true))) continue;
+                        if (!seenEmails.add(email)) {
+                            System.err.println("Warning: Duplicate email: " + email + ", skip");
+                            continue;
+                        }
                         try {
                             Student student = new Student(name, surname, lastname, group, email, password);
                             if (role.equals("HEAD_STUDENT")) {
@@ -157,10 +161,10 @@ public class UserFileHandler {
                                 student.setRole(REGULAR);
                             }
                             student.assignId();
-                            student.setPassword(password);
                             users.add(student);
-                        } catch (IllegalArgumentException e) {
-                            System.err.println("Warning: Line " + lineNumber + " has invalid Student role, using REGULAR" + e.getMessage());
+                        } catch (Exception e) {
+                            System.err.println("Warning: Line " + lineNumber + " has invalid Student format, skipping: " + e.getMessage());
+                            continue;
                         }
                     } else if (type.equals("Teacher")) {
                         if (parts.length != 8) {
@@ -183,11 +187,13 @@ public class UserFileHandler {
                             continue;
                         }
 
+                        if (!seenEmails.add(email)) {
+                            System.err.println("Duplicate email: " + email);
+                            continue;
+                        }
                         Teacher teacher = new Teacher(name, surname, department, degree, salary, email, password);
                         teacher.assignId();
-                        teacher.setPassword(password);
                         users.add(teacher);
-
                     } else {
                         System.err.println("Warning: Line " + lineNumber + " has unknown user type '" + type + "', skip");
                     }
@@ -206,6 +212,5 @@ public class UserFileHandler {
             System.err.println("Error loading users: " + e.getMessage());
         }
         setSavedList(users);
-        return users;
     }
 }

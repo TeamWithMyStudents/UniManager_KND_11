@@ -74,7 +74,7 @@ public class ConsoleMenu {
             String choice = sc.nextLine().trim();
             switch (choice) {
                 case "1":
-                    System.out.println("Please enter Student data (Surname Name Lastname Group Email@example.com Password):");
+                    System.out.println("Please enter Student data (Name Surname Lastname Group Email@example.com Password):");
                     String input = sc.nextLine();
                     studentController.create(input);
                     break;

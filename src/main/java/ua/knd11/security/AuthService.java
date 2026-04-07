@@ -24,21 +24,13 @@ public interface AuthService {
      * @param password user's password
      * @return authenticated user or null if authentication fails
      */
+    User login(String email, String password) throws IllegalArgumentException;
 
     /**
-     * Removes the user with the specified id from the registered users list.
+     * Removes a user with the specified unique identifier from the registered users list.
      *
-     * @param id the identifier of the user to remove
-     * @return `true` if a user was removed, `false` if no user with the given id existed
+     * @param id the unique identifier of the user to be removed
+     * @throws IllegalArgumentException if no user with the specified id is found
      */
-    boolean removeUser(int id);
-
-    /**
-     * Authenticate a user using the provided email and password.
-     *
-     * @param email    the user's email address
-     * @param password the user's password
-     * @return the authenticated {@link User} when credentials are valid, {@code null} otherwise
-     */
-    User login(String email, String password);
+    void removeUser(int id) throws IllegalArgumentException;
 }
