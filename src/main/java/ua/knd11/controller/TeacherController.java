@@ -1,34 +1,17 @@
 package ua.knd11.controller;
 
+import ua.knd11.model.Student;
 import ua.knd11.model.Teacher;
 import ua.knd11.model.User;
 import ua.knd11.service.impl.TeacherServiceImpl;
 
 import java.util.List;
 
-/**
- * Controller class responsible for handling teacher-related operations.
- * It acts as an intermediary between the user interface (e.g., ConsoleMenu)
- * and the underlying {@link TeacherServiceImpl} business logic layer.
- */
 public class TeacherController {
 
-    /**
-     * The service used for executing business logic related to teachers.
-     */
     private final TeacherServiceImpl service = new TeacherServiceImpl();
 
-    /**
-     * Creates and adds a new teacher to the system by parsing a single input string.
-     * <p>
-     * The input string must contain exactly 7 fields separated by spaces or commas:
-     * Name, Surname, Department, Degree, Salary, Email, and Password.
-     * <p>
-     * Example of a valid input: {@code "John Doe CS PhD 5000.50 john@example.com pass123"}
-     *
-     * @param input a raw string containing the teacher's details.
-     */
-    public void create(String input) {
+    public void create(String input) { // TODO: Переписать в вид как в StudentController
         //normalize commas to spaces and trim whitespace
         String normalized = input.trim().replace(",", " ");
         //array that splits user input into tokens and stores them in elements
@@ -53,51 +36,36 @@ public class TeacherController {
         try {
             salary = Double.parseDouble(parts[4]);
             Teacher teacher = new Teacher(name, surname, department, degree, salary, email, password);
-            if (service.add(teacher)) {
-                System.out.println("Teacher added successfully!");
-            } else {
-                System.out.println("Teacher wasn't added.");
-            }
+
+            service.addTeacher(teacher);
+            System.out.println("Teacher added successfully!");
         } catch (IllegalArgumentException e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
 
-    /**
-     * Retrieves and prints a list of all teachers currently stored in the repository.
-     * <p>
-     * This method fetches all users from the underlying service, filters the list to
-     * include only instances of {@link Teacher}, and prints their details to the
-     * standard output stream. If no teachers are found, an error message is printed
-     * to the standard error stream.
-     */
-    public void getAll() {
-        List<User> teachers = service.getAll();
+    public void deleteTeacher(int id) {
+        service.deleteTeacher(id);
+    }
+
+    public void getAll() { // TODO: Переписать что бы было проще (KISS, .isEmpty)
+        List<Teacher> teachers = service.getAllTeachers();
         boolean found = false;
-        for (User teacher : teachers) {
-            if (teacher instanceof Teacher) {
-                System.out.println(teacher);
+        for (User student : teachers) {
+            if (student instanceof Student) {
+                System.out.println(student);
                 found = true;
             }
         }
-
         if (!found) {
             System.err.println("No teachers found in the repository.\n");
         }
     }
 
-    /**
-     * Calculates the total salary of all teachers.
-     */
     public void calculateTotalSalary() {
         service.calculateTotalSalary();
     }
 
-    /**
-     * Filters teachers by academic degree and displays matching results.
-     *
-     * @param degree the academic degree to filter by (e.g., "Master", "PhD", "Doctor of Science")
-     */
     public void filterByDegree(String degree) {
         service.filterByDegree(degree);
     }

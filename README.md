@@ -8,7 +8,7 @@ password handling and robust validation.
 
 ### Student Management
 
-- **Add Students**: Register new students with details (Name, Surname, Lastname, Group, Email, Password).
+- **Add Students**: Register new students with details (Name, Surname, Group, Email, Password).
 - **View All Students**: Display a comprehensive list of all registered students.
 - **Delete Students**: Remove student records using their unique ID.
 - **Head Student Assignment**: Designate a specific student as the Head Student for their group.
@@ -57,7 +57,7 @@ password handling and robust validation.
 ### File Storage Format (users_db.txt)
 
 ```
-Student, Name, Surname, Lastname, Group, ROLE, Email@example.com, hashed_password
+Student, Name, Surname, Group, ROLE, Email@example.com, hashed_password
 Teacher, Name, Surname, Department, Degree, Salary, Email@example.com, hashed_password
 ```
 

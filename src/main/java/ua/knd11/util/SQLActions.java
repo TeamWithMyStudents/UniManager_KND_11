@@ -1,30 +1,220 @@
 package ua.knd11.util;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import ua.knd11.model.Student;
+import ua.knd11.model.Teacher;
+import ua.knd11.model.enums.StudentRole;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public final class SQLActions {
+    // TODO: можно реализовать возможность сеттеров (тяжело)
+    private static final String DATABASE_URL = Objects.requireNonNull(System.getenv("DATABASE_URL"));
 
-    private static final String DATABASE_URL = System.getenv("DATABASE_URL");
+    @SuppressWarnings("SqlResolve")
+    private static final String QUERY_ADD_STUDENT = """
+            INSERT INTO STUDENTS (name, surname, "group", role, email, password)
+            VALUES (?, ?, ?, ?, ?, ?);
+            """;
 
-    /**
-     * Establishes and returns a connection to the database using the configured database URL.
-     *
-     * @return a {@link Connection} instance representing the active database connection
-     * @throws SQLException if a database access error occurs or the URL is invalid
-     */
+    @SuppressWarnings("SqlResolve")
+    private static final String QUERY_ADD_TEACHER = """
+            INSERT INTO TEACHERS (name, surname, department, degree, salary, email, password)
+            VALUES (?, ?, ?, ?, ?, ?, ?);
+            """;
+    @SuppressWarnings("SqlResolve")
+    private static final String QUERY_GET_STUDENTS = "SELECT * FROM STUDENTS";
+
+    @SuppressWarnings("SqlResolve")
+    private static final String QUERY_GET_TEACHERS = "SELECT * FROM TEACHERS";
+
+    @SuppressWarnings("SqlResolve")
+    private static final String QUERY_DELETE_TEACHER_BY_ID = "DELETE FROM TEACHERS WHERE id = ?";
+
+    @SuppressWarnings("SqlResolve")
+    private static final String QUERY_DELETE_STUDENT_BY_ID = "DELETE FROM STUDENTS WHERE id = ?";
+
+
+    private static final String QUERY_CREATE_STUDENTS_TABLE = """
+            CREATE TABLE IF NOT EXISTS STUDENTS (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                surname VARCHAR(255) NOT NULL,
+                "group" VARCHAR(255) NOT NULL,
+                role VARCHAR(255) NOT NULL,
+                email VARCHAR(255) UNIQUE NOT NULL,
+                password VARCHAR(255) NOT NULL
+            );
+            """;
+
+    private static final String QUERY_CREATE_TEACHERS_TABLE = """
+            CREATE TABLE IF NOT EXISTS TEACHERS (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                surname VARCHAR(255) NOT NULL,
+                department VARCHAR(255) NOT NULL,
+                degree VARCHAR(255) NOT NULL,
+                salary DOUBLE PRECISION NOT NULL,
+                email VARCHAR(255) UNIQUE NOT NULL,
+                password VARCHAR(255) NOT NULL
+            );
+            """;
+
 
     private static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DATABASE_URL);
     }
 
-    public static void executeSQLQuery(String sql) {
-        try (Connection conn = getConnection(); PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
-            preparedStatement.executeUpdate();
+
+    public static void initDatabase() {// TODO: если коннекта к дб нету, код не должен продолжать работу
+        try (Connection conn = getConnection(); Statement stmt = conn.createStatement()) {
+            stmt.executeUpdate(QUERY_CREATE_STUDENTS_TABLE);
+            stmt.executeUpdate(QUERY_CREATE_TEACHERS_TABLE);
         } catch (SQLException e) {
-            System.err.println("Database operation failed: " + e.getMessage());
+            System.err.println("Database initialization failed");
+            throw new RuntimeException(e);
         }
+    }
+
+
+    public static void addStudentToDB(Student student) {
+        if (student == null) return;
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(QUERY_ADD_STUDENT)) {
+            stmt.setString(1, student.getName());
+            stmt.setString(2, student.getSurname());
+            stmt.setString(3, student.getGroup());
+            stmt.setString(4, String.valueOf(student.getRole()));
+            stmt.setString(5, student.getEmail());
+            stmt.setString(6, student.getPassword());
+            stmt.executeUpdate();
+            System.out.println("Student added to database");
+        } catch (SQLException e) {
+            System.err.println("Failed to add student to database");
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void addTeacherToDB(Teacher teacher) {
+        if (teacher == null) return;
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(QUERY_ADD_TEACHER)) {
+            stmt.setString(1, teacher.getName());
+            stmt.setString(2, teacher.getSurname());
+            stmt.setString(3, teacher.getDepartment());
+            stmt.setString(4, teacher.getDegree());
+            stmt.setString(5, String.valueOf(teacher.getSalary()));
+            stmt.setString(6, teacher.getEmail());
+            stmt.setString(7, teacher.getPassword());
+            stmt.executeUpdate();
+            System.out.println("Teacher added to database");
+        } catch (SQLException e) {
+            System.err.println("Failed to add teacher to database");
+            throw new RuntimeException(e);
+        }
+    }
+
+    @NotNull
+    @Contract(" -> new")
+    public static ArrayList<Student> retrieveStudentsFromDB() {
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(QUERY_GET_STUDENTS)) {
+            return new ArrayList<>(parseStudentsFromResultSet(rs));
+
+        } catch (SQLException e) {
+            System.err.println("Error retrieving STUDENTS table");
+            throw new RuntimeException(e);
+        }
+    }
+
+    @NotNull
+    @Contract(" -> new")
+    public static ArrayList<Teacher> retrieveTeachersFromDB() {
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(QUERY_GET_TEACHERS)) {
+            return new ArrayList<>(parseTeachersFromResultSet(rs));
+
+        } catch (SQLException e) {
+            System.err.println("Error retrieving TEACHERS table");
+            throw new RuntimeException(e);
+        }
+    }
+
+    @NotNull
+    private static List<Student> parseStudentsFromResultSet(@NotNull ResultSet resultSet) throws SQLException {
+        List<Student> list = new ArrayList<>();
+        while (resultSet.next()) {
+            Student student = new Student(
+                    resultSet.getString("name"),
+                    resultSet.getString("surname"),
+                    resultSet.getString("group"),
+                    resultSet.getString("email"),
+                    resultSet.getString("password")
+            );
+
+            String roleStr = resultSet.getString("role");
+            if ("HEAD_STUDENT".equals(roleStr)) {
+                student.setRole(StudentRole.HEAD_STUDENT);
+            }
+            student.assignId();
+            list.add(student);
+        }
+        return list;
+    }
+
+    @NotNull
+    private static List<Teacher> parseTeachersFromResultSet(@NotNull ResultSet resultSet) throws SQLException {
+        List<Teacher> list = new ArrayList<>();
+        while (resultSet.next()) {
+            if (resultSet.getString("salary").equals("null")) {
+                System.err.println("Teacher with email " + resultSet.getString("email") + " has wrong salary");
+                continue;
+            }
+            Teacher teacher = new Teacher(
+                    resultSet.getString("name"),
+                    resultSet.getString("surname"),
+                    resultSet.getString("department"),
+                    resultSet.getString("degree"),
+                    resultSet.getDouble("salary"),
+                    resultSet.getString("email"),
+                    resultSet.getString("password")
+            );
+            list.add(teacher);
+        }
+        return list;
+    }
+
+    public static void deleteStudentFromDBWithID(int id) {
+        if (id < 0) return;
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(QUERY_DELETE_STUDENT_BY_ID)) {
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+            System.out.println("Student with ID " + id + " deleted from database");
+        } catch (SQLException e) {
+            System.err.println("Failed to delete student with ID " + id + " from database");
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void deleteTeacherFromDBWithID(int id) {
+        if (id < 0) return;
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(QUERY_DELETE_TEACHER_BY_ID)) {
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+            System.out.println("Teacher with ID " + id + " deleted from database");
+        } catch (SQLException e) {
+            System.err.println("Failed to delete teacher with ID " + id + " from database");
+            throw new RuntimeException(e);
+        }
+    }
+
+    public enum TableName {
+        USERS, TEACHERS, STUDENTS
     }
 }
