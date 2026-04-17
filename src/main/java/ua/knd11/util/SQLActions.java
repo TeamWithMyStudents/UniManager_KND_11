@@ -38,6 +38,7 @@ public final class SQLActions {
     @SuppressWarnings("SqlResolve")
     private static final String QUERY_DELETE_STUDENT_BY_ID = "DELETE FROM STUDENTS WHERE id = ?";
 
+    private static final String QUERY_SET_STUDENT_ASSIGNEDHEAD_BY_ID = "UPDATE STUDENTS SET role = 'HEAD_STUDENT' WHERE id = ?";
 
     private static final String QUERY_CREATE_STUDENTS_TABLE = """
             CREATE TABLE IF NOT EXISTS STUDENTS (
@@ -94,6 +95,18 @@ public final class SQLActions {
             System.out.println("Student added to database");
         } catch (SQLException e) {
             System.err.println("Failed to add student to database");
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void assignStudentById(int id) {
+        if (id < 0) return;
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(QUERY_SET_STUDENT_ASSIGNEDHEAD_BY_ID)){
+            stmt.setObject(1, id);
+            stmt.executeUpdate();
+            System.out.println("Student assigned to database");
+        } catch (SQLException e) {
+            System.err.println("Failed to assign student to teacher from database");
             throw new RuntimeException(e);
         }
     }

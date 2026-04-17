@@ -1,7 +1,6 @@
 package ua.knd11.controller;
 
 import ua.knd11.model.Student;
-import ua.knd11.model.User;
 import ua.knd11.service.StudentService;
 import ua.knd11.service.impl.StudentServiceImpl;
 
@@ -38,15 +37,7 @@ public class StudentController {
 
     public void getAll() { // TODO: Переписать что бы было короче (KISS, .isEmpty?)
         List<Student> students = service.getAllStudents();
-        boolean found = false;
-        for (User student : students) {
-            if (student instanceof Student) {
-                System.out.println(student);
-                found = true;
-            }
-        }
-        if (!found) {
-            System.err.println("No students found in the repository.\n");
-        }
+        students.stream().filter(student -> student instanceof Student).forEach(System.out::println);
+        if (students.isEmpty()) { System.out.println("No students found"); }
     }
 }

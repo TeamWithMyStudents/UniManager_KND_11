@@ -18,19 +18,16 @@ public class ScheduleServiceImpl implements ScheduleService {
     public void addLesson(String day, String time, String subject, String teacherSurname) {
 
         if (day == null || day.trim().isEmpty() || time == null || time.trim().isEmpty()) {
-            throw new IllegalArgumentException("День та час не можуть бути порожніми.");
+            throw new IllegalArgumentException("The day and time cannot be empty.");
         }
         try {
-            DayOfWeek dayOfWeekEnum = parseDayOfWeek(day);
-            LocalTime localTime = LocalTime.parse(time.trim());
-
-            Lesson lesson = new Lesson(dayOfWeekEnum, localTime, subject, teacherSurname);
+            Lesson lesson = new Lesson(parseDayOfWeek(day), LocalTime.parse(time.trim()), subject, teacherSurname);
             lessons.add(lesson);
-            System.out.println("Заняття успішно додано!");
+            System.out.println("Lesson added successfully!");
 
         } catch (DateTimeParseException |
                  IllegalArgumentException e) { // TODO: укоротить либо перенести на несколько строк
-            throw new IllegalArgumentException("Неправильний формат часу або дня. Очікується день (наприклад, 'ПОНЕДІЛОК' або 'MONDAY') та час у форматі 24h (наприклад, '14:30'). Деталі: " + e.getMessage());
+            throw new IllegalArgumentException("Invalid time or day format. Expected day (e.g. 'MONDAY') and time in 24h format Details:" + e.getMessage());
         }
     }
 
@@ -44,14 +41,14 @@ public class ScheduleServiceImpl implements ScheduleService {
     private DayOfWeek parseDayOfWeek(String day) {
         String normalizedDay = day.trim().toUpperCase();
         return switch (normalizedDay) {
-            case "ПОНЕДІЛОК", "MONDAY" -> DayOfWeek.MONDAY;
-            case "ВІВТОРОК", "TUESDAY" -> DayOfWeek.TUESDAY;
-            case "СЕРЕДА", "WEDNESDAY" -> DayOfWeek.WEDNESDAY;
-            case "ЧЕТВЕР", "THURSDAY" -> DayOfWeek.THURSDAY;
-            case "П'ЯТНИЦЯ", "ПЯТНИЦЯ", "FRIDAY" -> DayOfWeek.FRIDAY;
-            case "СУБОТА", "SATURDAY" -> DayOfWeek.SATURDAY;
-            case "НЕДІЛЯ", "SUNDAY" -> DayOfWeek.SUNDAY;
-            default -> throw new IllegalArgumentException("Невідомий день тижня: " + day);
+            case "MONDAY" -> DayOfWeek.MONDAY;
+            case "TUESDAY" -> DayOfWeek.TUESDAY;
+            case "WEDNESDAY" -> DayOfWeek.WEDNESDAY;
+            case "THURSDAY" -> DayOfWeek.THURSDAY;
+            case "FRIDAY" -> DayOfWeek.FRIDAY;
+            case "SATURDAY" -> DayOfWeek.SATURDAY;
+            case "SUNDAY" -> DayOfWeek.SUNDAY;
+            default -> throw new IllegalArgumentException("Unknown day of the week: " + day);
         };
     }
 }

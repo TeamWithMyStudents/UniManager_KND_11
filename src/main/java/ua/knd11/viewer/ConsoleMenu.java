@@ -2,6 +2,7 @@ package ua.knd11.viewer;
 
 import ua.knd11.controller.StudentController;
 import ua.knd11.controller.TeacherController;
+import ua.knd11.util.SQLActions;
 
 import java.util.Scanner;
 
@@ -77,6 +78,7 @@ public class ConsoleMenu {
                         int assignId = sc.nextInt();
                         sc.nextLine();
                         studentController.assignHeadStudent(assignId);
+                        SQLActions.assignStudentById(assignId);
                     } else {
                         System.out.println("Error, ID must be a number!");
                         sc.nextLine(); // Clearing error input
@@ -111,7 +113,7 @@ public class ConsoleMenu {
             switch (choice) {
                 case "1":
                     System.out.print("Please enter Teacher data (Name Surname Dept Degree Salary Email@example.com Password): ");
-                    teacherController.create(sc.nextLine());
+                    teacherController.addTeacherFromTerminal(sc.nextLine());
                     break;
                 case "2":
                     teacherController.getAll();
