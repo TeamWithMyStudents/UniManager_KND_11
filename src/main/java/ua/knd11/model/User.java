@@ -30,6 +30,9 @@ public abstract class User {
         }
         this.id = nextId++;
     }
+    public void setIdFromDB(int id) {
+        this.id = id;
+    }
 
     @SuppressWarnings("unused")
     public void setName(String name) throws IllegalArgumentException {

@@ -9,39 +9,23 @@ import ua.knd11.util.SQLActions;
 import java.util.ArrayList;
 
 public class StudentServiceImpl implements StudentService {
-
+    @Override
     public void assignHeadStudent(int studentId) {
-        Student newHeadStudent = null;
-        for (User u : this.getAllStudents()) {
-            if (u.getId() == studentId && u instanceof Student) {
-                newHeadStudent = (Student) u;
-                break;
-            }
-        }
-        if (newHeadStudent == null) {
+        Student student = SQLActions.getStudentById(studentId);
+
+        if (student == null) {
             System.out.println("Student with ID " + studentId + " not found.");
             return;
         }
-        String targetGroup = newHeadStudent.getGroup();
-
-        for (User u : this.getAllStudents()) { // TODO: перепишите пж
-            if (u instanceof Student st) {
-                if (st.getGroup().equals(targetGroup) && st.getRole() == StudentRole.HEAD_STUDENT &&
-                        st.getId() != studentId) {
-                    st.setRole(StudentRole.REGULAR);
-                    System.out.println("Previous Head Student " + st.getName() + " " + st.getSurname() + " " +
-                            "\nin group " + st.getGroup() + " stepped down.");
-                } else if (st.getGroup().equals(targetGroup) && st.getRole() == StudentRole.HEAD_STUDENT &&
-                        st.getId() == studentId) {
-                    System.out.println("Student " + st.getName() + " " + st.getSurname() + " " +
-                            "\nis already the Head Student of group " + st.getGroup() + ".");
-                    return;
-                }
-            }
+        if (student.getRole() == StudentRole.HEAD_STUDENT) {
+            System.out.println("Student " + student.getName() + " is already the Head of group " + student.getGroup());
+            return;
         }
-        newHeadStudent.setRole(StudentRole.HEAD_STUDENT);
-        System.out.println("Student " + newHeadStudent.getName() + " " + newHeadStudent.getSurname() + " " +
-                "\nis now the Head Student of group " + targetGroup + "!");
+        SQLActions.demoteAllHeadsInGroup(student.getGroup());
+        SQLActions.updateStudentRole(studentId, StudentRole.HEAD_STUDENT);
+
+        System.out.println("Student " + student.getName() + " " + student.getSurname() +
+                " is now the Head Student of group " + student.getGroup() + "!");
     }
 
     public void addStudent(Student student) {

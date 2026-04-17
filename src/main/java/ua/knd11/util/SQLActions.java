@@ -160,7 +160,7 @@ public final class SQLActions {
             if ("HEAD_STUDENT".equals(roleStr)) {
                 student.setRole(StudentRole.HEAD_STUDENT);
             }
-            student.assignId();
+            student.setIdFromDB(resultSet.getInt("id"));
             list.add(student);
         }
         return list;
@@ -212,6 +212,40 @@ public final class SQLActions {
             System.err.println("Failed to delete teacher with ID " + id + " from database");
             throw new RuntimeException(e);
         }
+    }
+
+    public static Student getStudentById(int id) {
+        String query = "SELECT * FROM STUDENTS WHERE id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, id);
+            var students = parseStudentsFromResultSet(stmt.executeQuery());
+
+            return students.isEmpty() ? null : students.get(0);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to find student with ID: " + id + "in database");
+        }
+    }
+
+    private static void executeUpdate(String sql, Object... params) {
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            for (int i = 0; i < params.length; i++) {
+                stmt.setObject(i + 1, params[i]);
+            }
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error executing SQL: " + sql, e);
+        }
+    }
+
+    public static void updateStudentRole(int id, StudentRole role) {
+        executeUpdate("UPDATE STUDENTS SET role = ? WHERE id = ?", role.name(), id);
+    }
+
+    public static void demoteAllHeadsInGroup(String groupName) {
+        executeUpdate("UPDATE STUDENTS SET role = 'REGULAR' WHERE \"group\" = ? AND role = 'HEAD_STUDENT'", groupName);
     }
 
     public enum TableName {

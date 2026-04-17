@@ -36,17 +36,13 @@ public class StudentController {
         service.deleteStudent(id);
     }
 
-    public void getAll() { // TODO: Переписать что бы было короче (KISS, .isEmpty?)
+    public void getAll() {
         List<Student> students = service.getAllStudents();
-        boolean found = false;
-        for (User student : students) {
-            if (student instanceof Student) {
-                System.out.println(student);
-                found = true;
-            }
-        }
-        if (!found) {
+        if (students.isEmpty()) {
             System.err.println("No students found in the repository.\n");
+            return;
         }
+        students.forEach(System.out::println);
     }
 }
+
