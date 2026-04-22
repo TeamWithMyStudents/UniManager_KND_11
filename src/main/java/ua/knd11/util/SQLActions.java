@@ -17,7 +17,7 @@ public final class SQLActions {
 
     @SuppressWarnings("SqlResolve")
     private static final String QUERY_ADD_STUDENT = """
-            INSERT INTO STUDENTS (name, surname, "group", role, email, password)
+            INSERT INTO STUDENTS (name, surname, "group" , role, email, password)
             VALUES (?, ?, ?, ?, ?, ?);
             """;
 
@@ -38,7 +38,17 @@ public final class SQLActions {
     @SuppressWarnings("SqlResolve")
     private static final String QUERY_DELETE_STUDENT_BY_ID = "DELETE FROM STUDENTS WHERE id = ?";
 
-    private static final String QUERY_SET_STUDENT_ASSIGNEDHEAD_BY_ID = "UPDATE STUDENTS SET role = 'HEAD_STUDENT' WHERE id = ?";
+    private static final String QUERY_SET_NAME_STUDENT_BY_ID = "UPDATE STUDENTS SET name = ? WHERE id = ?";
+    private static final String QUERY_SET_SURNAME_STUDENT_BY_ID = "UPDATE STUDENTS SET surname = ? WHERE id = ?";
+    private static final String QUERY_SET_GROUP_STUDENT_BY_ID = "UPDATE STUDENTS SET \"group\" = ? WHERE id = ?";
+    private static final String QUERY_SET_EMAIL_STUDENT_BY_ID = "UPDATE STUDENTS SET email = ? WHERE id = ?";
+
+    private static final String QUERY_SET_NAME_TEACHER_BY_ID = "UPDATE TEACHERS SET name = ? WHERE id = ?";
+    private static final String QUERY_SET_SURNAME_TEACHER_BY_ID = "UPDATE TEACHERS SET surname = ? WHERE id = ?";
+    private static final String QUERY_SET_DEPARTMENT_TEACHER_BY_ID = "UPDATE TEACHERS SET department = ? WHERE id = ?";
+    private static final String QUERY_SET_DEGREE_TEACHER_BY_ID = "UPDATE TEACHERS SET degree = ? WHERE id = ?";
+    private static final String QUERY_SET_SALARY_TEACHER_BY_ID = "UPDATE TEACHERS SET salary = ? WHERE id = ?";
+    private static final String QUERY_SET_EMAIL_TEACHER_BY_ID = "UPDATE TEACHERS SET email = ? WHERE id = ?";
 
     private static final String QUERY_CREATE_STUDENTS_TABLE = """
             CREATE TABLE IF NOT EXISTS STUDENTS (
@@ -99,18 +109,6 @@ public final class SQLActions {
         }
     }
 
-    public static void assignStudentById(int id) {
-        if (id < 0) return;
-        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(QUERY_SET_STUDENT_ASSIGNEDHEAD_BY_ID)){
-            stmt.setObject(1, id);
-            stmt.executeUpdate();
-            System.out.println("Student assigned to database");
-        } catch (SQLException e) {
-            System.err.println("Failed to assign student to teacher from database");
-            throw new RuntimeException(e);
-        }
-    }
-
     public static void addTeacherToDB(Teacher teacher) {
         if (teacher == null) return;
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(QUERY_ADD_TEACHER)) {
@@ -118,7 +116,7 @@ public final class SQLActions {
             stmt.setString(2, teacher.getSurname());
             stmt.setString(3, teacher.getDepartment());
             stmt.setString(4, teacher.getDegree());
-            stmt.setString(5, String.valueOf(teacher.getSalary()));
+            stmt.setDouble(5, teacher.getSalary());
             stmt.setString(6, teacher.getEmail());
             stmt.setString(7, teacher.getPassword());
             stmt.executeUpdate();
@@ -238,6 +236,145 @@ public final class SQLActions {
             return students.isEmpty() ? null : students.get(0);
         } catch (SQLException e) {
             throw new RuntimeException("Failed to find student with ID: " + id + "in database");
+        }
+    }
+    public static void updateStudentName(int id, String name) {
+        FieldValidator.validateId(id);
+        FieldValidator.validateAlphabeticString(name, "name");
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(QUERY_SET_NAME_STUDENT_BY_ID)) {
+            stmt.setString(1, name);
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+            System.out.println("Successfully updated student name: " + name);
+        } catch (SQLException e){
+            System.out.println("Failed to update student name: " + e.getMessage());
+            throw new RuntimeException();
+        }
+    }
+
+    public static void updateStudentSurname(int id, String surname) {
+        FieldValidator.validateId(id);
+        FieldValidator.validateAlphabeticString(surname, "surname");
+        try(Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(QUERY_SET_SURNAME_STUDENT_BY_ID)) {
+            stmt.setString(1, surname);
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+            System.out.println("Successfully updated student surname: " + surname);
+        } catch (SQLException e){
+            System.out.println("Failed to update student surname: " + e.getMessage());
+            throw new RuntimeException();
+        }
+    }
+
+    public static void updateStudentGroup(int id, String group) {
+        FieldValidator.validateId(id);
+        FieldValidator.validateGroup(group);
+        try(Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(QUERY_SET_GROUP_STUDENT_BY_ID)){
+            stmt.setString(1, group);
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+            System.out.println("Successfully updated student group: " + group);
+        } catch (SQLException e){
+            System.out.println("Failed to update student group: " + e.getMessage());
+            throw new RuntimeException();
+        }
+    }
+
+    public static void updateStudentEmail(int id, String email) {
+        FieldValidator.validateId(id);
+        FieldValidator.validateEmail(email);
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(QUERY_SET_EMAIL_STUDENT_BY_ID)){
+            stmt.setString(1, email);
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+            System.out.println("Successfully updated student email: " + email);
+        } catch (SQLException e){
+            System.out.println("Failed to update student email: " + e.getMessage());
+            throw new RuntimeException();
+        }
+    }
+
+    public static void updateTeacherName(int id, String name) {
+        FieldValidator.validateId(id);
+        FieldValidator.validateAlphabeticString(name, "name");
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(QUERY_SET_NAME_TEACHER_BY_ID)){
+            stmt.setString(1, name);
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+            System.out.println("Successfully updated teacher name: " + name);
+        } catch (SQLException e){
+            System.out.println("Failed to update teacher name: " + e.getMessage());
+            throw new RuntimeException();
+        }
+    }
+
+    public static void updateTeacherSurname(int id, String surname) {
+        FieldValidator.validateId(id);
+        FieldValidator.validateAlphabeticString(surname, "surname");
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(QUERY_SET_SURNAME_TEACHER_BY_ID)){
+            stmt.setString(1, surname);
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+            System.out.println("Successfully updated teacher surname: " + surname);
+        } catch (SQLException e){
+            System.out.println("Failed to update teacher surname: " + e.getMessage());
+            throw new RuntimeException();
+        }
+    }
+
+    public static void updateTeacherDepartment(int id, String department) {
+        FieldValidator.validateId(id);
+        FieldValidator.validateAlphabeticString(department, "department");
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(QUERY_SET_DEPARTMENT_TEACHER_BY_ID)){
+            stmt.setString(1, department);
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+            System.out.println("Successfully updated teacher department: " + department);
+        } catch (SQLException e){
+            System.out.println("Failed to update teacher department: " + e.getMessage());
+            throw new RuntimeException();
+        }
+    }
+
+    public static void updateTeacherDegree(int id, String degree) {
+        FieldValidator.validateId(id);
+        FieldValidator.validateAlphabeticString(degree, "degree");
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(QUERY_SET_DEGREE_TEACHER_BY_ID)){
+            stmt.setString(1, degree);
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+            System.out.println("Successfully updated teacher degree: " + degree);
+        } catch (SQLException e){
+            System.out.println("Failed to update teacher degree: " + e.getMessage());
+            throw new RuntimeException();
+        }
+    }
+
+    public static void updateTeacherSalary(int id, double salary) {
+        FieldValidator.validateId(id);
+        FieldValidator.validateSalary(salary);
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(QUERY_SET_SALARY_TEACHER_BY_ID)){
+            stmt.setDouble(1, salary);
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+            System.out.println("Successfully updated teacher salary: " + salary);
+        } catch (SQLException e){
+            System.out.println("Failed to update teacher salary: " + e.getMessage());
+            throw new RuntimeException();
+        }
+    }
+
+    public static void updateTeacherEmail(int id, String email) {
+        FieldValidator.validateId(id);
+        FieldValidator.validateEmail(email);
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(QUERY_SET_EMAIL_TEACHER_BY_ID)){
+            stmt.setString(1, email);
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+            System.out.println("Successfully updated teacher email: " + email);
+        } catch (SQLException e){
+            System.out.println("Failed to update teacher email: " + e.getMessage());
+            throw new RuntimeException();
         }
     }
 

@@ -2,6 +2,7 @@ package ua.knd11.controller;
 
 import ua.knd11.model.Teacher;
 import ua.knd11.service.impl.TeacherServiceImpl;
+import ua.knd11.util.FieldValidator;
 
 import java.util.List;
 
@@ -19,14 +20,19 @@ public class TeacherController {
     }
 
     private Teacher createTeacherWithParts(String[] parts) {
-        // parts[1] name
-        // parts[2] surname
-        // parts[3] department
-        // parts[4] degree
-        // parts[5] salary
-        // parts[6] email
-        // parts[7] password
-        return new Teacher(parts[1], parts[2], parts[3], parts[4], Double.parseDouble(parts[5]), parts[6], parts[7]);
+        String name = parts[0];
+        String surname = parts[1];
+        String dept = parts[2];
+        String degree = parts[3];
+        double salary = Double.parseDouble(parts[4]);
+        String email = parts[5];
+        String password = parts[6];
+
+        FieldValidator.validateSalary(salary);
+        FieldValidator.validateEmail(email);
+        FieldValidator.validatePassword(password);
+
+        return new Teacher(name, surname, dept, degree, salary, email, password);
     }
 
     public void deleteTeacher(int id) {

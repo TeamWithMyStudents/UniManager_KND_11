@@ -2,7 +2,6 @@ package ua.knd11.viewer;
 
 import ua.knd11.controller.StudentController;
 import ua.knd11.controller.TeacherController;
-import ua.knd11.util.SQLActions;
 
 import java.util.Scanner;
 
@@ -78,7 +77,6 @@ public class ConsoleMenu {
                         int assignId = sc.nextInt();
                         sc.nextLine();
                         studentController.assignHeadStudent(assignId);
-                        SQLActions.assignStudentById(assignId);
                     } else {
                         System.out.println("Error, ID must be a number!");
                         sc.nextLine(); // Clearing error input
@@ -102,8 +100,9 @@ public class ConsoleMenu {
                     \n TEACHER MANAGER:
                     1. Add Teacher
                     2. Show All Teachers
-                    3. Calculate Budget
-                    4. Filter by Degree
+                    3. Delete Teacher
+                    4. Calculate Salary
+                    5. Filter Degree
                     0. Back to Main Menu
                     """);
             System.out.print("Select an option (number): ");
