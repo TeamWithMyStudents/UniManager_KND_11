@@ -38,6 +38,9 @@ public final class SQLActions {
     @SuppressWarnings("SqlResolve")
     private static final String QUERY_DELETE_STUDENT_BY_ID = "DELETE FROM STUDENTS WHERE id = ?";
 
+    private static final String QUERY_GET_STUDENT_BY_EMAIL = "SELECT * FROM STUDENTS WHERE email = ?";
+    private static final String QUERY_GET_TEACHER_BY_EMAIL = "SELECT * FROM TEACHERS WHERE email = ?";
+
     private static final String QUERY_SET_NAME_STUDENT_BY_ID = "UPDATE STUDENTS SET name = ? WHERE id = ?";
     private static final String QUERY_SET_SURNAME_STUDENT_BY_ID = "UPDATE STUDENTS SET surname = ? WHERE id = ?";
     private static final String QUERY_SET_GROUP_STUDENT_BY_ID = "UPDATE STUDENTS SET \"group\" = ? WHERE id = ?";
@@ -194,6 +197,7 @@ public final class SQLActions {
                     resultSet.getString("email"),
                     resultSet.getString("password")
             );
+            teacher.setIdFromDB(resultSet.getInt("id"));
             list.add(teacher);
         }
         return list;
@@ -222,6 +226,28 @@ public final class SQLActions {
         } catch (SQLException e) {
             System.err.println("Failed to delete teacher with ID " + id + " from database");
             throw new RuntimeException(e);
+        }
+    }
+
+    public static Student getStudentByEmail(String email) {
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(QUERY_GET_STUDENT_BY_EMAIL)) {
+            stmt.setString(1, email);
+            List<Student> students = parseStudentsFromResultSet(stmt.executeQuery());
+            return students.isEmpty() ? null : students.get(0);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error searching student by email", e);
+        }
+    }
+
+    public static Teacher getTeacherByEmail(String email) {
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(QUERY_GET_TEACHER_BY_EMAIL)) {
+            stmt.setString(1, email);
+            List<Teacher> teachers = parseTeachersFromResultSet(stmt.executeQuery());
+            return teachers.isEmpty() ? null : teachers.get(0);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error searching teacher by email", e);
         }
     }
 

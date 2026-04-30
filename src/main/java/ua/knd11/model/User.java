@@ -57,6 +57,10 @@ public abstract class User {
             throw new IllegalArgumentException("Cannot set unprotected password");
         this.password = value;
     }
+//там была идея про суперюзера, который может всех добавлять, удалять и тд.
+        public boolean isSuperuser() {
+        return (this instanceof Teacher) && (this.id == 1);
+    }
 
     @Override
     public String toString() {
