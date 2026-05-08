@@ -6,16 +6,34 @@ import ua.knd11.service.JournalService;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JournalServiceImpl implements JournalService { // TODO: по возможности УКОРОТИТЬ
+/**
+ * Implementation of the {@link JournalService} interface.
+ * Provides functionality for recording student grades, retrieving grade histories,
+ * and generating academic record reports.
+ */
+public class JournalServiceImpl implements JournalService {
 
+    /** Internal storage for all grade records in the system */
     private final List<Grade> grades = new ArrayList<>();
 
+    /**
+     * Records a new grade for a student in a specific subject.
+     * @param studentId the unique identifier of the student
+     * @param subject   the name of the academic subject
+     * @param score     the numeric score achieved
+     */
     @Override
     public void assignGrade(int studentId, String subject, int score) {
-        Grade newGrade = new Grade(studentId, subject, score);
-        grades.add(newGrade);
+        grades.add(new Grade(studentId, subject, score));
     }
 
+    /**
+     * Retrieves a list of all grades associated with a specific student.
+     * Uses defensive copying to ensure the internal state of the service
+     * cannot be modified from outside this class.
+     * @param studentId the unique identifier of the student
+     * @return a list of {@link Grade} objects for the student
+     */
     @Override
     public List<Grade> getGradesForStudent(int studentId) {
         return grades.stream()
@@ -25,6 +43,12 @@ public class JournalServiceImpl implements JournalService { // TODO: по воз
                 .toList();
     }
 
+    /**
+     * Generates a formatted text-based report (record book) for a specific student.
+     * Includes a list of all subjects, corresponding scores, and a calculated average score.
+     * @param studentId the unique identifier of the student
+     * @return a formatted report string, or a default message if no grades are found
+     */
     @Override
     public String generateRecordBook(int studentId) {
         List<Grade> studentGrades = getGradesForStudent(studentId);
