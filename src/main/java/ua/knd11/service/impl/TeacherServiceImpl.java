@@ -30,11 +30,17 @@ public class TeacherServiceImpl implements TeacherService {
     /**
      * Filters and prints teachers who hold a specific academic degree.
      * The search is case-insensitive and validates the input string format.
+     *
      * @param degree the academic degree or part of the degree string to filter by
      * @throws IllegalArgumentException if the provided degree string fails alphabetic validation
      */
     public void filterByDegree(String degree) throws IllegalArgumentException {
-        FieldValidator.validateAlphabeticString("Degree", degree);
+        try {
+            FieldValidator.validateAlphabeticString("Degree", degree);
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+            return;
+        }
 
         boolean found = false;
         for (User user : getAllTeachers()) {
@@ -52,6 +58,7 @@ public class TeacherServiceImpl implements TeacherService {
 
     /**
      * Registers a new teacher by persisting their record to the database.
+     *
      * @param teacher the {@link Teacher} object to be added
      * @throws IllegalArgumentException if the teacher data is invalid
      */
@@ -61,6 +68,7 @@ public class TeacherServiceImpl implements TeacherService {
 
     /**
      * Deletes a teacher from the database using their unique identifier.
+     *
      * @param id the unique identifier of the teacher to be removed
      */
     @Override
@@ -70,6 +78,7 @@ public class TeacherServiceImpl implements TeacherService {
 
     /**
      * Retrieves a list of all teachers stored in the database.
+     *
      * @return an {@link ArrayList} containing all {@link Teacher} records
      */
     public ArrayList<Teacher> getAllTeachers() {

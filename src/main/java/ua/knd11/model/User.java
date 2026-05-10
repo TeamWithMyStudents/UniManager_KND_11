@@ -10,22 +10,35 @@ import ua.knd11.util.FieldValidator;
  */
 @Getter
 public abstract class User {
-    /** Static counter used to generate the next unique identifier */
+    /**
+     * Static counter used to generate the next unique identifier
+     */
     private static int nextId = 1;
-    /** The unique identifier for this specific user; 0 indicates an unassigned ID */
+    /**
+     * The unique identifier for this specific user; 0 indicates an unassigned ID
+     */
     private int id = 0;
-    /** The user's first name */
+    /**
+     * The user's first name
+     */
     private String name;
-    /** The user's last name (surname) */
+    /**
+     * The user's last name (surname)
+     */
     private String surname;
-    /** The user's unique email address */
+    /**
+     * The user's unique email address
+     */
     private String email;
-    /** The user's password, which must be protected/encrypted */
+    /**
+     * The user's password, which must be protected/encrypted
+     */
     private String password;
 
     /**
      * Constructs a new User and validates their name, surname, and email.
      * Also ensures the password is in a protected format.
+     *
      * @param name     the user's first name
      * @param surname  the user's last name
      * @param email    the user's unique email address
@@ -36,15 +49,17 @@ public abstract class User {
         FieldValidator.validateAlphabeticString("Name", name);
         FieldValidator.validateAlphabeticString("Surname", surname);
         FieldValidator.validateEmail(email);
-        if (!FieldValidator.isPasswordProtected(password)) FieldValidator.makeProtectedPassword(password);
         this.name = name;
         this.surname = surname;
         this.email = email;
         this.password = password;
+        if (!FieldValidator.isPasswordProtected(password))
+            this.password = FieldValidator.makeProtectedPassword(password);
     }
 
     /**
      * Assigns a unique ID to the user using an internal auto-incrementing counter.
+     *
      * @throws IllegalStateException if an ID has already been assigned to this user
      */
     public void assignId() throws IllegalStateException {
@@ -56,6 +71,7 @@ public abstract class User {
 
     /**
      * Manually sets the user ID, typically used when loading existing data from a database.
+     *
      * @param id the unique ID to be assigned
      */
     public void setIdFromDB(int id) {
@@ -64,6 +80,7 @@ public abstract class User {
 
     /**
      * Updates the user's first name with alphabetic validation.
+     *
      * @param name the new first name
      * @throws IllegalArgumentException if the name is invalid
      */
@@ -75,6 +92,7 @@ public abstract class User {
 
     /**
      * Updates the user's last name with alphabetic validation.
+     *
      * @param surname the new last name
      * @throws IllegalArgumentException if the surname is invalid
      */
@@ -86,6 +104,7 @@ public abstract class User {
 
     /**
      * Updates the user's email address with format validation.
+     *
      * @param email the new email address
      * @throws IllegalArgumentException if the email format is invalid
      */
@@ -97,6 +116,7 @@ public abstract class User {
 
     /**
      * Updates the user's password. The new password must already be in a protected format.
+     *
      * @param value the new protected password string
      * @throws IllegalArgumentException if the provided password is not protected
      */
@@ -108,6 +128,7 @@ public abstract class User {
 
     /**
      * Returns a basic string representation of the user, excluding sensitive data like passwords.
+     *
      * @return a string containing ID, name, surname, and email
      */
     @Override

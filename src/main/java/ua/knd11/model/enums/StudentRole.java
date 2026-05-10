@@ -3,7 +3,7 @@ package ua.knd11.model.enums;
 import lombok.Getter;
 
 @Getter
-public enum StudentRole { // TODO: Вырезать депути
+public enum StudentRole {
 
     HEAD_STUDENT("Head Student"),
     REGULAR("Student");

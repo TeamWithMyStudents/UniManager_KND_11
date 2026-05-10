@@ -201,7 +201,7 @@ public final class SQLActions {
              ResultSet rs = stmt.executeQuery(QUERY_GET_ALL_USERS)) {
             return new ArrayList<>(parseUsersFromResultSet(rs));
         } catch (SQLException e) {
-            System.err.println("Error retrieving STUDENTS table");
+            System.err.println("Error retrieving USERS table");
             throw new RuntimeException(e);
         }
     }

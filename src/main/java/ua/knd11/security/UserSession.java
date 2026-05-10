@@ -1,7 +1,9 @@
 package ua.knd11.security;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Getter;
 import ua.knd11.model.User;
+import ua.knd11.util.FieldValidator;
 
 import java.util.Objects;
 
@@ -11,20 +13,49 @@ import java.util.Objects;
  * Utilizes a static context to track the active {@link User}.
  */
 public class UserSession {
-    /**  A predefined administrative user with full system privileges.
+
+    private final static String SUPER_USER_EMAIL;
+
+    private final static String SUPER_USER_PASSWORD;
+
+    static {
+        try {
+            FieldValidator.validateEmail(Dotenv.load().get("SUPER_USER_EMAIL"));
+            SUPER_USER_EMAIL = Dotenv.load().get("SUPER_USER_EMAIL");
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException(e + "SUPER_USER_EMAIL is not valid");
+        }
+    }
+
+    static {
+        try {
+            FieldValidator.validatePassword(Dotenv.load().get("SUPER_USER_PASSWORD"));
+            SUPER_USER_PASSWORD = Dotenv.load().get("SUPER_USER_PASSWORD");
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException(e + "SUPER_USER_PASSWORD is not valid");
+        }
+    }
+
+    /**
+     * A predefined administrative user with full system privileges.
      * Initialized as an anonymous subclass of the abstract User.
      */
     @Getter
-    private static final User superUser =  new User("admin", "admin", "admin@gmail.com", "admin1234") {};
-
-    /** Internal lock object used for thread synchronization */
+    private static final User superUser = new User("admin", "admin", SUPER_USER_EMAIL, SUPER_USER_PASSWORD) {
+    };
+    /**
+     * Internal lock object used for thread synchronization
+     */
     private static final Object lock = new Object();
-
-    /** The currently authenticated user; null if no session is active */
+    /**
+     * The currently authenticated user; null if no session is active
+     */
     private static User currentUser = null;
+
 
     /**
      * Establishes a session for the provided user.
+     *
      * @param user the user instance to log in (cannot be null)
      * @throws NullPointerException if the provided user is null
      */
@@ -37,6 +68,7 @@ public class UserSession {
 
     /**
      * Terminates the current user session.
+     *
      * @throws IllegalArgumentException if no user is currently authenticated
      */
     public static void logout() {
@@ -51,6 +83,7 @@ public class UserSession {
 
     /**
      * Retrieves the user currently associated with the session.
+     *
      * @return the active {@link User}, or null if not logged in
      */
     public static User getCurrentUser() {
@@ -61,6 +94,7 @@ public class UserSession {
 
     /**
      * Checks whether a user is currently logged into the system.
+     *
      * @return true if a session is active, false otherwise
      */
     public static boolean isAuthenticated() {
@@ -72,14 +106,16 @@ public class UserSession {
     /**
      * Verifies if the current user has administrative (SuperUser) access.
      * Prints an "Access denied" message if the user is not the admin.
-     * @return true if access is denied (user is not superUser), false if access is granted
+     *
+     * @return false if access is denied (user is not superUser), true if access is granted
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean checkAccess() {
         User current = UserSession.getCurrentUser();
-        if (!current.equals(superUser)){
-            System.out.println("Access denied");
+        if (current.equals(superUser)) {
             return true;
         }
+        System.err.println(" Access denied!");
         return false;
     }
 }
