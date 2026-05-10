@@ -1,9 +1,11 @@
 package ua.knd11.util;
 
-import com.password4j.BadParametersException;
 import com.password4j.Hash;
 import com.password4j.Password;
 import io.github.cdimascio.dotenv.Dotenv;
+
+import java.security.SecureRandom;
+import java.util.Base64;
 
 /**
  * A final utility class providing static methods for data validation and security.
@@ -154,37 +156,43 @@ public final class FieldValidator {
      * @param passwordHash the hashed password to compare against
      * @param salt         the salt value used during the password hashing process
      * @return true if the raw password matches the hashed password when processed with the salt; false otherwise
+     * @throws IllegalStateException if the pepper is not configured
      */
-    public static Boolean verifyPassword(String value, String passwordHash, String salt) {
+    public static boolean verifyPassword(String value, String passwordHash, String salt) {
         return Password.check(value, passwordHash).addSalt(salt).addPepper(pepper).withArgon2();
     }
 
     /**
-     * Generates a cryptographically secure salt value using the Argon2 hashing algorithm.
-     * The method appends a random salt, processes it with Argon2, and retrieves the final salt value.
+     * Generates a cryptographically secure random salt value.
+     * Uses SecureRandom for direct byte generation and encodes to Base64.
      *
-     * @return a securely generated salt value as a string
-     * @throws IllegalStateException if the length of the random salt is invalid or improperly formatted
+     * @return a securely generated salt value as a Base64-encoded string
+     * @throws IllegalStateException if the salt length is invalid
      */
     public static String makeProtectedSalt() {
         try {
-            return Password.hash("salt")
-                    .addRandomSalt(Integer.parseInt(salt))
-                    .withArgon2()
-                    .getSalt();
-        } catch (BadParametersException e) {
-            throw new IllegalStateException("RANDOM_SALT_LENGHT must be positive integer number");
-        } catch (NumberFormatException e) {
-            throw new IllegalStateException("RANDOM_SALT_LENGHT does not contain a valid integer number");
+            if (salt.isEmpty()) {
+                throw new IllegalStateException("RANDOM_SALT_LENGTH must be a positive integer");
+            }
+            byte[] saltBytes = new byte[salt.length()];
+            SecureRandom random = new SecureRandom();
+            random.nextBytes(saltBytes);
+            return Base64.getEncoder().encodeToString(saltBytes);
+        } catch (IllegalStateException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to generate salt", e);
         }
     }
 
     /**
-     * Hashes a raw password string using PBKDF2 with a specific salt and pepper.
+     * Hashes a raw password string using Argon2id with a specific salt and pepper.
      * This method secures the password for storage in the database.
      *
      * @param value the raw password to protect
+     * @param salt  the salt value used during hashing
      * @return a hashed string representation of the password
+     * @throws IllegalStateException if the pepper is not configured
      */
     public static String makeProtectedPasswordWithSalt(String value, String salt) {
         try {

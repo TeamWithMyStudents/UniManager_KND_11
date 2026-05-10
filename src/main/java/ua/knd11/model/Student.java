@@ -38,6 +38,24 @@ public class Student extends User {
     }
 
     /**
+     * Constructor for database fill.
+     * Bypasses validation and hashing to save stored values.
+     *
+     * @param name     the first name
+     * @param surname  the last name
+     * @param group    the academic group
+     * @param email    the email address
+     * @param password the stored hashed password
+     * @param salt     the stored salt
+     * @param role     the student role
+     */
+    public Student(String name, String surname, String group, String email, String password, String salt, StudentRole role) {
+        super(name, surname, email, password, salt);
+        this.group = group;
+        this.role = role;
+    }
+
+    /**
      * Updates the academic group name with validation.
      * Normalizes the input string to uppercase for consistency.
      * @param group the new academic group identifier

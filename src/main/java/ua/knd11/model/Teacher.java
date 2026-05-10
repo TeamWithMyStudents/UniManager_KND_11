@@ -39,7 +39,28 @@ public class Teacher extends User {
     }
 
     /**
+     * Constructor for database fill.
+     * Bypasses validation and hashing to save stored values.
+     *
+     * @param name       the first name
+     * @param surname    the last name
+     * @param department the department name
+     * @param degree     the academic degree
+     * @param salary     the salary value
+     * @param email      the email address
+     * @param password   the stored hashed password
+     * @param salt       the stored salt
+     */
+    public Teacher(String name, String surname, String department, String degree, double salary, String email, String password, String salt) {
+        super(name, surname, email, password, salt);
+        this.department = department;
+        this.degree = degree;
+        this.salary = salary;
+    }
+
+    /**
      * Updates the academic department with alphabetic validation.
+     *
      * @param department the new department name
      * @throws IllegalArgumentException if the string contains non-alphabetic characters
      */
@@ -51,6 +72,7 @@ public class Teacher extends User {
 
     /**
      * Updates the academic degree with alphabetic validation.
+     *
      * @param degree the new academic degree
      * @throws IllegalArgumentException if the string contains non-alphabetic characters
      */
@@ -62,6 +84,7 @@ public class Teacher extends User {
 
     /**
      * Updates the salary amount with numeric validation.
+     *
      * @param salary the new salary value
      * @throws IllegalArgumentException if the salary amount is invalid
      */
@@ -74,6 +97,7 @@ public class Teacher extends User {
     /**
      * Returns a detailed string representation of the Teacher.
      * Includes inherited fields from {@link User} such as ID and Full Name.
+     *
      * @return a formatted string containing teacher professional details
      */
     @Override

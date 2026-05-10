@@ -178,16 +178,13 @@ public final class SQLActions {
 
     /**
      * Initializes the database by creating the STUDENTS and TEACHERS tables if they do not exist.
-     *
-     * @throws RuntimeException if table creation fails due to a database error.
      */
     public static void initDatabase() {
         try (Connection conn = getConnection(); Statement stmt = conn.createStatement()) {
             stmt.executeUpdate(QUERY_CREATE_STUDENTS_TABLE);
             stmt.executeUpdate(QUERY_CREATE_TEACHERS_TABLE);
         } catch (SQLException e) {
-            System.err.println("Database initialization failed");
-            throw new RuntimeException(e);
+            System.err.println("Database initialization failed: " + e.getMessage());
         }
     }
 
@@ -197,7 +194,6 @@ public final class SQLActions {
      * Inserts a new student record into the database.
      *
      * @param student the {@link Student} object to persist
-     * @throws RuntimeException if the SQL execution fails
      */
     public static void addStudentToDB(Student student) {
         if (student == null) return;
@@ -212,8 +208,7 @@ public final class SQLActions {
             stmt.executeUpdate();
             System.out.println("Student added to database");
         } catch (SQLException e) {
-            System.err.println("Failed to add student to database");
-            throw new RuntimeException(e);
+            System.err.println("Failed to add student to database: " + e.getMessage());
         }
     }
 
@@ -221,7 +216,6 @@ public final class SQLActions {
      * Inserts a new teacher record into the database.
      *
      * @param teacher the {@link Teacher} object to persist
-     * @throws RuntimeException if the SQL execution fails
      */
     public static void addTeacherToDB(Teacher teacher) {
         if (teacher == null) return;
@@ -237,8 +231,7 @@ public final class SQLActions {
             stmt.executeUpdate();
             System.out.println("Teacher added to database");
         } catch (SQLException e) {
-            System.err.println("Failed to add teacher to database");
-            throw new RuntimeException(e);
+            System.err.println("Failed to add teacher to database: " + e.getMessage());
         }
     }
 
@@ -313,7 +306,8 @@ public final class SQLActions {
                     resultSet.getString("email"),
                     resultSet.getString("password"),
                     resultSet.getString("salt")
-            ){};
+            ) {
+            };
             list.add(user);
         }
         return list;
@@ -326,18 +320,19 @@ public final class SQLActions {
     private static List<Student> parseStudentsFromResultSet(@NotNull ResultSet resultSet) throws SQLException {
         List<Student> list = new ArrayList<>();
         while (resultSet.next()) {
+            String roleStr = resultSet.getString("role");
+            StudentRole role = "HEAD_STUDENT".equals(roleStr) ? StudentRole.HEAD_STUDENT : StudentRole.REGULAR;
+
             Student student = new Student(
                     resultSet.getString("name"),
                     resultSet.getString("surname"),
                     resultSet.getString("group"),
                     resultSet.getString("email"),
-                    resultSet.getString("password")
-            );
 
-            String roleStr = resultSet.getString("role");
-            if ("HEAD_STUDENT".equals(roleStr)) {
-                student.setRole(StudentRole.HEAD_STUDENT);
-            }
+                    resultSet.getString("password"),
+                    resultSet.getString("salt"),
+                    role
+            );
             student.setIdFromDB(resultSet.getInt("id"));
             list.add(student);
         }
@@ -358,7 +353,9 @@ public final class SQLActions {
                     resultSet.getString("degree"),
                     resultSet.getDouble("salary"),
                     resultSet.getString("email"),
-                    resultSet.getString("password")
+
+                    resultSet.getString("password"),
+                    resultSet.getString("salt")
             );
             teacher.setIdFromDB(resultSet.getInt("id"));
             list.add(teacher);
@@ -374,15 +371,14 @@ public final class SQLActions {
      * @param id the unique identifier of the student
      */
     public static void deleteStudentFromDBWithID(int id) {
-        if (id < 0) return;
+        if (id <= 0) return;
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(QUERY_DELETE_STUDENT_BY_ID)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
             System.out.println("Student with ID " + id + " deleted from database");
         } catch (SQLException e) {
-            System.err.println("Failed to delete student with ID " + id + " from database");
-            throw new RuntimeException(e);
+            System.err.println("Failed to delete student with ID " + id + " from database: " + e.getMessage());
         }
     }
 
@@ -392,15 +388,14 @@ public final class SQLActions {
      * @param id the unique identifier of the teacher
      */
     public static void deleteTeacherFromDBWithID(int id) {
-        if (id < 0) return;
+        if (id <= 0) return;
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(QUERY_DELETE_TEACHER_BY_ID)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
             System.out.println("Teacher with ID " + id + " deleted from database");
         } catch (SQLException e) {
-            System.err.println("Failed to delete teacher with ID " + id + " from database");
-            throw new RuntimeException(e);
+            System.err.println("Failed to delete teacher with ID " + id + " from database: " + e.getMessage());
         }
     }
 
@@ -415,10 +410,13 @@ public final class SQLActions {
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(QUERY_GET_STUDENT_BY_EMAIL)) {
             stmt.setString(1, email);
-            List<Student> students = parseStudentsFromResultSet(stmt.executeQuery());
-            return students.isEmpty() ? null : students.getFirst();
+            try (ResultSet rs = stmt.executeQuery()) {
+                List<Student> students = parseStudentsFromResultSet(rs);
+                return students.isEmpty() ? null : students.getFirst();
+            }
         } catch (SQLException e) {
-            throw new RuntimeException("Error searching student by email", e);
+            System.err.println("Error searching student by email: " + e.getMessage());
+            return null;
         }
     }
 
@@ -431,10 +429,13 @@ public final class SQLActions {
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(QUERY_GET_TEACHER_BY_EMAIL)) {
             stmt.setString(1, email);
-            List<Teacher> teachers = parseTeachersFromResultSet(stmt.executeQuery());
-            return teachers.isEmpty() ? null : teachers.getFirst();
+            try (ResultSet rs = stmt.executeQuery()) {
+                List<Teacher> teachers = parseTeachersFromResultSet(rs);
+                return teachers.isEmpty() ? null : teachers.getFirst();
+            }
         } catch (SQLException e) {
-            throw new RuntimeException("Error searching teacher by email", e);
+            System.err.println("Error searching teacher by email: " + e.getMessage());
+            return null;
         }
     }
 
@@ -448,10 +449,13 @@ public final class SQLActions {
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, id);
-            var students = parseStudentsFromResultSet(stmt.executeQuery());
-            return students.isEmpty() ? null : students.getFirst();
+            try (ResultSet rs = stmt.executeQuery()) {
+                var students = parseStudentsFromResultSet(rs);
+                return students.isEmpty() ? null : students.getFirst();
+            }
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to find student with ID: " + id + "in database");
+            System.err.println("Failed to find student with ID: " + id + " in database: " + e.getMessage());
+            return null;
         }
     }
 
@@ -470,7 +474,6 @@ public final class SQLActions {
             System.out.println("Successfully updated student name: " + name);
         } catch (SQLException e) {
             System.err.println("Failed to update student name for id=" + id + ": " + e.getMessage());
-            throw new RuntimeException("Failed to update student name for id=" + id, e);
         }
     }
 
@@ -487,7 +490,6 @@ public final class SQLActions {
             System.out.println("Successfully updated student surname: " + surname);
         } catch (SQLException e) {
             System.err.println("Failed to update student surname for id=" + id + ": " + e.getMessage());
-            throw new RuntimeException("Failed to update student surname for id=" + id, e);
         }
     }
 
@@ -504,7 +506,6 @@ public final class SQLActions {
             System.out.println("Successfully updated student group: " + group);
         } catch (SQLException e) {
             System.err.println("Failed to update student group for id=" + id + ": " + e.getMessage());
-            throw new RuntimeException("Failed to update student group for id=" + id, e);
         }
     }
 
@@ -521,7 +522,6 @@ public final class SQLActions {
             System.out.println("Successfully updated student email: " + email);
         } catch (SQLException e) {
             System.err.println("Failed to update student email for id=" + id + ": " + e.getMessage());
-            throw new RuntimeException("Failed to update student email for id=" + id, e);
         }
     }
 
@@ -540,7 +540,6 @@ public final class SQLActions {
             System.out.println("Successfully updated teacher name: " + name);
         } catch (SQLException e) {
             System.err.println("Failed to update teacher name for id=" + id + ": " + e.getMessage());
-            throw new RuntimeException("Failed to update teacher name for id=" + id, e);
         }
     }
 
@@ -557,7 +556,6 @@ public final class SQLActions {
             System.out.println("Successfully updated teacher surname: " + surname);
         } catch (SQLException e) {
             System.err.println("Failed to update teacher surname for id=" + id + ": " + e.getMessage());
-            throw new RuntimeException("Failed to update teacher surname for id=" + id, e);
         }
     }
 
@@ -574,7 +572,6 @@ public final class SQLActions {
             System.out.println("Successfully updated teacher department: " + department);
         } catch (SQLException e) {
             System.err.println("Failed to update teacher department for id=" + id + ": " + e.getMessage());
-            throw new RuntimeException("Failed to update teacher department for id=" + id, e);
         }
     }
 
@@ -591,7 +588,6 @@ public final class SQLActions {
             System.out.println("Successfully updated teacher degree: " + degree);
         } catch (SQLException e) {
             System.err.println("Failed to update teacher degree for id=" + id + ": " + e.getMessage());
-            throw new RuntimeException("Failed to update teacher degree for id=" + id, e);
         }
     }
 
@@ -608,7 +604,6 @@ public final class SQLActions {
             System.out.println("Successfully updated teacher salary: " + salary);
         } catch (SQLException e) {
             System.err.println("Failed to update teacher salary for id=" + id + ": " + e.getMessage());
-            throw new RuntimeException("Failed to update teacher salary for id=" + id, e);
         }
     }
 
@@ -625,7 +620,6 @@ public final class SQLActions {
             System.out.println("Successfully updated teacher email: " + email);
         } catch (SQLException e) {
             System.err.println("Failed to update teacher email for id=" + id + ": " + e.getMessage());
-            throw new RuntimeException("Failed to update teacher email for id=" + id, e);
         }
     }
 
@@ -645,7 +639,7 @@ public final class SQLActions {
             }
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("Error executing SQL: " + sql, e);
+            System.err.println("Error executing SQL: " + sql + ": " + e.getMessage());
         }
     }
 
@@ -674,56 +668,34 @@ public final class SQLActions {
      *
      * @param studentId the ID of the student to promote
      * @param groupName the group name of the student
-     * @throws RuntimeException if the transaction fails (rolled back)
      */
     public static void assignHeadStudentTransactional(int studentId, String groupName) {
-        Connection conn = null;
-        try {
-            conn = getConnection();
+        try (Connection conn = getConnection()) {
             conn.setAutoCommit(false);
 
-            // Demote existing heads in the group
-            try (PreparedStatement demoteStmt = conn.prepareStatement(
-                    "UPDATE STUDENTS SET role = 'REGULAR' WHERE \"group\" = ? AND role = 'HEAD_STUDENT'")) {
-                demoteStmt.setString(1, groupName);
-                demoteStmt.executeUpdate();
-            }
+            try {
+                // Demote existing heads in the group
+                try (PreparedStatement demoteStmt = conn.prepareStatement(
+                        "UPDATE STUDENTS SET role = 'REGULAR' WHERE \"group\" = ? AND role = 'HEAD_STUDENT'")) {
+                    demoteStmt.setString(1, groupName);
+                    demoteStmt.executeUpdate();
+                }
 
-            // Promote the target student
-            try (PreparedStatement promoteStmt = conn.prepareStatement(
-                    "UPDATE STUDENTS SET role = ? WHERE id = ?")) {
-                promoteStmt.setString(1, StudentRole.HEAD_STUDENT.name());
-                promoteStmt.setInt(2, studentId);
-                promoteStmt.executeUpdate();
-            }
+                // Promote the target student
+                try (PreparedStatement promoteStmt = conn.prepareStatement(
+                        "UPDATE STUDENTS SET role = ? WHERE id = ?")) {
+                    promoteStmt.setString(1, StudentRole.HEAD_STUDENT.name());
+                    promoteStmt.setInt(2, studentId);
+                    promoteStmt.executeUpdate();
+                }
 
-            conn.commit();
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                System.err.println("Failed to assign head student transactionally: " + e.getMessage());
+            }
         } catch (SQLException e) {
-            if (conn != null) {
-                try {
-                    conn.rollback();
-                } catch (SQLException rollbackEx) {
-                    System.err.println("Rollback failed: " + rollbackEx.getMessage());
-                }
-            }
             System.err.println("Failed to assign head student transactionally: " + e.getMessage());
-            throw new RuntimeException("Failed to assign head student", e);
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (SQLException closeEx) {
-                    System.err.println("Failed to close connection: " + closeEx.getMessage());
-                }
-            }
         }
-    }
-
-    /**
-     * Enum representing the tables managed by this utility.
-     */
-    public enum TableName {
-        USERS, TEACHERS, STUDENTS
     }
 }

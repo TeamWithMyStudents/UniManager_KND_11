@@ -24,7 +24,7 @@ password handling and robust validation.
 
 ### Authentication & Security
 
-- **Secure Password Storage**: Passwords are hashed using PBKDF2 with salt and pepper for enhanced security.
+- **Secure Password Storage**: Passwords are hashed using Argon2id with salt and pepper for enhanced security.
 - **User Authentication**: Login system with email and password verification.
 - **Session Management**: Single-user session control to prevent multiple simultaneous logins.
 - **Password Validation**: Strong password requirements (8+ characters, allowed special characters).
@@ -40,7 +40,7 @@ password handling and robust validation.
 
 - **Language**: Java 25
 - **Build Tool**: Maven
-- **Security**: Password4j library for PBKDF2 password hashing
+- **Security**: Password4j library for Argon2id password hashing
 - **Architecture**: MVC (Model-View-Controller) pattern with Service layer.
 
 ## Project Structure
@@ -57,16 +57,18 @@ password handling and robust validation.
 
 ### File Storage Format (remote PostgreSQL)
 
-```
-Student, Name, Surname, Group, ROLE, Email@example.com, hashed_password
-Teacher, Name, Surname, Department, Degree, Salary, Email@example.com, hashed_password
+```text
+Student, Name, Surname, Group, ROLE, Email@example.com, hashed_password, salt
+Teacher, Name, Surname, Department, Degree, Salary, Email@example.com, hashed_password, salt
 ```
 
 ## Password Security
 
-- **Algorithm**: PBKDF2 with SHA256
-- **Iterations**: 310,000
-- **Key Length**: 256 bits
+- **Algorithm**: Argon2id
+- **Memory**: 19456 KB (≈19 MiB, OWASP baseline)
+- **Iterations**: 2
+- **Parallelism**: 1
+- **Key Length**: 128 bits
 - **Salt & Pepper**: Additional security layers with unique salts and application-wide pepper
 - **Storage**: Passwords are never stored in plain text - only hashed values are persisted
 
@@ -91,18 +93,19 @@ DB url and superuser can be configured in `.env`:
 
 Password hashing behavior can be configured in `src/main/resources/psw4j.properties`:
 
-- `hash.pbkdf2.algorithm`: Hashing algorithm (default: SHA256)
-- `hash.pbkdf2.iterations`: Number of iterations (default: 310000)
-- `hash.pbkdf2.length`: Key length in bits (default: 256)
+- `hash.argon2.memory`: Memory usage in KB (default: 19456)
+- `hash.argon2.iterations`: Number of iterations (default: 2)
+- `hash.argon2.parallelism`: Parallelism factor (default: 1)
+- `hash.argon2.length`: Key length in bits (default: 128)
 
-Pepper and salt for password protection can be configured in `.env`:
+Pepper and salt length for password protection can be configured in `.env`:
 
-- `STATIC_PEPPER`:
-- `STATIC_SALT`:
+- `STATIC_PEPPER`: Application-wide pepper value
+- `RANDOM_SALT_LENGTH`: Length of random salt in bytes
 
 ## Setting Up the Application
 
-1. Install Java Development Kit (JDK) 11 or higher.
+1. Install Java Development Kit (JDK) 25.
 2. Install Apache Maven.
 3. Clone the repository to your local machine.
 4. Create a new file named `.env` in the root directory of the project.
@@ -112,7 +115,7 @@ Pepper and salt for password protection can be configured in `.env`:
 - `SUPER_USER_EMAIL`=YOUR_SUPER_USER_EMAIL
 - `SUPER_USER_PASSWORD`=YOUR_SUPER_USER_PASSWORD
 - `STATIC_PEPPER`=YOUR_PEPPER
-- `RANDOM_SALT_LENGHT`=YOUR_SALT_LENGHT
+- `RANDOM_SALT_LENGTH`=YOUR_SALT_LENGTH
 ## WIP
 
 - Website control panel deployment

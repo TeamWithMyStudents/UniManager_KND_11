@@ -11,8 +11,10 @@ import ua.knd11.util.FieldValidator;
 @Getter
 public abstract class User {
     /**
-     * @deprecated Static counter used to generate the next unique identifier
+     * @deprecated Static counter used to generate the next unique identifier.
+     * Use setIdFromDB instead for database-backed ID assignment.
      */
+    @Deprecated
     private static int nextId = 1;
     /**
      * The user's password, which must be protected/encrypted
@@ -68,25 +70,23 @@ public abstract class User {
      *
      */
     public User(String name, String surname, String email, String password) {
-        try {
-            FieldValidator.validateAlphabeticString("Name", name);
-            FieldValidator.validateAlphabeticString("surname", surname);
-            FieldValidator.validateEmail(email);
-        } catch (IllegalArgumentException e) {
-            System.err.println(e.getMessage());
-            return;
-        }
+        FieldValidator.validateAlphabeticString("Name", name);
+        FieldValidator.validateAlphabeticString("Surname", surname);
+        FieldValidator.validateEmail(email);
+        FieldValidator.validatePassword(password);
         this.name = name;
         this.surname = surname;
         this.email = email;
         this.salt = FieldValidator.makeProtectedSalt();
-        this.password = FieldValidator.makeProtectedPasswordWithSalt(password, salt);
+        this.password = FieldValidator.makeProtectedPasswordWithSalt(password, this.salt);
     }
 
     /**
      * @throws IllegalStateException if an ID has already been assigned to this user
      * @deprecated Assigns a unique ID to the user using an internal auto-incrementing counter.
+     * Use setIdFromDB instead for database-backed ID assignment.
      */
+    @Deprecated
     public void assignId() throws IllegalStateException {
         if (this.id != 0) {
             throw new IllegalStateException("Id has already been assigned");
@@ -139,17 +139,6 @@ public abstract class User {
         this.email = email;
     }
 
-    /**
-     * Updates the user's password. The new password must already be in a protected format.
-     *
-     * @param value the new protected password string
-     * @throws IllegalArgumentException if the provided password is not protected
-     * @deprecated
-     */
-    public void setPassword(String value) throws IllegalArgumentException {
-        FieldValidator.validatePassword(value);
-//        this.password = value;
-    }
 
     /**
      * Returns a basic string representation of the user, excluding sensitive data like passwords.

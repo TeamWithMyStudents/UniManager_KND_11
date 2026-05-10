@@ -7,8 +7,6 @@ import ua.knd11.security.UserSession;
 import ua.knd11.util.FieldValidator;
 import ua.knd11.util.SQLActions;
 
-import java.util.ArrayList;
-
 /**
  * Implementation of the {@link AuthService} interface.
  * Handles user registration, authentication (login), and user removal
@@ -61,14 +59,20 @@ public class AuthServiceImpl implements AuthService {
             return;
         }
 
-        ArrayList<User> users = SQLActions.retrieveUsersFromDB();
-        users.add(UserSession.getSuperUser());
-        for (User user : users) {
-            if (user.getEmail().equalsIgnoreCase(email) && FieldValidator.verifyPassword(value, user.getPassword(), user.getSalt())) {
-                UserSession.login(user);
-                System.out.println("Logged \n Welcome! User " + user.getName());
+        User superUser = UserSession.getSuperUser();
+        if (superUser.getEmail().equalsIgnoreCase(email)) {
+            if (FieldValidator.verifyPassword(value, superUser.getPassword(), superUser.getSalt())) {
+                UserSession.login(superUser);
+                System.out.println("Logged \n Welcome! User " + superUser.getName());
                 return;
             }
+        }
+
+        User user = findUserByEmail(email);
+        if (user != null && FieldValidator.verifyPassword(value, user.getPassword(), user.getSalt())) {
+            UserSession.login(user);
+            System.out.println("Logged \n Welcome! User " + user.getName());
+            return;
         }
         System.err.println("Incorrect email or password");
     }

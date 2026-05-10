@@ -42,6 +42,7 @@ public class StudentServiceImpl implements StudentService {
      * Persists a new student record into the database.
      * @param student the student object to be added
      */
+    @Override
     public void addStudent(Student student) {
         SQLActions.addStudentToDB(student);
     }
@@ -50,6 +51,7 @@ public class StudentServiceImpl implements StudentService {
      * Permanently removes a student from the database using their unique ID.
      * @param id the unique identifier of the student to be deleted
      */
+    @Override
     public void deleteStudent(int id) {
         SQLActions.deleteStudentFromDBWithID(id);
     }
@@ -58,6 +60,7 @@ public class StudentServiceImpl implements StudentService {
      * Retrieves a complete list of all students currently stored in the database.
      * @return an {@link ArrayList} containing all {@link Student} records
      */
+    @Override
     public ArrayList<Student> getAllStudents() {
         return SQLActions.retrieveStudentsFromDB();
     }

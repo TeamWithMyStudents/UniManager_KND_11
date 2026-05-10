@@ -39,6 +39,7 @@ public class StudentController {
         String[] parts = value.trim().split("\\s+");
         if (parts.length != 5) {
             System.out.println("Error: Expected 5 fields (Name Surname Group Email@example.com Password).");
+            return;
         }
         try {
             service.addStudent(createStudentWithParts(parts));
