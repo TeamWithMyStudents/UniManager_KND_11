@@ -54,7 +54,7 @@ password handling and robust validation.
 
 ## Data Format
 
-### File Storage Format (users_db.txt)
+### File Storage Format (remote PostgreSQL)
 
 ```
 Student, Name, Surname, Group, ROLE, Email@example.com, hashed_password
@@ -78,8 +78,36 @@ Teacher, Name, Surname, Department, Degree, Salary, Email@example.com, hashed_pa
 
 ## Configuration
 
+### DB url and superuser `(admin)`
+
+DB url and superuser can be configured in `src/main/resources/.env`:
+
+- `DATABASE_URL`:
+- `SUPER_USER_EMAIL`:
+- `SUPER_USER_PASSWORD`:
+
+### Password Hashing
+
 Password hashing behavior can be configured in `src/main/resources/psw4j.properties`:
 
 - `hash.pbkdf2.algorithm`: Hashing algorithm (default: SHA256)
 - `hash.pbkdf2.iterations`: Number of iterations (default: 310000)
 - `hash.pbkdf2.length`: Key length in bits (default: 256)
+
+## Setting Up the Application
+
+1. Install Java Development Kit (JDK) 11 or higher.
+2. Install Apache Maven.
+3. Clone the repository to your local machine.
+4. Create a new file named `.env` in the root directory of the project.
+5. Inside the `.env` file, add the following lines:
+
+- `DATABASE_URL`="YOUR REMOTE DB URL"
+- `SUPER_USER_EMAIL`="YOUR SUPER USER EMAIL"
+- `SUPER_USER_PASSWORD`="YOUR SUPER USER PASSWORD"
+
+## WIP
+
+- Website control panel deployment
+- Improvements to the user interface
+- Improve constants handling and usage
