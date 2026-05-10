@@ -39,15 +39,6 @@ public class Teacher extends User {
     }
 
     /**
-     * Assigns a unique identifier to the teacher using the parent class logic.
-     * @throws IllegalStateException if the ID has already been assigned
-     */
-    @Override
-    public void assignId() throws IllegalStateException {
-        super.assignId();
-    }
-
-    /**
      * Updates the academic department with alphabetic validation.
      * @param department the new department name
      * @throws IllegalArgumentException if the string contains non-alphabetic characters

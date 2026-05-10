@@ -5,12 +5,13 @@ import ua.knd11.controller.TeacherController;
 import ua.knd11.security.UserSession;
 import ua.knd11.security.impl.AuthServiceImpl;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 /**
  * The primary View component of the application.
  * Provides a text-based Command Line Interface (CLI) for user interaction,
- * including authentication flows and management sub-menus for students and teachers.
+ * including authentication flows and management submenus for students and teachers.
  */
 public class ConsoleMenu {
     /**
@@ -73,7 +74,7 @@ public class ConsoleMenu {
     }
 
     /**
-     * Displays and manages the Student Management sub-menu.
+     * Displays and manages the Student Management submenu.
      * Allows for adding, viewing, deleting, and assigning roles to students.
      * Permission checks are enforced via {@link UserSession}.
      */
@@ -103,7 +104,7 @@ public class ConsoleMenu {
     }
 
     /**
-     * Displays and manages the Teacher Management sub-menu.
+     * Displays and manages the Teacher Management submenu.
      * Allows for adding, viewing, and deleting teachers, as well as
      * performing budget calculations and degree filtering.
      * Permission checks are enforced via {@link UserSession}.
@@ -165,22 +166,34 @@ public class ConsoleMenu {
             int id;
             switch (choice) {
                 case "1":
-                    authService.addStudent();
+                    System.out.println("Enter student details: Name Surname Group Email@example.com Password");
+                    studentController.addStudentFromTerminal(sc.nextLine());
                     break;
                 case "2":
-                    authService.addTeacher();
+                    System.out.println("Enter teacher details: Name Surname Dept Degree Salary Email@example.com Password");
+                    teacherController.addTeacherFromTerminal(sc.nextLine());
                     break;
                 case "3":
                     System.out.print("Enter student ID to remove: ");
-                    id = sc.nextInt();
-                    authService.removeStudent(id);
-                    sc.nextLine();
+                    try {
+                        id = sc.nextInt();
+                        studentController.deleteStudent(id);
+                        sc.nextLine();
+                    } catch (InputMismatchException e) {
+                        System.err.println("Id must be integer");
+                        return;
+                    }
                     break;
                 case "4":
                     System.out.println("Enter teacher ID to remove: ");
-                    id = sc.nextInt();
-                    authService.removeTeacher(id);
-                    sc.nextLine();
+                    try {
+                        id = sc.nextInt();
+                        teacherController.deleteTeacher(id);
+                        sc.nextLine();
+                    } catch (InputMismatchException e) {
+                        System.err.println("Id must be integer");
+                        return;
+                    }
                     break;
                 case "0":
                     System.out.println("returning to Main Menu");
@@ -199,15 +212,12 @@ public class ConsoleMenu {
      * The loop continues until a user is successfully authenticated or the application is exited.
      */
     public void LogOrReg() {
-        while (true) {
+        do {
             System.out.println("\n Please enter email and Password:");
             String emailLog = sc.next().trim();
             String passwordLog = sc.next().trim();
             sc.nextLine();
             authService.login(emailLog, passwordLog);
-            if (UserSession.isAuthenticated()) {
-                break;
-            }
-        }
+        } while (!UserSession.isAuthenticated());
     }
 }

@@ -5,6 +5,7 @@ import ua.knd11.service.impl.TeacherServiceImpl;
 import ua.knd11.util.FieldValidator;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Controller class for managing teacher-related operations within the terminal interface.
@@ -12,31 +13,47 @@ import java.util.List;
  */
 public class TeacherController {
 
-    /** Service implementation instance for teacher business logic */
+    /**
+     * Service implementation instance for teacher business logic
+     */
     private final TeacherServiceImpl service = new TeacherServiceImpl();
 
     /**
      * Parses a raw string input from the terminal and attempts to add a new teacher.
      * Expects exactly 7 space-separated fields: Name, Surname, Department, Degree, Salary, Email, and Password.
+     *
      * @param value the raw string input containing teacher data
      */
     public void addTeacherFromTerminal(String value) {
         String[] parts = value.trim().split("\\s+");
-        if (parts.length == 7) {
-            service.addTeacher(createTeacherWithParts(parts));
+        if (parts.length != 7) {
+            System.err.println("Error: Expected 7 fields (Name Surname Dept Degree Salary Email@example.com Password).");
             return;
         }
-        System.out.println("Error: Expected 7 fields (Name Surname Dept Degree Salary Email@example.com Password).");
+        try {
+            service.addTeacher(createTeacherWithParts(parts));
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+        }
     }
 
     /**
      * Internal helper to validate input parts and create a Teacher model object.
      * Uses {@link FieldValidator} to ensure data integrity for sensitive fields.
+     *
      * @param parts an array of strings representing teacher attributes
      * @return a new {@link Teacher} object populated with validated data
      */
-    private Teacher createTeacherWithParts(String[] parts) {
-        FieldValidator.validateSalary(Double.parseDouble(parts[4]));
+    private Teacher createTeacherWithParts(String[] parts) throws IllegalArgumentException {
+        FieldValidator.validateAlphabeticString("name", parts[0]);
+        FieldValidator.validateAlphabeticString("surname", parts[1]);
+        FieldValidator.validateAlphabeticString("department", parts[2]);
+        FieldValidator.validateAlphabeticString("degree", parts[3]);
+        try {
+            FieldValidator.validateSalary(Double.parseDouble(parts[4]));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Salary must be a valid number");
+        }
         FieldValidator.validateEmail(parts[5]);
         FieldValidator.validatePassword(parts[6]);
         return new Teacher(parts[0], parts[1], parts[2], parts[3], Double.parseDouble(parts[4]), parts[5], parts[6]);
@@ -44,6 +61,7 @@ public class TeacherController {
 
     /**
      * Removes a teacher from the system based on their unique identifier.
+     *
      * @param id the unique identifier of the teacher to be deleted
      */
     public void deleteTeacher(int id) {
@@ -56,8 +74,10 @@ public class TeacherController {
      */
     public void getAll() {
         List<Teacher> teachers = service.getAllTeachers();
-        teachers.stream().filter(teacher -> teacher instanceof Teacher).forEach(System.out::println);
-        if (teachers.isEmpty()) { System.out.println("No teachers found"); }
+        teachers.stream().filter(Objects::nonNull).forEach(System.out::println);
+        if (teachers.isEmpty()) {
+            System.out.println("No teachers found");
+        }
     }
 
     /**
@@ -70,6 +90,7 @@ public class TeacherController {
 
     /**
      * Filters and displays teachers based on their academic degree.
+     *
      * @param degree the academic degree string to filter by (e.g., "PhD", "Master")
      */
     public void filterByDegree(String degree) {

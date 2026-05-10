@@ -32,8 +32,7 @@ public class StudentServiceImpl implements StudentService {
             System.out.println("Student " + student.getName() + " is already the Head of group " + student.getGroup());
             return;
         }
-        SQLActions.demoteAllHeadsInGroup(student.getGroup());
-        SQLActions.updateStudentRole(studentId, StudentRole.HEAD_STUDENT);
+        SQLActions.assignHeadStudentTransactional(studentId, student.getGroup());
 
         System.out.println("Student " + student.getName() + " " + student.getSurname() +
                 " is now the Head Student of group " + student.getGroup() + "!");

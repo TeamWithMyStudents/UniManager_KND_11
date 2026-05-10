@@ -38,15 +38,6 @@ public class Student extends User {
     }
 
     /**
-     * Assigns a unique identifier to the student using the parent class logic.
-     * @throws IllegalStateException if the ID has already been assigned
-     */
-    @Override
-    public void assignId() throws IllegalStateException {
-        super.assignId();
-    }
-
-    /**
      * Updates the academic group name with validation.
      * Normalizes the input string to uppercase for consistency.
      * @param group the new academic group identifier

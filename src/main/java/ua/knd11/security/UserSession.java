@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * Manages the current authentication state of the application.
  * Provides thread-safe methods to handle user login, logout, and session-based access control.
- * Utilizes a static context to track the active {@link User}.
+ * Uses a static context to track the active {@link User}.
  */
 public class UserSession {
 
@@ -111,6 +111,12 @@ public class UserSession {
      */
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean checkAccess() {
+        synchronized (lock) {
+            if (!isAuthenticated()) {
+                System.err.println("User is not logged in");
+                return false;
+            }
+        }
         User current = UserSession.getCurrentUser();
         if (current.equals(superUser)) {
             return true;

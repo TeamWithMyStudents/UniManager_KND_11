@@ -81,7 +81,7 @@ Teacher, Name, Surname, Department, Degree, Salary, Email@example.com, hashed_pa
 
 ### DB url and superuser `(admin)`
 
-DB url and superuser can be configured in `src/main/resources/.env`:
+DB url and superuser can be configured in `.env`:
 
 - `DATABASE_URL`:
 - `SUPER_USER_EMAIL`:
@@ -95,7 +95,7 @@ Password hashing behavior can be configured in `src/main/resources/psw4j.propert
 - `hash.pbkdf2.iterations`: Number of iterations (default: 310000)
 - `hash.pbkdf2.length`: Key length in bits (default: 256)
 
-Pepper and salt for password protection can be configured in `src/main/resources/.env`:
+Pepper and salt for password protection can be configured in `.env`:
 
 - `STATIC_PEPPER`:
 - `STATIC_SALT`:
@@ -112,7 +112,7 @@ Pepper and salt for password protection can be configured in `src/main/resources
 - `SUPER_USER_EMAIL`=YOUR_SUPER_USER_EMAIL
 - `SUPER_USER_PASSWORD`=YOUR_SUPER_USER_PASSWORD
 - `STATIC_PEPPER`=YOUR_PEPPER
-- `STATIC_SALT`=YOUR_SALT
+- `RANDOM_SALT_LENGHT`=YOUR_SALT_LENGHT
 ## WIP
 
 - Website control panel deployment

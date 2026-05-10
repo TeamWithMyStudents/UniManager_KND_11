@@ -11,9 +11,17 @@ import ua.knd11.util.FieldValidator;
 @Getter
 public abstract class User {
     /**
-     * Static counter used to generate the next unique identifier
+     * @deprecated Static counter used to generate the next unique identifier
      */
     private static int nextId = 1;
+    /**
+     * The user's password, which must be protected/encrypted
+     */
+    private String password;
+    /**
+     * The salt used for password protection
+     */
+    private String salt;
     /**
      * The unique identifier for this specific user; 0 indicates an unassigned ID
      */
@@ -30,37 +38,54 @@ public abstract class User {
      * The user's unique email address
      */
     private String email;
-    /**
-     * The user's password, which must be protected/encrypted
-     */
-    private String password;
 
     /**
-     * Constructs a new User and validates their name, surname, and email.
-     * Also ensures the password is in a protected format.
+     * Constructs a new User instance with the specified name, surname, email, password, and salt.
+     * For internal use only, used when loading existing data from a database.
      *
-     * @param name     the user's first name
-     * @param surname  the user's last name
-     * @param email    the user's unique email address
-     * @param password the user's account password
-     * @throws IllegalArgumentException if validation checks fail via {@link FieldValidator}
+     * @param name     the first name of the user
+     * @param surname  the last name of the user
+     * @param email    the email address of the user
+     * @param password the raw password for the user, which may be salted and secured
+     * @param salt     the salt value used for hashing the user's password
      */
-    public User(String name, String surname, String email, String password) throws IllegalArgumentException {
-        FieldValidator.validateAlphabeticString("Name", name);
-        FieldValidator.validateAlphabeticString("Surname", surname);
-        FieldValidator.validateEmail(email);
+    public User(String name, String surname, String email, String password, String salt) {
         this.name = name;
         this.surname = surname;
         this.email = email;
         this.password = password;
-        if (!FieldValidator.isPasswordProtected(password))
-            this.password = FieldValidator.makeProtectedPassword(password);
+        this.salt = salt;
     }
 
     /**
-     * Assigns a unique ID to the user using an internal auto-incrementing counter.
+     * Constructs a new User instance with the specified name, surname, email, and password.
+     * Validates the provided inputs for proper formatting and security considerations.
      *
+     * @param name     the first name of the user
+     * @param surname  the last name of the user
+     * @param email    the email address of the user
+     * @param password the raw password for the user, which will be salted and hashed for storage
+     *
+     */
+    public User(String name, String surname, String email, String password) {
+        try {
+            FieldValidator.validateAlphabeticString("Name", name);
+            FieldValidator.validateAlphabeticString("surname", surname);
+            FieldValidator.validateEmail(email);
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+            return;
+        }
+        this.name = name;
+        this.surname = surname;
+        this.email = email;
+        this.salt = FieldValidator.makeProtectedSalt();
+        this.password = FieldValidator.makeProtectedPasswordWithSalt(password, salt);
+    }
+
+    /**
      * @throws IllegalStateException if an ID has already been assigned to this user
+     * @deprecated Assigns a unique ID to the user using an internal auto-incrementing counter.
      */
     public void assignId() throws IllegalStateException {
         if (this.id != 0) {
@@ -119,11 +144,11 @@ public abstract class User {
      *
      * @param value the new protected password string
      * @throws IllegalArgumentException if the provided password is not protected
+     * @deprecated
      */
     public void setPassword(String value) throws IllegalArgumentException {
-        if (!FieldValidator.isPasswordProtected(value))
-            throw new IllegalArgumentException("Cannot set unprotected password");
-        this.password = value;
+        FieldValidator.validatePassword(value);
+//        this.password = value;
     }
 
     /**
