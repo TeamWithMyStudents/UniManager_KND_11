@@ -2,6 +2,7 @@ package ua.knd11.util;
 
 import com.password4j.Hash;
 import com.password4j.Password;
+import io.github.cdimascio.dotenv.Dotenv;
 
 /**
  * A final utility class providing static methods for data validation and security.
@@ -141,10 +142,19 @@ public final class FieldValidator {
      * @return a hashed string representation of the password
      */
     public static String makeProtectedPassword(String value) {
-        //noinspection SpellCheckingInspection
+        String pepper = Dotenv.load().get("STATIC_PEPPER");
+        String salt = Dotenv.load().get("STATIC_SALT");
+
+        try {
+            validateNonEmptyString("pepper", pepper);
+            validateNonEmptyString("salt", salt);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException(e);
+        }
+
         Hash password = Password.hash(value)
-                .addPepper("Uni-hddjtf") // random characters
-                .addSalt("Uni-fktjgyu") // random characters
+                .addPepper(pepper)
+                .addSalt(salt)
                 .withPBKDF2();
         return password.getResult();
     }

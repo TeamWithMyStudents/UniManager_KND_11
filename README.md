@@ -1,6 +1,7 @@
 # UniManager KND-11
 
-UniManager is a console-based university management system designed to handle student and teacher data efficiently. It
+UniManager is a currently-in-development console-based university management system designed to handle student and
+teacher data efficiently. It
 provides a structured way to manage academic records, group assignments, and departmental information with secure
 password handling and robust validation.
 
@@ -94,6 +95,11 @@ Password hashing behavior can be configured in `src/main/resources/psw4j.propert
 - `hash.pbkdf2.iterations`: Number of iterations (default: 310000)
 - `hash.pbkdf2.length`: Key length in bits (default: 256)
 
+Pepper and salt for password protection can be configured in `src/main/resources/.env`:
+
+- `STATIC_PEPPER`:
+- `STATIC_SALT`:
+
 ## Setting Up the Application
 
 1. Install Java Development Kit (JDK) 11 or higher.
@@ -102,10 +108,11 @@ Password hashing behavior can be configured in `src/main/resources/psw4j.propert
 4. Create a new file named `.env` in the root directory of the project.
 5. Inside the `.env` file, add the following lines:
 
-- `DATABASE_URL`="YOUR REMOTE DB URL"
-- `SUPER_USER_EMAIL`="YOUR SUPER USER EMAIL"
-- `SUPER_USER_PASSWORD`="YOUR SUPER USER PASSWORD"
-
+- `DATABASE_URL`=YOUR_REMOTE_DB_URL
+- `SUPER_USER_EMAIL`=YOUR_SUPER_USER_EMAIL
+- `SUPER_USER_PASSWORD`=YOUR_SUPER_USER_PASSWORD
+- `STATIC_PEPPER`=YOUR_PEPPER
+- `STATIC_SALT`=YOUR_SALT
 ## WIP
 
 - Website control panel deployment
