@@ -26,3 +26,4 @@ replay_pid*
 .idea
 *.iml
 /.env
+/target/classes/psw4j.properties

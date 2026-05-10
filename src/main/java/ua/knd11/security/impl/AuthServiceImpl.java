@@ -13,31 +13,6 @@ import ua.knd11.util.SQLActions;
  * by coordinating between the model layer, session management, and database persistence.
  */
 public class AuthServiceImpl implements AuthService {
-// --Commented out by Inspection START (10.05.2026 19:15):
-//    /**
-//     * Registers a new user in the system.
-//     * Validates user fields and ensures the email is unique before persisting
-//     * to the database as either a Student or a Teacher.
-//     *
-//     * @param user the user instance to be registered
-//     */
-//    public void registerUser(User user) throws IllegalArgumentException {
-//        FieldValidator.validateAlphabeticString("name", user.getName());
-//        FieldValidator.validateAlphabeticString("surname", user.getSurname());
-//        FieldValidator.validateEmail(user.getEmail());
-//        FieldValidator.validatePassword(user.getPassword());
-//
-//        if (isEmailTaken(user.getEmail())) {
-//            throw new IllegalArgumentException("\n User with email " + user.getEmail() + " already exists.");
-//        }
-//        if (user instanceof Student s) {
-//            SQLActions.addStudentToDB(s);
-//        } else if (user instanceof Teacher t) {
-//            SQLActions.addTeacherToDB(t);
-//        }
-//    }
-// --Commented out by Inspection STOP (10.05.2026 19:15)
-
     /**
      * Authenticates a user based on email and password.
      * Compares provided credentials against users in the database and the system SuperUser.
@@ -89,16 +64,5 @@ public class AuthServiceImpl implements AuthService {
         Teacher teacher = SQLActions.getTeacherByEmail(email);
         if (teacher != null) return teacher;
         return SQLActions.getStudentByEmail(email);
-    }
-
-    /**
-     * Checks if a specific email address is already associated with a registered user.
-     *
-     * @param email the email to check
-     * @return true if the email is taken, false otherwise
-     */
-    private boolean isEmailTaken(String email) {
-        FieldValidator.validateEmail(email);
-        return findUserByEmail(email) != null;
     }
 }

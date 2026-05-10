@@ -1,6 +1,6 @@
 # UniManager KND-11
 
-UniManager is a currently-in-development console-based university management system designed to handle student and
+UniManager is a currently in development console-based university management system designed to handle student and
 teacher data efficiently. It
 provides a structured way to manage academic records, group assignments, and departmental information with secure
 password handling and robust validation.
@@ -55,7 +55,7 @@ password handling and robust validation.
 
 ## Data Format
 
-### File Storage Format (remote PostgreSQL)
+### Database Storage Format (PostgreSQL)
 
 ```text
 Student, Name, Surname, Group, ROLE, Email@example.com, hashed_password, salt
@@ -83,7 +83,7 @@ Teacher, Name, Surname, Department, Degree, Salary, Email@example.com, hashed_pa
 
 ### DB url and superuser `(admin)`
 
-DB url and superuser can be configured in `.env`:
+DB url and superuser can be configured in `.env` (must be placed in project root):
 
 - `DATABASE_URL`:
 - `SUPER_USER_EMAIL`:
@@ -98,7 +98,7 @@ Password hashing behavior can be configured in `src/main/resources/psw4j.propert
 - `hash.argon2.parallelism`: Parallelism factor (default: 1)
 - `hash.argon2.length`: Key length in bits (default: 128)
 
-Pepper and salt length for password protection can be configured in `.env`:
+STATIC_PEPPER (pepper value) and RANDOM_SALT_LENGTH (salt length) for password protection can be configured in `.env`:
 
 - `STATIC_PEPPER`: Application-wide pepper value
 - `RANDOM_SALT_LENGTH`: Length of random salt in bytes

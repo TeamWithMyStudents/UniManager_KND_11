@@ -4,7 +4,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import ua.knd11.model.Student;
 import ua.knd11.model.Teacher;
-import ua.knd11.model.User;
 import ua.knd11.model.enums.StudentRole;
 
 import java.sql.*;
@@ -22,7 +21,7 @@ public final class SQLActions {
     /**
      * The connection string for the database, retrieved from the environment variables.
      */
-    private static final String DATABASE_URL = Objects.requireNonNull(System.getenv("DATABASE_URL"));
+    private static final String DATABASE_URL = Objects.requireNonNull(System.getenv("DATABASE_URL"), "Environment variable DATABASE_URL must be set");
 
     /**
      * SQL query to insert a new record into the STUDENTS table.
@@ -53,15 +52,6 @@ public final class SQLActions {
      */
     @SuppressWarnings("SqlResolve")
     private static final String QUERY_GET_TEACHERS = "SELECT * FROM TEACHERS";
-
-    /**
-     * SQL query that performs a UNION to retrieve base account data
-     * (name, surname, email, password, salt) for all users in the system.
-     */
-    private static final String QUERY_GET_ALL_USERS = """
-             SELECT name, surname, email, password, salt FROM students UNION
-             SELECT name, surname, email, password, salt FROM teachers
-            \s""";
 
     /**
      * SQL query to delete a specific teacher based on their unique ID.
@@ -203,7 +193,7 @@ public final class SQLActions {
             stmt.setString(3, student.getGroup());
             stmt.setString(4, String.valueOf(student.getRole()));
             stmt.setString(5, student.getEmail());
-            stmt.setString(6, String.valueOf(student.getPassword()));
+            stmt.setString(6, student.getPassword());
             stmt.setString(7, student.getSalt());
             stmt.executeUpdate();
             System.out.println("Student added to database");
@@ -226,7 +216,7 @@ public final class SQLActions {
             stmt.setString(4, teacher.getDegree());
             stmt.setDouble(5, teacher.getSalary());
             stmt.setString(6, teacher.getEmail());
-            stmt.setString(7, String.valueOf(teacher.getPassword()));
+            stmt.setString(7, teacher.getPassword());
             stmt.setString(8, teacher.getSalt());
             stmt.executeUpdate();
             System.out.println("Teacher added to database");
@@ -236,24 +226,6 @@ public final class SQLActions {
     }
 
     // --- RETRIEVAL METHODS ---
-
-    /**
-     * Retrieves a union of all unique users (name, surname, email, password, salt) from both tables.
-     *
-     * @return an {@link ArrayList} of anonymous {@link User} implementations
-     */
-    @NotNull
-    @Contract(" -> new")
-    public static ArrayList<User> retrieveUsersFromDB() {
-        try (Connection conn = getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(QUERY_GET_ALL_USERS)) {
-            return new ArrayList<>(parseUsersFromResultSet(rs));
-        } catch (SQLException e) {
-            System.err.println("Error retrieving USERS table");
-            throw new RuntimeException(e);
-        }
-    }
 
     /**
      * Fetches all records from the STUDENTS table.
@@ -292,26 +264,6 @@ public final class SQLActions {
     }
 
     // --- PARSING HELPERS ---
-
-    /**
-     * Internal helper to convert a ResultSet into a list of basic User objects.
-     */
-    @NotNull
-    private static List<User> parseUsersFromResultSet(@NotNull ResultSet resultSet) throws SQLException {
-        List<User> list = new ArrayList<>();
-        while (resultSet.next()) {
-            User user = new User(
-                    resultSet.getString("name"),
-                    resultSet.getString("surname"),
-                    resultSet.getString("email"),
-                    resultSet.getString("password"),
-                    resultSet.getString("salt")
-            ) {
-            };
-            list.add(user);
-        }
-        return list;
-    }
 
     /**
      * Internal helper to convert a ResultSet into a list of Student objects.
@@ -473,7 +425,7 @@ public final class SQLActions {
             stmt.executeUpdate();
             System.out.println("Successfully updated student name: " + name);
         } catch (SQLException e) {
-            System.err.println("Failed to update student name for id=" + id + ": " + e.getMessage());
+            throw new RuntimeException("Failed to update student name for id=" + id, e);
         }
     }
 
@@ -489,7 +441,7 @@ public final class SQLActions {
             stmt.executeUpdate();
             System.out.println("Successfully updated student surname: " + surname);
         } catch (SQLException e) {
-            System.err.println("Failed to update student surname for id=" + id + ": " + e.getMessage());
+            throw new RuntimeException("Failed to update student surname for id=" + id, e);
         }
     }
 
@@ -505,7 +457,7 @@ public final class SQLActions {
             stmt.executeUpdate();
             System.out.println("Successfully updated student group: " + group);
         } catch (SQLException e) {
-            System.err.println("Failed to update student group for id=" + id + ": " + e.getMessage());
+            throw new RuntimeException("Failed to update student group for id=" + id, e);
         }
     }
 
@@ -521,7 +473,7 @@ public final class SQLActions {
             stmt.executeUpdate();
             System.out.println("Successfully updated student email: " + email);
         } catch (SQLException e) {
-            System.err.println("Failed to update student email for id=" + id + ": " + e.getMessage());
+            throw new RuntimeException("Failed to update student email for id=" + id, e);
         }
     }
 
@@ -539,7 +491,7 @@ public final class SQLActions {
             stmt.executeUpdate();
             System.out.println("Successfully updated teacher name: " + name);
         } catch (SQLException e) {
-            System.err.println("Failed to update teacher name for id=" + id + ": " + e.getMessage());
+            throw new RuntimeException("Failed to update teacher name for id=" + id, e);
         }
     }
 
@@ -555,7 +507,7 @@ public final class SQLActions {
             stmt.executeUpdate();
             System.out.println("Successfully updated teacher surname: " + surname);
         } catch (SQLException e) {
-            System.err.println("Failed to update teacher surname for id=" + id + ": " + e.getMessage());
+            throw new RuntimeException("Failed to update teacher surname for id=" + id, e);
         }
     }
 
@@ -571,7 +523,7 @@ public final class SQLActions {
             stmt.executeUpdate();
             System.out.println("Successfully updated teacher department: " + department);
         } catch (SQLException e) {
-            System.err.println("Failed to update teacher department for id=" + id + ": " + e.getMessage());
+            throw new RuntimeException("Failed to update teacher department for id=" + id, e);
         }
     }
 
@@ -587,7 +539,7 @@ public final class SQLActions {
             stmt.executeUpdate();
             System.out.println("Successfully updated teacher degree: " + degree);
         } catch (SQLException e) {
-            System.err.println("Failed to update teacher degree for id=" + id + ": " + e.getMessage());
+            throw new RuntimeException("Failed to update teacher degree for id=" + id, e);
         }
     }
 
@@ -603,7 +555,7 @@ public final class SQLActions {
             stmt.executeUpdate();
             System.out.println("Successfully updated teacher salary: " + salary);
         } catch (SQLException e) {
-            System.err.println("Failed to update teacher salary for id=" + id + ": " + e.getMessage());
+            throw new RuntimeException("Failed to update teacher salary for id=" + id, e);
         }
     }
 
@@ -619,7 +571,7 @@ public final class SQLActions {
             stmt.executeUpdate();
             System.out.println("Successfully updated teacher email: " + email);
         } catch (SQLException e) {
-            System.err.println("Failed to update teacher email for id=" + id + ": " + e.getMessage());
+            throw new RuntimeException("Failed to update teacher email for id=" + id, e);
         }
     }
 

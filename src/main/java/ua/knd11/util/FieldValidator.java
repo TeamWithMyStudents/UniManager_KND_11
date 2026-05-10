@@ -15,7 +15,22 @@ import java.util.Base64;
 public final class FieldValidator {
 
     static final private String pepper = Dotenv.load().get("STATIC_PEPPER");
-    static final private String salt = Dotenv.load().get("RANDOM_SALT_LENGHT");
+    static final private int RANDOM_SALT_LENGTH;
+
+    static {
+        String saltLengthStr = Dotenv.load().get("RANDOM_SALT_LENGTH");
+        if (saltLengthStr == null || saltLengthStr.isBlank()) {
+            throw new IllegalStateException("RANDOM_SALT_LENGTH must be a positive integer");
+        }
+        try {
+            RANDOM_SALT_LENGTH = Integer.parseInt(saltLengthStr);
+            if (RANDOM_SALT_LENGTH <= 0) {
+                throw new IllegalStateException("RANDOM_SALT_LENGTH must be a positive integer");
+            }
+        } catch (NumberFormatException e) {
+            throw new IllegalStateException("RANDOM_SALT_LENGTH must be a positive integer", e);
+        }
+    }
 
     /**
      * Private constructor to prevent instantiation of this utility class.
@@ -159,6 +174,11 @@ public final class FieldValidator {
      * @throws IllegalStateException if the pepper is not configured
      */
     public static boolean verifyPassword(String value, String passwordHash, String salt) {
+        try {
+            validateNonEmptyString("pepper", pepper);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalStateException("STATIC_PEPPER must be configured", e);
+        }
         return Password.check(value, passwordHash).addSalt(salt).addPepper(pepper).withArgon2();
     }
 
@@ -170,19 +190,10 @@ public final class FieldValidator {
      * @throws IllegalStateException if the salt length is invalid
      */
     public static String makeProtectedSalt() {
-        try {
-            if (salt.isEmpty()) {
-                throw new IllegalStateException("RANDOM_SALT_LENGTH must be a positive integer");
-            }
-            byte[] saltBytes = new byte[salt.length()];
-            SecureRandom random = new SecureRandom();
-            random.nextBytes(saltBytes);
-            return Base64.getEncoder().encodeToString(saltBytes);
-        } catch (IllegalStateException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new IllegalStateException("Failed to generate salt", e);
-        }
+        byte[] saltBytes = new byte[RANDOM_SALT_LENGTH];
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(saltBytes);
+        return Base64.getEncoder().encodeToString(saltBytes);
     }
 
     /**
