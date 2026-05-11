@@ -11,76 +11,48 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Implementation of the {@link ScheduleService}.
- * Manages the lesson schedule using an in-memory list. Handles data validation,
- * parsing of bilingual day names (English/Ukrainian), and time formatting.
+ * Implementation of the {@link ScheduleService} interface.
+ * Provides in-memory storage and management for the university timetable.
  */
 public class ScheduleServiceImpl implements ScheduleService {
 
     /**
-     * In-memory repository storing all scheduled lessons.
+     * An in-memory list storing the entire lesson schedule.
      */
-    private final List<Lesson> lessons = new ArrayList<>();
+    private final List<Lesson> schedule = new ArrayList<>();
 
     /**
-     * Adds a new lesson to the schedule after validating and parsing the input data.
+     * Adds a new lesson to the university schedule.
      *
-     * @param day            the day of the week as a string (e.g., "Monday" or "Понеділок")
-     * @param time           the starting time of the lesson in 24-hour format (e.g., "14:30")
-     * @param subject        the name of the subject
-     * @param teacherSurname the surname of the teacher
-     * @throws IllegalArgumentException if the day or time is null, empty, or cannot be parsed
+     * @param day            the day of the week as a string (e.g., "MONDAY")
+     * @param time           the time of the lesson in HH:mm format (e.g., "14:30")
+     * @param subject        the name of the subject being taught
+     * @param teacherSurname the surname of the teacher conducting the lesson
      */
     @Override
     public void addLesson(String day, String time, String subject, String teacherSurname) {
-
-        if (day == null || day.trim().isEmpty() || time == null || time.trim().isEmpty()) {
-            throw new IllegalArgumentException("День та час не можуть бути порожніми.");
-        }
         try {
-            DayOfWeek dayOfWeekEnum = parseDayOfWeek(day);
+            DayOfWeek dayOfWeek = DayOfWeek.valueOf(day.trim().toUpperCase());
             LocalTime localTime = LocalTime.parse(time.trim());
 
-            Lesson lesson = new Lesson(dayOfWeekEnum, localTime, subject, teacherSurname);
-            lessons.add(lesson);
-            System.out.println("Заняття успішно додано!");
-
-        } catch (DateTimeParseException | IllegalArgumentException e) {
-            throw new IllegalArgumentException("Неправильний формат часу або дня. Очікується день (наприклад, 'ПОНЕДІЛОК' або 'MONDAY') та час у форматі 24h (наприклад, '14:30'). Деталі: " + e.getMessage());
+            Lesson newLesson = new Lesson(dayOfWeek, localTime, subject, teacherSurname);
+            schedule.add(newLesson);
+            System.out.println("[SUCCESS] Lesson '" + subject + "' added to the schedule on " + dayOfWeek + ".");
+        } catch (IllegalArgumentException | DateTimeParseException e) {
+            System.out.println("[ERROR] Invalid format. Day must be like 'MONDAY', time like '14:30'.");
         }
     }
 
     /**
-     * Retrieves lessons scheduled for the specified day.
+     * Retrieves all scheduled lessons for a specific day of the week.
      *
-     * @param dayOfWeek the DayOfWeek to select lessons for
-     * @return a list of Lesson objects scheduled on the specified day
+     * @param dayOfWeek the targeted {@link DayOfWeek}
+     * @return a {@link List} of {@link Lesson} objects scheduled for that day
      */
     @Override
     public List<Lesson> getLessonsByDay(DayOfWeek dayOfWeek) {
-        return lessons.stream()
+        return schedule.stream()
                 .filter(lesson -> lesson.getDayOfWeek() == dayOfWeek)
                 .collect(Collectors.toList());
-    }
-
-    /**
-     * Parses an English or Ukrainian day name into the corresponding {@link DayOfWeek}.
-     *
-     * @param day the day name in English or Ukrainian (case and surrounding whitespace are ignored)
-     * @return the corresponding {@link DayOfWeek}
-     * @throws IllegalArgumentException if the provided string does not match any supported day
-     */
-    private DayOfWeek parseDayOfWeek(String day) {
-        String normalizedDay = day.trim().toUpperCase();
-        return switch (normalizedDay) {
-            case "ПОНЕДІЛОК", "MONDAY" -> DayOfWeek.MONDAY;
-            case "ВІВТОРОК", "TUESDAY" -> DayOfWeek.TUESDAY;
-            case "СЕРЕДА", "WEDNESDAY" -> DayOfWeek.WEDNESDAY;
-            case "ЧЕТВЕР", "THURSDAY" -> DayOfWeek.THURSDAY;
-            case "П'ЯТНИЦЯ", "ПЯТНИЦЯ", "FRIDAY" -> DayOfWeek.FRIDAY;
-            case "СУБОТА", "SATURDAY" -> DayOfWeek.SATURDAY;
-            case "НЕДІЛЯ", "SUNDAY" -> DayOfWeek.SUNDAY;
-            default -> throw new IllegalArgumentException("Невідомий день тижня: " + day);
-        };
     }
 }

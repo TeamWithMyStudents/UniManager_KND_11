@@ -1,95 +1,89 @@
 package ua.knd11.controller;
 
-import ua.knd11.model.Student;
-import ua.knd11.model.User;
-import ua.knd11.service.StudentService;
-import ua.knd11.service.impl.StudentServiceImpl;
+import ua.knd11.model.Lesson;
+import ua.knd11.service.JournalService;
+import ua.knd11.service.ScheduleService;
 
+import java.time.DayOfWeek;
 import java.util.List;
+import java.util.Scanner;
 
 /**
- * Controller for managing operations on students.
- * Processes input data, formats it, and calls the appropriate logic methods.
+ * Controller class responsible for handling student-specific interactions.
+ * Processes user input for viewing grades and schedules (Read-only access).
  */
 public class StudentController {
-    private final StudentService service = new StudentServiceImpl();
+
+    /** Service for managing academic records. */
+    private final JournalService journalService;
+
+    /** Service for managing the lesson timetable. */
+    private final ScheduleService scheduleService;
 
     /**
-     * Assigns the student with the given ID as a head student.
+     * Constructs a StudentController with required service dependencies.
      *
-     * @param id the student's unique identifier
-     * @see StudentService#assignHeadStudent(int)
+     * @param journalService  the service handling grades
+     * @param scheduleService the service handling schedules
      */
-    public void assignHeadStudent(int id) {
-        service.assignHeadStudent(id);
+    public StudentController(JournalService journalService, ScheduleService scheduleService) {
+        this.journalService = journalService;
+        this.scheduleService = scheduleService;
     }
 
     /**
-     * Creates and adds a new Student parsed from a single-line input string.
-     * <p>
-     * The input must contain exactly six fields in this order: name, surname, lastname, group, email, password.
-     * Fields may be separated by spaces or commas; surrounding whitespace is ignored.
+     * Displays the student dashboard and processes menu selections.
      *
-     * @param input single-line student data with six fields in the order: name, surname, lastname, group, email, password
+     * @param scanner   the {@link Scanner} object for reading user input
+     * @param studentId the ID of the currently authenticated student
      */
-    public void create(String input) {
-        //normalize input by replacing commas with spaces and trimming whitespace
-        String normalized = input.trim().replace(",", " ");
-        //array that splits the normalized string on whitespace into tokens
-        String[] parts = normalized.split("\\s+");
-        if (parts.length != 6) {
-            System.out.println("Error: Expected 6 fields (Name Surname Lastname Group Email@example.com Password).");
-            return;
-        }
-//assigning variables to specific array cells
-        String name = parts[0];
-        String surname = parts[1];
-        String lastname = parts[2];
-        String group = parts[3];
-        String email = parts[4];
-        String password = parts[5];
+    public void displayMenu(Scanner scanner, int studentId) {
+        boolean running = true;
+        while (running) {
+            System.out.println("\n=== Student Dashboard ===");
+            System.out.println("1. View My Grades (Record Book)");
+            System.out.println("2. View Schedule for a Day");
+            System.out.println("3. Return to Main Menu");
+            System.out.print("Select action: ");
 
+            String choice = scanner.nextLine();
+            switch (choice) {
+                case "1":
+                    System.out.println(journalService.generateRecordBook(studentId));
+                    break;
+                case "2":
+                    handleViewSchedule(scanner);
+                    break;
+                case "3":
+                    running = false;
+                    break;
+                default:
+                    System.out.println("[WARNING] Invalid option. Try again.");
+            }
+        }
+    }
+
+    /**
+     * Prompts the student for a day of the week and displays the corresponding schedule.
+     *
+     * @param scanner the {@link Scanner} object for reading user input
+     */
+    private void handleViewSchedule(Scanner scanner) {
+        System.out.print("Enter Day of Week (e.g., MONDAY): ");
         try {
-            Student student = new Student(name, surname, lastname, group, email, password);
-            if (service.add(student)) {
-                System.out.println("Student added successfully!");
+            DayOfWeek day = DayOfWeek.valueOf(scanner.nextLine().trim().toUpperCase());
+            List<Lesson> lessons = scheduleService.getLessonsByDay(day);
+
+            if (lessons.isEmpty()) {
+                System.out.println("No lessons scheduled for " + day + ".");
             } else {
-                System.out.println("Student wasn't added.");
+                System.out.println("\n--- Schedule for " + day + " ---");
+                for (Lesson lesson : lessons) {
+                    System.out.println(lesson.toString());
+                }
             }
         } catch (IllegalArgumentException e) {
-            System.err.println("Error: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Removes the student with the given identifier from the system.
-     *
-     * @param id the identifier of the student to remove
-     */
-    public void delete(int id) {
-        if (service.delete(id)) {
-            System.out.println("Student successfully deleted.");
-        } else {
-            System.out.println("Student with ID " + id + " is not found.");
-        }
-    }
-
-    /**
-     * Prints all stored Student instances to standard output.
-     * <p>
-     * Retrieves all users from the service and prints each object that is an instance of {@code Student}. If no students are present, prints a message to {@link System#err}.
-     */
-    public void getAll() {
-        List<User> students = service.getAll();
-        boolean found = false;
-        for (User student : students) {
-            if (student instanceof Student) {
-                System.out.println(student);
-                found = true;
-            }
-        }
-        if (!found) {
-            System.err.println("No students found in the repository.\n");
+            System.out.println("[ERROR] Invalid day entered.");
         }
     }
 }

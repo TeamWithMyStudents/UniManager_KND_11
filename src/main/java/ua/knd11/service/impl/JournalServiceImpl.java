@@ -5,86 +5,81 @@ import ua.knd11.service.JournalService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * Implementation of the {@link JournalService}.
- * Manages an in-memory repository of student grades and provides functionality
- * to assign grades, retrieve them safely, and generate academic reports.
+ * Implementation of the {@link JournalService} interface.
+ * This class provides in-memory management of student academic records
+ * and handles the assignment and retrieval of grades.
  */
 public class JournalServiceImpl implements JournalService {
 
     /**
-     * Internal in-memory list storing all assigned grades.
+     * An in-memory list storing all assigned student grades.
      */
     private final List<Grade> grades = new ArrayList<>();
 
     /**
-     * Assigns a new grade to a student for a specific subject and stores it in the repository.
-     * Note: Validation of the input data is handled by the {@link Grade} constructor.
+     * Assigns a new grade to a student for a specific subject.
      *
      * @param studentId the unique identifier of the student
-     * @param subject   the name of the subject
-     * @param score     the numeric score achieved by the student
+     * @param subject   the name of the academic subject
+     * @param score     the numeric score achieved by the student (usually 0-100)
      */
     @Override
     public void assignGrade(int studentId, String subject, int score) {
-        Grade newGrade = new Grade(studentId, subject, score);
-        grades.add(newGrade);
+        try {
+            Grade newGrade = new Grade(studentId, subject, score);
+            grades.add(newGrade);
+            System.out.println("[SUCCESS] Grade securely recorded for Student ID: " + studentId);
+        } catch (IllegalArgumentException e) {
+            System.out.println("[ERROR] Failed to assign grade. " + e.getMessage());
+        }
     }
 
     /**
-     * Retrieves a list of all grades belonging to a specific student.
-     * <p>
-     * This method creates and returns a <b>defensive copy</b> of the grades. By mapping
-     * the original objects to new {@link Grade} instances, it prevents external
-     * modification of the internal repository state.
-     * </p>
+     * Retrieves all grades assigned to a specific student.
      *
-     * @param studentId the unique identifier of the student whose grades are being retrieved
-     * @return a list of copied {@link Grade} objects for the specified student
+     * @param studentId the unique identifier of the student
+     * @return a {@link List} of {@link Grade} objects belonging to the student
      */
     @Override
     public List<Grade> getGradesForStudent(int studentId) {
         return grades.stream()
                 .filter(grade -> grade.getStudentId() == studentId)
-                // Creating defensive copies to protect the internal state
-                .map(original -> new Grade(original.getStudentId(), original.getSubject(), original.getScore()))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     /**
-     * Generate a formatted record-book report for a student listing subjects, scores, and the overall average.
+     * Generates a formatted academic transcript (Record Book) for a student,
+     * including all subjects, scores, and the overall average score.
      *
-     * @param studentId the student's unique identifier
-     * @return the formatted record-book string; if the student has no grades, returns "Grades are not yet available"
+     * @param studentId the unique identifier of the student
+     * @return a formatted {@link String} representing the student's academic record
      */
     @Override
     public String generateRecordBook(int studentId) {
         List<Grade> studentGrades = getGradesForStudent(studentId);
 
-        // Handle the case where the student has no recorded grades
         if (studentGrades.isEmpty()) {
-            return "Grades are not yet available";
+            return "No academic records found for student ID: " + studentId;
         }
 
-        StringBuilder report = new StringBuilder();
-        report.append("--- Student record book (ID: ").append(studentId).append(") ---\n");
+        StringBuilder recordBook = new StringBuilder();
+        recordBook.append("\n=== Academic Transcript | Student ID: ").append(studentId).append(" ===\n");
 
-        int sum = 0;
-
+        int totalScore = 0;
         for (Grade grade : studentGrades) {
-            report.append("subject: ").append(grade.getSubject())
-                    .append(" | score: ").append(grade.getScore())
-                    .append("\n");
-            sum += grade.getScore();
+            recordBook.append(String.format("- Subject: %-15s | Score: %d\n",
+                    grade.getSubject(), grade.getScore()));
+            totalScore += grade.getScore();
         }
 
-        // Calculate the average score
-        double average = (double) sum / studentGrades.size();
+        double average = (double) totalScore / studentGrades.size();
+        recordBook.append("------------------------------------------------\n");
+        recordBook.append(String.format("Overall Average Score: %.2f\n", average));
+        recordBook.append("================================================\n");
 
-        report.append("--------------------------------------\n");
-        report.append(String.format("Average score: %.2f\n", average));
-
-        return report.toString();
+        return recordBook.toString();
     }
 }
