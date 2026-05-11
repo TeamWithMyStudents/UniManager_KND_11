@@ -40,7 +40,7 @@ public class JournalServiceImpl implements JournalService {
                 .filter(grade -> grade.getStudentId() == studentId)
                 // Creating defensive copies to protect the internal state
                 .map(original -> new Grade(original.getStudentId(), original.getSubject(), original.getScore()))
-                .toList();
+                .collect(java.util.stream.Collectors.toList());
     }
 
     /**
@@ -74,7 +74,7 @@ public class JournalServiceImpl implements JournalService {
         double average = (double) sum / studentGrades.size();
 
         report.append("--------------------------------------\n");
-        report.append(String.format("Average score: %.2f\n", average));
+        report.append(String.format(java.util.Locale.US, "Average score: %.2f\n", average));
 
         return report.toString();
     }

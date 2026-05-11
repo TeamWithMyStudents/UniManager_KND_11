@@ -28,12 +28,11 @@ public class UserSession {
     }
 
     static {
-        try {
-            FieldValidator.validatePassword(Dotenv.load().get("SUPER_USER_PASSWORD"));
-            SUPER_USER_PASSWORD = Dotenv.load().get("SUPER_USER_PASSWORD");
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException(e + "SUPER_USER_PASSWORD is not valid");
+        String password = Dotenv.load().get("SUPER_USER_PASSWORD");
+        if (password == null || password.isBlank() || password.length() < 8) {
+            throw new RuntimeException("SUPER_USER_PASSWORD must be at least 8 characters");
         }
+        SUPER_USER_PASSWORD = password;
     }
 
     /**
@@ -41,7 +40,7 @@ public class UserSession {
      * Initialized as an anonymous subclass of the abstract User.
      */
     @Getter
-    private static final User superUser = new User("admin", "admin", SUPER_USER_EMAIL, SUPER_USER_PASSWORD) {
+    private static final User superUser = new User("admin", "admin", SUPER_USER_EMAIL, SUPER_USER_PASSWORD, "NO_SALT") {
     };
     /**
      * Internal lock object used for thread synchronization

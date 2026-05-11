@@ -6,6 +6,8 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A final utility class providing static methods for data validation and security.
@@ -95,11 +97,12 @@ public final class FieldValidator {
     }
 
     /**
-     * Validates an email address against a standard pattern.
-     * Ensures the total length is under 254 characters and the local part is under 64 characters.
+     * Validates that the provided string is a properly formatted email address.
+     * The email must adhere to standard conventions, including a valid domain and
+     * restrictions on length and character usage.
      *
      * @param value the email string to validate
-     * @throws IllegalArgumentException if the email does not match the required regex format
+     * @throws IllegalArgumentException if the email is null, empty, or does not match the expected format
      */
     public static void validateEmail(String value) throws IllegalArgumentException {
         validateNonEmptyString("Email", value);
@@ -108,24 +111,40 @@ public final class FieldValidator {
         // and have 1 to 64 characters before the @ symbol
         // allows only English characters, numbers, and special characters
         // that can be used in email addresses
-        String regex = "^(?=.{1,254}$)(?=.{1,64}@)[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
-        if (!value.matches(regex)) throw new IllegalArgumentException("Email doesn't match regex");
+        Pattern regex = Pattern.compile("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@" +
+                "(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = regex.matcher(value);
+
+        if (!matcher.matches()) throw new IllegalArgumentException("Email doesn't match regex");
     }
 
     /**
-     * Validates a raw password for security requirements.
-     * Bypasses checks if the password is already in a protected (hashed) format.
-     * Requires at least 8 characters consisting of alphanumeric and allowed special characters.
+     * Validates that the provided password string meets specified complexity requirements.
+     * The password must adhere to the following rules:
+     * - Must contain at least one digit.
+     * - Must contain at least one lowercase letter.
+     * - Must contain at least one uppercase letter.
+     * - Must contain at least one special character from the set {@code @#$%^&+=}.
+     * - Must not contain any whitespace characters.
+     * - Must be at least 8 characters in length.
      *
      * @param value the password string to validate
-     * @throws IllegalArgumentException if the password is too short or contains forbidden characters
+     * @throws IllegalArgumentException if the password is null, empty, or does not meet the complexity requirements
      */
     public static void validatePassword(String value) throws IllegalArgumentException {
         validateNonEmptyString("Password", value);
 
-        String charactersRegex = "^[-=!@#$%^&*.A-Za-z\\d]{8,}$";
-        if (!(value.length() >= 8)) throw new IllegalArgumentException("Too short password!");
-        if (!value.matches(charactersRegex)) throw new IllegalArgumentException("Invalid characters in password");
+        // ^                 # start-of-string
+        // (?=.*[0-9])       # a digit must occur at least once
+        // (?=.*[a-z])       # a lower case letter must occur at least once
+        // (?=.*[A-Z])       # an upper case letter must occur at least once
+        // (?=.*[@#$%^&+=])  # a special character must occur at least once
+        // (?=\S+$)          # no whitespace allowed in the entire string
+        // .{8,}             # anything, at least eight places though
+        // $                 # end-of-string
+        String charactersRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#!$%^&+=])(?=\\S+$).{8,}$";
+        if (!value.matches(charactersRegex))
+            throw new IllegalArgumentException("Password must be at least 8 characters and contain at least one letter");
     }
 
     /**

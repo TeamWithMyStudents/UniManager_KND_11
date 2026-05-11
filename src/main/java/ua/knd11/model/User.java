@@ -19,11 +19,11 @@ public abstract class User {
     /**
      * The user's password, which must be protected/encrypted
      */
-    private String password;
+    private final String password;
     /**
      * The salt used for password protection
      */
-    private String salt;
+    private final String salt;
     /**
      * The unique identifier for this specific user; 0 indicates an unassigned ID
      */
