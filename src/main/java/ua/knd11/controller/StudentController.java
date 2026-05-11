@@ -17,7 +17,24 @@ public class StudentController {
     /**
      * Service layer instance for student data processing
      */
-    private final StudentService service = new StudentServiceImpl();
+    private final StudentService service;
+
+    /**
+     * Constructs a StudentController with the default service implementation.
+     */
+    public StudentController() {
+        this(new StudentServiceImpl());
+    }
+
+    /**
+     * Constructs a StudentController with a provided service instance.
+     * Allows for dependency injection, primarily for testing purposes.
+     *
+     * @param service the StudentService implementation to use
+     */
+    public StudentController(StudentService service) {
+        this.service = service;
+    }
 
     /**
      * Assigns a specific student as the head student based on their unique ID.

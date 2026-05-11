@@ -16,19 +16,25 @@ import java.util.regex.Pattern;
  */
 public final class FieldValidator {
 
-    static final private String pepper = Dotenv.load().get("STATIC_PEPPER");
-    static final private int RANDOM_SALT_LENGTH;
+    private static String getPepper() {
+        String pepper = Dotenv.load().get("STATIC_PEPPER");
+        if (pepper == null || pepper.isBlank()) {
+            throw new IllegalStateException("STATIC_PEPPER must be configured");
+        }
+        return pepper;
+    }
 
-    static {
+    private static int getRandomSaltLength() {
         String saltLengthStr = Dotenv.load().get("RANDOM_SALT_LENGTH");
         if (saltLengthStr == null || saltLengthStr.isBlank()) {
             throw new IllegalStateException("RANDOM_SALT_LENGTH must be a positive integer");
         }
         try {
-            RANDOM_SALT_LENGTH = Integer.parseInt(saltLengthStr);
-            if (RANDOM_SALT_LENGTH <= 0) {
+            int length = Integer.parseInt(saltLengthStr);
+            if (length <= 0) {
                 throw new IllegalStateException("RANDOM_SALT_LENGTH must be a positive integer");
             }
+            return length;
         } catch (NumberFormatException e) {
             throw new IllegalStateException("RANDOM_SALT_LENGTH must be a positive integer", e);
         }
@@ -144,7 +150,7 @@ public final class FieldValidator {
         // $                 # end-of-string
         String charactersRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#!$%^&+=])(?=\\S+$).{8,}$";
         if (!value.matches(charactersRegex))
-            throw new IllegalArgumentException("Password must be at least 8 characters and contain at least one letter");
+            throw new IllegalArgumentException("Password must be at least 8 characters, contain at least one digit, one lowercase letter, one uppercase letter, one special character (@#!$%^&+=), and no whitespace");
     }
 
     /**
@@ -193,11 +199,7 @@ public final class FieldValidator {
      * @throws IllegalStateException if the pepper is not configured
      */
     public static boolean verifyPassword(String value, String passwordHash, String salt) {
-        try {
-            validateNonEmptyString("pepper", pepper);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalStateException("STATIC_PEPPER must be configured", e);
-        }
+        String pepper = getPepper();
         return Password.check(value, passwordHash).addSalt(salt).addPepper(pepper).withArgon2();
     }
 
@@ -209,7 +211,7 @@ public final class FieldValidator {
      * @throws IllegalStateException if the salt length is invalid
      */
     public static String makeProtectedSalt() {
-        byte[] saltBytes = new byte[RANDOM_SALT_LENGTH];
+        byte[] saltBytes = new byte[getRandomSaltLength()];
         SecureRandom random = new SecureRandom();
         random.nextBytes(saltBytes);
         return Base64.getEncoder().encodeToString(saltBytes);
@@ -225,12 +227,7 @@ public final class FieldValidator {
      * @throws IllegalStateException if the pepper is not configured
      */
     public static String makeProtectedPasswordWithSalt(String value, String salt) {
-        try {
-            validateNonEmptyString("pepper", pepper);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalStateException("STATIC_PEPPER must be configured", e);
-        }
-
+        String pepper = getPepper();
         Hash password = Password.hash(value)
                 .addSalt(salt)
                 .addPepper(pepper)

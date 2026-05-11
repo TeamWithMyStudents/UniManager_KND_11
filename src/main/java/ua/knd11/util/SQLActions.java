@@ -19,9 +19,14 @@ import java.util.Objects;
 @SuppressWarnings({"SqlResolve", "unused"})
 public final class SQLActions {
     /**
-     * The connection string for the database, retrieved from the environment variables.
+     * Lazy resolver for the database connection string from environment variables.
+     *
+     * @return the DATABASE_URL environment variable value
+     * @throws NullPointerException if DATABASE_URL is not set
      */
-    private static final String DATABASE_URL = Objects.requireNonNull(System.getenv("DATABASE_URL"), "Environment variable DATABASE_URL must be set");
+    private static String getDatabaseUrl() {
+        return Objects.requireNonNull(System.getenv("DATABASE_URL"), "Environment variable DATABASE_URL must be set");
+    }
 
     /**
      * SQL query to insert a new record into the STUDENTS table.
@@ -52,6 +57,19 @@ public final class SQLActions {
      */
     @SuppressWarnings("SqlResolve")
     private static final String QUERY_GET_TEACHERS = "SELECT * FROM TEACHERS";
+
+
+    /**
+     * SQL query to delete a specific teacher based on their unique email.
+     */
+    @SuppressWarnings("SqlResolve")
+    private static final String QUERY_DELETE_TEACHER_BY_EMAIL = "DELETE FROM TEACHERS WHERE email = ?";
+
+    /**
+     * SQL query to delete a specific student based on their unique email.
+     */
+    @SuppressWarnings("SqlResolve")
+    private static final String QUERY_DELETE_STUDENT_BY_EMAIL = "DELETE FROM STUDENTS WHERE email = ?";
 
     /**
      * SQL query to delete a specific teacher based on their unique ID.
@@ -163,18 +181,20 @@ public final class SQLActions {
      * @throws SQLException if a database access error occurs
      */
     private static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(DATABASE_URL);
+        return DriverManager.getConnection(getDatabaseUrl());
     }
 
     /**
      * Initializes the database by creating the STUDENTS and TEACHERS tables if they do not exist.
+     *
+     * @throws RuntimeException if database initialization fails
      */
     public static void initDatabase() {
         try (Connection conn = getConnection(); Statement stmt = conn.createStatement()) {
             stmt.executeUpdate(QUERY_CREATE_STUDENTS_TABLE);
             stmt.executeUpdate(QUERY_CREATE_TEACHERS_TABLE);
         } catch (SQLException e) {
-            System.err.println("Database initialization failed: " + e.getMessage());
+            throw new RuntimeException("Database initialization failed", e);
         }
     }
 
@@ -184,6 +204,7 @@ public final class SQLActions {
      * Inserts a new student record into the database.
      *
      * @param student the {@link Student} object to persist
+     * @throws RuntimeException if the database operation fails
      */
     public static void addStudentToDB(Student student) {
         if (student == null) return;
@@ -191,14 +212,14 @@ public final class SQLActions {
             stmt.setString(1, student.getName());
             stmt.setString(2, student.getSurname());
             stmt.setString(3, student.getGroup());
-            stmt.setString(4, String.valueOf(student.getRole()));
+            stmt.setString(4, student.getRole() != null ? student.getRole().name() : null);
             stmt.setString(5, student.getEmail());
             stmt.setString(6, student.getPassword());
             stmt.setString(7, student.getSalt());
             stmt.executeUpdate();
             System.out.println("Student added to database");
         } catch (SQLException e) {
-            System.err.println("Failed to add student to database: " + e.getMessage());
+            throw new RuntimeException("Failed to add student to database", e);
         }
     }
 
@@ -206,6 +227,7 @@ public final class SQLActions {
      * Inserts a new teacher record into the database.
      *
      * @param teacher the {@link Teacher} object to persist
+     * @throws RuntimeException if the database operation fails
      */
     public static void addTeacherToDB(Teacher teacher) {
         if (teacher == null) return;
@@ -221,7 +243,7 @@ public final class SQLActions {
             stmt.executeUpdate();
             System.out.println("Teacher added to database");
         } catch (SQLException e) {
-            System.err.println("Failed to add teacher to database: " + e.getMessage());
+            throw new RuntimeException("Failed to add teacher to database", e);
         }
     }
 
@@ -273,7 +295,15 @@ public final class SQLActions {
         List<Student> list = new ArrayList<>();
         while (resultSet.next()) {
             String roleStr = resultSet.getString("role");
-            StudentRole role = "HEAD_STUDENT".equals(roleStr) ? StudentRole.HEAD_STUDENT : StudentRole.REGULAR;
+            int studentId = resultSet.getInt("id");
+            String studentName = resultSet.getString("name");
+            StudentRole role;
+            try {
+                role = StudentRole.valueOf(roleStr);
+            } catch (IllegalArgumentException | NullPointerException e) {
+                System.err.println("Warning: Unknown role '" + roleStr + "' for student id=" + studentId + ", name=" + studentName + ", defaulting to REGULAR");
+                role = StudentRole.REGULAR;
+            }
 
             Student student = new Student(
                     resultSet.getString("name"),
@@ -321,16 +351,24 @@ public final class SQLActions {
      * Deletes a student record by ID.
      *
      * @param id the unique identifier of the student
+     * @return true if a row was deleted, false otherwise
+     * @throws RuntimeException if the database operation fails
      */
-    public static void deleteStudentFromDBWithID(int id) {
-        if (id <= 0) return;
+    public static boolean deleteStudentFromDBWithID(int id) {
+        if (id <= 0) return false;
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(QUERY_DELETE_STUDENT_BY_ID)) {
             stmt.setInt(1, id);
-            stmt.executeUpdate();
-            System.out.println("Student with ID " + id + " deleted from database");
+            int affectedRows = stmt.executeUpdate();
+            boolean deleted = affectedRows > 0;
+            if (deleted) {
+                System.out.println("Student with ID " + id + " deleted from database");
+            } else {
+                System.out.println("No student found with ID " + id);
+            }
+            return deleted;
         } catch (SQLException e) {
-            System.err.println("Failed to delete student with ID " + id + " from database: " + e.getMessage());
+            throw new RuntimeException("Failed to delete student with ID " + id, e);
         }
     }
 
@@ -338,16 +376,75 @@ public final class SQLActions {
      * Deletes a teacher record by ID.
      *
      * @param id the unique identifier of the teacher
+     * @return true if a row was deleted, false otherwise
+     * @throws RuntimeException if the database operation fails
      */
-    public static void deleteTeacherFromDBWithID(int id) {
-        if (id <= 0) return;
+    public static boolean deleteTeacherFromDBWithID(int id) {
+        if (id <= 0) return false;
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(QUERY_DELETE_TEACHER_BY_ID)) {
             stmt.setInt(1, id);
-            stmt.executeUpdate();
-            System.out.println("Teacher with ID " + id + " deleted from database");
+            int affectedRows = stmt.executeUpdate();
+            boolean deleted = affectedRows > 0;
+            if (deleted) {
+                System.out.println("Teacher with ID " + id + " deleted from database");
+            } else {
+                System.out.println("No teacher found with ID " + id);
+            }
+            return deleted;
         } catch (SQLException e) {
-            System.err.println("Failed to delete teacher with ID " + id + " from database: " + e.getMessage());
+            throw new RuntimeException("Failed to delete teacher with ID " + id, e);
+        }
+    }
+
+
+    /**
+     * Deletes a teacher record by email.
+     *
+     * @param email the unique email of the teacher
+     * @return true if a row was deleted, false otherwise
+     * @throws RuntimeException if the database operation fails
+     */
+    public static boolean deleteTeacherFromDBWithEmail(String email) {
+        if (email == null || email.isEmpty()) return false;
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(QUERY_DELETE_TEACHER_BY_EMAIL)) {
+            stmt.setString(1, email);
+            int affectedRows = stmt.executeUpdate();
+            boolean deleted = affectedRows > 0;
+            if (deleted) {
+                System.out.println("Teacher with email " + email + " deleted from database");
+            } else {
+                System.out.println("No teacher found with email " + email);
+            }
+            return deleted;
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to delete teacher with email " + email, e);
+        }
+    }
+
+    /**
+     * Deletes a student record by email.
+     *
+     * @param email the unique email of the student
+     * @return true if a row was deleted, false otherwise
+     * @throws RuntimeException if the database operation fails
+     */
+    public static boolean deleteStudentFromDBWithEmail(String email) {
+        if (email == null || email.isEmpty()) return false;
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(QUERY_DELETE_STUDENT_BY_EMAIL)) {
+            stmt.setString(1, email);
+            int affectedRows = stmt.executeUpdate();
+            boolean deleted = affectedRows > 0;
+            if (deleted) {
+                System.out.println("Student with email " + email + " deleted from database");
+            } else {
+                System.out.println("No student found with email " + email);
+            }
+            return deleted;
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to delete student with email " + email, e);
         }
     }
 
@@ -582,6 +679,7 @@ public final class SQLActions {
      *
      * @param sql    the SQL string to execute
      * @param params the objects to bind to the statement
+     * @throws RuntimeException if the database operation fails
      */
     private static void executeUpdate(String sql, Object... params) {
         try (Connection conn = getConnection();
@@ -591,7 +689,7 @@ public final class SQLActions {
             }
             stmt.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("Error executing SQL: " + sql + ": " + e.getMessage());
+            throw new RuntimeException("Error executing SQL: " + sql, e);
         }
     }
 
@@ -620,6 +718,7 @@ public final class SQLActions {
      *
      * @param studentId the ID of the student to promote
      * @param groupName the group name of the student
+     * @throws RuntimeException if the transaction fails
      */
     public static void assignHeadStudentTransactional(int studentId, String groupName) {
         try (Connection conn = getConnection()) {
@@ -643,11 +742,15 @@ public final class SQLActions {
 
                 conn.commit();
             } catch (SQLException e) {
-                conn.rollback();
-                System.err.println("Failed to assign head student transactionally: " + e.getMessage());
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackEx) {
+                    e.addSuppressed(rollbackEx);
+                }
+                throw new RuntimeException("Failed to assign head student transactionally", e);
             }
         } catch (SQLException e) {
-            System.err.println("Failed to assign head student transactionally: " + e.getMessage());
+            throw new RuntimeException("Failed to assign head student transactionally", e);
         }
     }
 }

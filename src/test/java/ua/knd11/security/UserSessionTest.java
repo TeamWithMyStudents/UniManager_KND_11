@@ -3,6 +3,8 @@ package ua.knd11.security;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import ua.knd11.model.User;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @see UserSession
  */
+@Execution(ExecutionMode.SAME_THREAD)
 class UserSessionTest {
 
     /**
@@ -40,13 +43,16 @@ class UserSessionTest {
 
     /**
      * Tests that the super user is properly initialized and accessible.
+     * Asserts that name and surname are non-null and non-empty (fetched from env vars).
      */
     @Test
     void getSuperUser_ShouldReturnNonNullSuperUser() {
         User superUser = UserSession.getSuperUser();
         assertNotNull(superUser);
-        assertEquals("admin", superUser.getName());
-        assertEquals("admin", superUser.getSurname());
+        assertNotNull(superUser.getName());
+        assertNotNull(superUser.getSurname());
+        assertFalse(superUser.getName().isEmpty(), "Super user name should not be empty");
+        assertFalse(superUser.getSurname().isEmpty(), "Super user surname should not be empty");
     }
 
     /**

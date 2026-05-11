@@ -1,9 +1,11 @@
 package ua.knd11.controller;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ua.knd11.util.SQLActions;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
@@ -16,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 @ExtendWith(MockitoExtension.class)
 class TeacherControllerTest {
 
+
     private TeacherController teacherController;
 
     /**
@@ -24,6 +27,12 @@ class TeacherControllerTest {
     @BeforeEach
     void setUp() {
         teacherController = new TeacherController();
+    }
+
+    @AfterAll
+    static void tearDown() {
+        SQLActions.deleteTeacherFromDBWithEmail("jane.smith@university.edu");
+        SQLActions.deleteTeacherFromDBWithEmail("jane.smith2t@university.edu");
     }
 
     /**
@@ -153,7 +162,7 @@ class TeacherControllerTest {
      */
     @Test
     void addTeacherFromTerminal_WithExtraWhitespace_ShouldHandleCorrectly() {
-        String inputWithExtraSpaces = "  Jane   Smith   ComputerScience   PhD   50000   jane.smith@university.edu   Password123!  ";
+        String inputWithExtraSpaces = "  Jane   Smith   ComputerScience   PhD   50000   jane.smith2t@university.edu   Password123!  ";
 
         assertDoesNotThrow(() -> teacherController.addTeacherFromTerminal(inputWithExtraSpaces));
     }

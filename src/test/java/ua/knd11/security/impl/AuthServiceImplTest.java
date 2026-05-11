@@ -6,8 +6,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ua.knd11.model.Student;
 import ua.knd11.model.User;
+import ua.knd11.model.enums.StudentRole;
 import ua.knd11.security.UserSession;
+import ua.knd11.util.FieldValidator;
 import ua.knd11.util.SQLActions;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -82,18 +85,62 @@ class AuthServiceImplTest {
     }
 
     /**
-     * Tests that login validates email format and attempts database lookup.
-     * Uses mocked SQLActions to avoid actual database calls.
+     * Tests that login with nonexistent email does not authenticate.
+     * Uses mocked SQLActions to verify database lookup attempts.
      */
     @Test
-    void findUserByEmail_WithValidEmail_ShouldValidateEmail() {
-        assertDoesNotThrow(() -> {
-            try (MockedStatic<SQLActions> sqlActions = mockStatic(SQLActions.class)) {
-                sqlActions.when(() -> SQLActions.getTeacherByEmail(anyString())).thenReturn(null);
-                sqlActions.when(() -> SQLActions.getStudentByEmail(anyString())).thenReturn(null);
+    void login_WithNonexistentEmail_ShouldNotAuthenticate() {
+        try (MockedStatic<SQLActions> sqlActions = mockStatic(SQLActions.class)) {
+            sqlActions.when(() -> SQLActions.getTeacherByEmail(anyString())).thenReturn(null);
+            sqlActions.when(() -> SQLActions.getStudentByEmail(anyString())).thenReturn(null);
 
-                authService.login("nonexistent@example.com", "Password123!");
-            }
-        });
+            authService.login("nonexistent@example.com", "Password123!");
+
+            assertFalse(UserSession.isAuthenticated());
+            sqlActions.verify(() -> SQLActions.getTeacherByEmail("nonexistent@example.com"));
+            sqlActions.verify(() -> SQLActions.getStudentByEmail("nonexistent@example.com"));
+        }
+    }
+
+    /**
+     * Tests successful DB-backed login with correct credentials.
+     * Verifies that UserSession contains the authenticated user after login.
+     */
+    @Test
+    void login_WithValidDbCredentials_ShouldAuthenticate() {
+        String email = "student@example.com";
+        String plaintextPassword = "Password123!";
+        String salt = FieldValidator.makeProtectedSalt();
+        String hashedPassword = FieldValidator.makeProtectedPasswordWithSalt(plaintextPassword, salt);
+
+        Student mockStudent = new Student("Test", "Student", "KND-11", email, hashedPassword, salt, StudentRole.REGULAR);
+
+        try (MockedStatic<SQLActions> sqlActions = mockStatic(SQLActions.class)) {
+            sqlActions.when(() -> SQLActions.getTeacherByEmail(email)).thenReturn(null);
+            sqlActions.when(() -> SQLActions.getStudentByEmail(email)).thenReturn(mockStudent);
+
+            authService.login(email, plaintextPassword);
+
+            assertTrue(UserSession.isAuthenticated());
+            assertEquals(mockStudent, UserSession.getCurrentUser());
+        }
+    }
+
+    /**
+     * Tests that login returns early without DB lookup when already authenticated.
+     * Verifies that SQLActions methods are never called when session exists.
+     */
+    @Test
+    void login_WhenAlreadyAuthenticated_ShouldNotQueryDatabase() {
+        User user = new User("John", "Doe", "john@example.com", "Password123!") {
+        };
+        UserSession.login(user);
+
+        try (MockedStatic<SQLActions> sqlActions = mockStatic(SQLActions.class)) {
+            authService.login("jane@example.com", "Password123!");
+
+            assertEquals(user, UserSession.getCurrentUser());
+            sqlActions.verifyNoInteractions();
+        }
     }
 }

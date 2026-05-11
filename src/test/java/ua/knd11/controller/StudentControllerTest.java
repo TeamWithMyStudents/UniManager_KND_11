@@ -1,14 +1,16 @@
 package ua.knd11.controller;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ua.knd11.model.Student;
 import ua.knd11.service.StudentService;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 
 /**
  * Unit tests for the {@link StudentController} class.
@@ -26,15 +28,6 @@ class StudentControllerTest {
     private StudentController studentController;
 
     /**
-     * Sets up the controller before each test.
-     */
-    @BeforeEach
-    void setUp() {
-        // Controller creates its own service, so we test it directly
-        studentController = new StudentController();
-    }
-
-    /**
      * Tests that valid student input is processed without throwing exceptions.
      */
     @Test
@@ -42,6 +35,7 @@ class StudentControllerTest {
         String validInput = "John Doe KND-11 john.doe@example.com Password123!";
 
         assertDoesNotThrow(() -> studentController.addStudentFromTerminal(validInput));
+        verify(studentService).addStudent(any(Student.class));
     }
 
     /**
@@ -119,22 +113,24 @@ class StudentControllerTest {
     }
 
     /**
-     * Tests that extra whitespace in input is handled correctly.
+     * Tests that extra whitespace in input is handled correctly (normalized and processed).
      */
     @Test
-    void addStudentFromTerminal_WithExtraWhitespace_ShouldHandleCorrectly() {
+    void addStudentFromTerminal_WithExtraWhitespace_ShouldNormalizeAndCallService() {
         String inputWithExtraSpaces = "  John   Doe   KND-11   john.doe@example.com   Password123!  ";
 
         assertDoesNotThrow(() -> studentController.addStudentFromTerminal(inputWithExtraSpaces));
+        verify(studentService).addStudent(any(Student.class));
     }
 
     /**
-     * Tests that Ukrainian (Cyrillic) names are accepted.
+     * Tests that Ukrainian (Cyrillic) names are accepted and service is called.
      */
     @Test
-    void addStudentFromTerminal_WithValidUkrainianName_ShouldWork() {
+    void addStudentFromTerminal_WithValidUkrainianName_ShouldCallService() {
         String validInput = "Олег Петренко KND-11 oleg@example.com Password123!";
 
         assertDoesNotThrow(() -> studentController.addStudentFromTerminal(validInput));
+        verify(studentService).addStudent(any(Student.class));
     }
 }

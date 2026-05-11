@@ -98,8 +98,16 @@ public abstract class User {
      * Manually sets the user ID, typically used when loading existing data from a database.
      *
      * @param id the unique ID to be assigned
+     * @throws IllegalArgumentException if the provided id is not positive
+     * @throws IllegalStateException if the id has already been assigned
      */
     public void setIdFromDB(int id) {
+        if (id <= 0) {
+            throw new IllegalArgumentException("ID must be a positive integer, got: " + id);
+        }
+        if (this.id != 0) {
+            throw new IllegalStateException("Id has already been assigned: " + this.id);
+        }
         this.id = id;
     }
 

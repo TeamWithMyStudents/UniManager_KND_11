@@ -36,9 +36,9 @@ public class AuthServiceImpl implements AuthService {
 
         User superUser = UserSession.getSuperUser();
         if (superUser.getEmail().equalsIgnoreCase(email)) {
-            if (FieldValidator.verifyPassword(value, superUser.getPassword(), superUser.getSalt())) {
+            if (superUser.getPassword().equals(value)) {
                 UserSession.login(superUser);
-                System.out.println("Logged \n Welcome! User " + superUser.getName());
+                System.out.println("Login successful. Welcome, " + superUser.getName() + "!");
                 return;
             }
         }
@@ -46,7 +46,7 @@ public class AuthServiceImpl implements AuthService {
         User user = findUserByEmail(email);
         if (user != null && FieldValidator.verifyPassword(value, user.getPassword(), user.getSalt())) {
             UserSession.login(user);
-            System.out.println("Logged \n Welcome! User " + user.getName());
+            System.out.println("Login successful. Welcome, " + user.getName() + "!");
             return;
         }
         System.err.println("Incorrect email or password");
@@ -56,11 +56,10 @@ public class AuthServiceImpl implements AuthService {
      * Helper method to find a user in the database by their email address.
      * The search priority is Teachers first, then Students.
      *
-     * @param email the email address to search for
+     * @param email the email address to search for (assumed to be already validated by caller)
      * @return the found {@link User} (Teacher or Student), or null if no match is found
      */
     private User findUserByEmail(String email) {
-        FieldValidator.validateEmail(email);
         Teacher teacher = SQLActions.getTeacherByEmail(email);
         if (teacher != null) return teacher;
         return SQLActions.getStudentByEmail(email);

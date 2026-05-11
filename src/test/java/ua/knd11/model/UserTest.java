@@ -3,7 +3,6 @@ package ua.knd11.model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -104,21 +103,28 @@ class UserTest {
     }
 
     /**
-     * Tests that auto-assigned IDs are unique and positive.
+     * Tests that auto-assigned IDs are unique and positive,
+     * and do not collide with DB-assigned IDs.
      */
     @Test
     void assignId_ShouldAssignUniqueId() {
-        User user1 = new User("Alice", "Smith", "alice@example.com", "Password123!") {
+        User userWithDbId = new User("Alice", "Smith", "alice@example.com", "Password123!") {
         };
-        User user2 = new User("Bob", "Jones", "bob@example.com", "Password123!") {
+        userWithDbId.setIdFromDB(42);
+
+        User user1 = new User("Bob", "Jones", "bob@example.com", "Password123!") {
+        };
+        User user2 = new User("Carol", "White", "carol@example.com", "Password123!") {
         };
 
         user1.assignId();
         user2.assignId();
 
-        assertTrue(user1.getId() > 0);
-        assertTrue(user2.getId() > 0);
-        assertNotEquals(user1.getId(), user2.getId());
+        assertTrue(user1.getId() > 0, "Assigned ID should be positive");
+        assertTrue(user2.getId() > 0, "Assigned ID should be positive");
+        assertNotEquals(user1.getId(), user2.getId(), "Assigned IDs should be unique");
+        assertNotEquals(42, user1.getId(), "Assigned ID should not collide with DB-set ID 42");
+        assertNotEquals(42, user2.getId(), "Assigned ID should not collide with DB-set ID 42");
     }
 
     /**
@@ -191,7 +197,7 @@ class UserTest {
      * @param validEmail a valid email string to test
      */
     @ParameterizedTest
-    @CsvSource({
+    @ValueSource(strings = {
             "user@example.com",
             "first.last@company.org",
             "user+tag@example.co.uk",
