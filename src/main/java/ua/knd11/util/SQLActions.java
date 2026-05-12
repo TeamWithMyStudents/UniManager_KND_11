@@ -93,6 +93,16 @@ public final class SQLActions {
      */
     private static final String QUERY_GET_TEACHER_BY_EMAIL = "SELECT * FROM TEACHERS WHERE email = ?";
 
+    /**
+     * SQL query to demote all head students in a group to regular students.
+     */
+    private static final String QUERY_DEMOTE_HEADS_IN_GROUP = "UPDATE STUDENTS SET role = 'REGULAR' WHERE \"group\" = ? AND role = 'HEAD_STUDENT'";
+
+    /**
+     * SQL query to promote a student to a specific role.
+     */
+    private static final String QUERY_PROMOTE_STUDENT_ROLE = "UPDATE STUDENTS SET role = ? WHERE id = ?";
+
     /* Update Queries for Students */
 
     /**
@@ -262,8 +272,7 @@ public final class SQLActions {
              ResultSet rs = stmt.executeQuery(QUERY_GET_STUDENTS)) {
             return new ArrayList<>(parseStudentsFromResultSet(rs));
         } catch (SQLException e) {
-            System.err.println("Error retrieving STUDENTS table");
-            throw new RuntimeException(e);
+            throw new RuntimeException(e + " Error retrieving STUDENTS table");
         }
     }
 
@@ -280,8 +289,7 @@ public final class SQLActions {
              ResultSet rs = stmt.executeQuery(QUERY_GET_TEACHERS)) {
             return new ArrayList<>(parseTeachersFromResultSet(rs));
         } catch (SQLException e) {
-            System.err.println("Error retrieving TEACHERS table");
-            throw new RuntimeException(e);
+            throw new RuntimeException(e + " Error retrieving TEACHERS table");
         }
     }
 
@@ -297,6 +305,12 @@ public final class SQLActions {
             String roleStr = resultSet.getString("role");
             int studentId = resultSet.getInt("id");
             String studentName = resultSet.getString("name");
+            String studentSurname = resultSet.getString("surname");
+            String studentGroup = resultSet.getString("group");
+            String studentEmail = resultSet.getString("email");
+            String studentPassword = resultSet.getString("password");
+            String studentSalt = resultSet.getString("salt");
+            
             StudentRole role;
             try {
                 role = StudentRole.valueOf(roleStr);
@@ -306,16 +320,15 @@ public final class SQLActions {
             }
 
             Student student = new Student(
-                    resultSet.getString("name"),
-                    resultSet.getString("surname"),
-                    resultSet.getString("group"),
-                    resultSet.getString("email"),
-
-                    resultSet.getString("password"),
-                    resultSet.getString("salt"),
+                    studentName,
+                    studentSurname,
+                    studentGroup,
+                    studentEmail,
+                    studentPassword,
+                    studentSalt,
                     role
             );
-            student.setIdFromDB(resultSet.getInt("id"));
+            student.setIdFromDB(studentId);
             list.add(student);
         }
         return list;
@@ -351,11 +364,10 @@ public final class SQLActions {
      * Deletes a student record by ID.
      *
      * @param id the unique identifier of the student
-     * @return true if a row was deleted, false otherwise
      * @throws RuntimeException if the database operation fails
      */
-    public static boolean deleteStudentFromDBWithID(int id) {
-        if (id <= 0) return false;
+    public static void deleteStudentFromDBWithID(int id) {
+        if (id <= 0) return;
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(QUERY_DELETE_STUDENT_BY_ID)) {
             stmt.setInt(1, id);
@@ -366,7 +378,6 @@ public final class SQLActions {
             } else {
                 System.out.println("No student found with ID " + id);
             }
-            return deleted;
         } catch (SQLException e) {
             throw new RuntimeException("Failed to delete student with ID " + id, e);
         }
@@ -376,11 +387,10 @@ public final class SQLActions {
      * Deletes a teacher record by ID.
      *
      * @param id the unique identifier of the teacher
-     * @return true if a row was deleted, false otherwise
      * @throws RuntimeException if the database operation fails
      */
-    public static boolean deleteTeacherFromDBWithID(int id) {
-        if (id <= 0) return false;
+    public static void deleteTeacherFromDBWithID(int id) {
+        if (id <= 0) return;
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(QUERY_DELETE_TEACHER_BY_ID)) {
             stmt.setInt(1, id);
@@ -391,7 +401,6 @@ public final class SQLActions {
             } else {
                 System.out.println("No teacher found with ID " + id);
             }
-            return deleted;
         } catch (SQLException e) {
             throw new RuntimeException("Failed to delete teacher with ID " + id, e);
         }
@@ -402,14 +411,13 @@ public final class SQLActions {
      * Deletes a teacher record by email.
      *
      * @param email the unique email of the teacher
-     * @return true if a row was deleted, false otherwise
      * @throws RuntimeException if the database operation fails
      */
-    public static boolean deleteTeacherFromDBWithEmail(String email) {
-        if (email == null || email.isEmpty()) return false;
+    public static void deleteTeacherFromDBWithEmail(String email) {
+        if (email == null || email.isEmpty()) return;
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(QUERY_DELETE_TEACHER_BY_EMAIL)) {
-            stmt.setString(1, email);
+            stmt.setString(1, email.toLowerCase().toLowerCase());
             int affectedRows = stmt.executeUpdate();
             boolean deleted = affectedRows > 0;
             if (deleted) {
@@ -417,7 +425,6 @@ public final class SQLActions {
             } else {
                 System.out.println("No teacher found with email " + email);
             }
-            return deleted;
         } catch (SQLException e) {
             throw new RuntimeException("Failed to delete teacher with email " + email, e);
         }
@@ -434,7 +441,7 @@ public final class SQLActions {
         if (email == null || email.isEmpty()) return false;
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(QUERY_DELETE_STUDENT_BY_EMAIL)) {
-            stmt.setString(1, email);
+            stmt.setString(1, email.toLowerCase().toLowerCase());
             int affectedRows = stmt.executeUpdate();
             boolean deleted = affectedRows > 0;
             if (deleted) {
@@ -458,7 +465,7 @@ public final class SQLActions {
     public static Student getStudentByEmail(String email) {
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(QUERY_GET_STUDENT_BY_EMAIL)) {
-            stmt.setString(1, email);
+            stmt.setString(1, email.toLowerCase().toLowerCase());
             try (ResultSet rs = stmt.executeQuery()) {
                 List<Student> students = parseStudentsFromResultSet(rs);
                 return students.isEmpty() ? null : students.getFirst();
@@ -477,7 +484,7 @@ public final class SQLActions {
     public static Teacher getTeacherByEmail(String email) {
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(QUERY_GET_TEACHER_BY_EMAIL)) {
-            stmt.setString(1, email);
+            stmt.setString(1, email.toLowerCase().toLowerCase());
             try (ResultSet rs = stmt.executeQuery()) {
                 List<Teacher> teachers = parseTeachersFromResultSet(rs);
                 return teachers.isEmpty() ? null : teachers.getFirst();
@@ -501,6 +508,26 @@ public final class SQLActions {
             try (ResultSet rs = stmt.executeQuery()) {
                 var students = parseStudentsFromResultSet(rs);
                 return students.isEmpty() ? null : students.getFirst();
+            }
+        } catch (SQLException e) {
+            System.err.println("Failed to find student with ID: " + id + " in database: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Finds a teacher by their unique database ID.
+     *
+     * @return {@link Teacher} or null if not found
+     */
+    public static Teacher getTeacherById(int id) {
+        String query = "SELECT * FROM TEACHERS WHERE id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                var teachers = parseTeachersFromResultSet(rs);
+                return teachers.isEmpty() ? null : teachers.getFirst();
             }
         } catch (SQLException e) {
             System.err.println("Failed to find student with ID: " + id + " in database: " + e.getMessage());
@@ -565,7 +592,7 @@ public final class SQLActions {
         FieldValidator.validateId(id);
         FieldValidator.validateEmail(email);
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(QUERY_SET_EMAIL_STUDENT_BY_ID)) {
-            stmt.setString(1, email);
+            stmt.setString(1, email.toLowerCase().toLowerCase());
             stmt.setInt(2, id);
             stmt.executeUpdate();
             System.out.println("Successfully updated student email: " + email);
@@ -663,7 +690,7 @@ public final class SQLActions {
         FieldValidator.validateId(id);
         FieldValidator.validateEmail(email);
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(QUERY_SET_EMAIL_TEACHER_BY_ID)) {
-            stmt.setString(1, email);
+            stmt.setString(1, email.toLowerCase());
             stmt.setInt(2, id);
             stmt.executeUpdate();
             System.out.println("Successfully updated teacher email: " + email);
@@ -700,7 +727,7 @@ public final class SQLActions {
      * @param role the new {@link StudentRole}
      */
     public static void updateStudentRole(int id, StudentRole role) {
-        executeUpdate("UPDATE STUDENTS SET role = ? WHERE id = ?", role.name(), id);
+        executeUpdate(QUERY_PROMOTE_STUDENT_ROLE, role.name(), id);
     }
 
     /**
@@ -709,7 +736,7 @@ public final class SQLActions {
      * @param groupName the name of the group to demote
      */
     public static void demoteAllHeadsInGroup(String groupName) {
-        executeUpdate("UPDATE STUDENTS SET role = 'REGULAR' WHERE \"group\" = ? AND role = 'HEAD_STUDENT'", groupName);
+        executeUpdate(QUERY_DEMOTE_HEADS_IN_GROUP, groupName);
     }
 
     /**
@@ -727,14 +754,14 @@ public final class SQLActions {
             try {
                 // Demote existing heads in the group
                 try (PreparedStatement demoteStmt = conn.prepareStatement(
-                        "UPDATE STUDENTS SET role = 'REGULAR' WHERE \"group\" = ? AND role = 'HEAD_STUDENT'")) {
+                        QUERY_DEMOTE_HEADS_IN_GROUP)) {
                     demoteStmt.setString(1, groupName);
                     demoteStmt.executeUpdate();
                 }
 
                 // Promote the target student
                 try (PreparedStatement promoteStmt = conn.prepareStatement(
-                        "UPDATE STUDENTS SET role = ? WHERE id = ?")) {
+                        QUERY_PROMOTE_STUDENT_ROLE)) {
                     promoteStmt.setString(1, StudentRole.HEAD_STUDENT.name());
                     promoteStmt.setInt(2, studentId);
                     promoteStmt.executeUpdate();

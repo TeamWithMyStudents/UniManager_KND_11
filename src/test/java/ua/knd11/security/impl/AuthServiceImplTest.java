@@ -75,13 +75,18 @@ class AuthServiceImplTest {
      */
     @Test
     void login_WhenAlreadyAuthenticated_ShouldNotAuthenticateAgain() {
-        User user = new User("John", "Doe", "john@example.com", "Password123!") {
-        };
-        UserSession.login(user);
+        try (MockedStatic<FieldValidator> fieldValidator = mockStatic(FieldValidator.class)) {
+            fieldValidator.when(() -> FieldValidator.makeProtectedSalt()).thenReturn("test-salt");
+            fieldValidator.when(() -> FieldValidator.makeProtectedPasswordWithSalt(anyString(), anyString())).thenReturn("test-hash");
 
-        authService.login("jane@example.com", "Password123!");
+            User user = new User("John", "Doe", "john@example.com", "Password123!") {
+            };
+            UserSession.login(user);
 
-        assertEquals(user, UserSession.getCurrentUser());
+            authService.login("jane@example.com", "Password123!");
+
+            assertEquals(user, UserSession.getCurrentUser());
+        }
     }
 
     /**
@@ -110,12 +115,18 @@ class AuthServiceImplTest {
     void login_WithValidDbCredentials_ShouldAuthenticate() {
         String email = "student@example.com";
         String plaintextPassword = "Password123!";
-        String salt = FieldValidator.makeProtectedSalt();
-        String hashedPassword = FieldValidator.makeProtectedPasswordWithSalt(plaintextPassword, salt);
+        String salt = "test-salt";
+        String hashedPassword = "test-hash";
 
         Student mockStudent = new Student("Test", "Student", "KND-11", email, hashedPassword, salt, StudentRole.REGULAR);
 
-        try (MockedStatic<SQLActions> sqlActions = mockStatic(SQLActions.class)) {
+        try (MockedStatic<SQLActions> sqlActions = mockStatic(SQLActions.class);
+             MockedStatic<FieldValidator> fieldValidator = mockStatic(FieldValidator.class)) {
+
+            fieldValidator.when(() -> FieldValidator.makeProtectedSalt()).thenReturn(salt);
+            fieldValidator.when(() -> FieldValidator.makeProtectedPasswordWithSalt(anyString(), anyString())).thenReturn(hashedPassword);
+            fieldValidator.when(() -> FieldValidator.verifyPassword(anyString(), anyString(), anyString())).thenReturn(true);
+            
             sqlActions.when(() -> SQLActions.getTeacherByEmail(email)).thenReturn(null);
             sqlActions.when(() -> SQLActions.getStudentByEmail(email)).thenReturn(mockStudent);
 
@@ -132,15 +143,20 @@ class AuthServiceImplTest {
      */
     @Test
     void login_WhenAlreadyAuthenticated_ShouldNotQueryDatabase() {
-        User user = new User("John", "Doe", "john@example.com", "Password123!") {
-        };
-        UserSession.login(user);
+        try (MockedStatic<FieldValidator> fieldValidator = mockStatic(FieldValidator.class)) {
+            fieldValidator.when(() -> FieldValidator.makeProtectedSalt()).thenReturn("test-salt");
+            fieldValidator.when(() -> FieldValidator.makeProtectedPasswordWithSalt(anyString(), anyString())).thenReturn("test-hash");
 
-        try (MockedStatic<SQLActions> sqlActions = mockStatic(SQLActions.class)) {
-            authService.login("jane@example.com", "Password123!");
+            User user = new User("John", "Doe", "john@example.com", "Password123!") {
+            };
+            UserSession.login(user);
 
-            assertEquals(user, UserSession.getCurrentUser());
-            sqlActions.verifyNoInteractions();
+            try (MockedStatic<SQLActions> sqlActions = mockStatic(SQLActions.class)) {
+                authService.login("jane@example.com", "Password123!");
+
+                assertEquals(user, UserSession.getCurrentUser());
+                sqlActions.verifyNoInteractions();
+            }
         }
     }
 }

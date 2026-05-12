@@ -11,12 +11,6 @@ import ua.knd11.util.FieldValidator;
 @Getter
 public abstract class User {
     /**
-     * @deprecated Static counter used to generate the next unique identifier.
-     * Use setIdFromDB instead for database-backed ID assignment.
-     */
-    @Deprecated
-    private static int nextId = 1;
-    /**
      * The user's password, which must be protected/encrypted
      */
     private final String password;
@@ -76,22 +70,9 @@ public abstract class User {
         FieldValidator.validatePassword(password);
         this.name = name;
         this.surname = surname;
-        this.email = email;
+        this.email = email.toLowerCase();
         this.salt = FieldValidator.makeProtectedSalt();
         this.password = FieldValidator.makeProtectedPasswordWithSalt(password, this.salt);
-    }
-
-    /**
-     * @throws IllegalStateException if an ID has already been assigned to this user
-     * @deprecated Assigns a unique ID to the user using an internal auto-incrementing counter.
-     * Use setIdFromDB instead for database-backed ID assignment.
-     */
-    @Deprecated
-    public void assignId() throws IllegalStateException {
-        if (this.id != 0) {
-            throw new IllegalStateException("Id has already been assigned");
-        }
-        this.id = nextId++;
     }
 
     /**

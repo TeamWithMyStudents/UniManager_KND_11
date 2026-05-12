@@ -14,34 +14,9 @@ import java.util.Objects;
  */
 public class UserSession {
 
-    private final static String SUPER_USER_EMAIL;
-
-    private final static String SUPER_USER_PASSWORD;
-
-    static {
-        try {
-            FieldValidator.validateEmail(Dotenv.load().get("SUPER_USER_EMAIL"));
-            SUPER_USER_EMAIL = Dotenv.load().get("SUPER_USER_EMAIL");
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException(e + "SUPER_USER_EMAIL is not valid");
-        }
-    }
-
-    static {
-        String password = Dotenv.load().get("SUPER_USER_PASSWORD");
-        if (password == null || password.isBlank() || password.length() < 8) {
-            throw new RuntimeException("SUPER_USER_PASSWORD must be at least 8 characters");
-        }
-        SUPER_USER_PASSWORD = password;
-    }
-
-    /**
-     * A predefined administrative user with full system privileges.
-     * Initialized as an anonymous subclass of the abstract User.
-     */
-    @Getter
-    private static final User superUser = new User("admin", "admin", SUPER_USER_EMAIL, SUPER_USER_PASSWORD, "NO_SALT") {
-    };
+    final static String email;
+    final static String salt;
+    final static String password;
     /**
      * Internal lock object used for thread synchronization
      */
@@ -51,6 +26,25 @@ public class UserSession {
      */
     private static User currentUser = null;
 
+    static {
+        try {
+            FieldValidator.validateEmail(Dotenv.load().get("SUPER_USER_EMAIL"));
+            email = Dotenv.load().get("SUPER_USER_EMAIL");
+            String passwordEnv = Dotenv.load().get("SUPER_USER_PASSWORD");
+            if (passwordEnv == null || passwordEnv.isBlank() || passwordEnv.length() < 8) {
+                throw new RuntimeException("SUPER_USER_PASSWORD must be at least 8 characters");
+            }
+
+            salt = FieldValidator.makeProtectedSalt();
+            password = FieldValidator.makeProtectedPasswordWithSalt(passwordEnv, salt);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException(e + "SUPER_USER_EMAIL is not valid");
+        }
+    }
+
+    @Getter
+    static final User superUser = new User("admin", "admin", email, password, salt) {
+    };
 
     /**
      * Establishes a session for the provided user.

@@ -103,40 +103,6 @@ class UserTest {
     }
 
     /**
-     * Tests that auto-assigned IDs are unique and positive,
-     * and do not collide with DB-assigned IDs.
-     */
-    @Test
-    void assignId_ShouldAssignUniqueId() {
-        User userWithDbId = new User("Alice", "Smith", "alice@example.com", "Password123!") {
-        };
-        userWithDbId.setIdFromDB(42);
-
-        User user1 = new User("Bob", "Jones", "bob@example.com", "Password123!") {
-        };
-        User user2 = new User("Carol", "White", "carol@example.com", "Password123!") {
-        };
-
-        user1.assignId();
-        user2.assignId();
-
-        assertTrue(user1.getId() > 0, "Assigned ID should be positive");
-        assertTrue(user2.getId() > 0, "Assigned ID should be positive");
-        assertNotEquals(user1.getId(), user2.getId(), "Assigned IDs should be unique");
-        assertNotEquals(42, user1.getId(), "Assigned ID should not collide with DB-set ID 42");
-        assertNotEquals(42, user2.getId(), "Assigned ID should not collide with DB-set ID 42");
-    }
-
-    /**
-     * Tests that assigning an ID twice throws an exception.
-     */
-    @Test
-    void assignId_WhenIdAlreadyAssigned_ShouldThrowException() {
-        user.assignId();
-        assertThrows(IllegalStateException.class, () -> user.assignId());
-    }
-
-    /**
      * Tests that name can be updated to a valid value.
      */
     @Test

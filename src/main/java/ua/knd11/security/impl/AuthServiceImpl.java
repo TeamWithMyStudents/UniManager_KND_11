@@ -36,7 +36,7 @@ public class AuthServiceImpl implements AuthService {
 
         User superUser = UserSession.getSuperUser();
         if (superUser.getEmail().equalsIgnoreCase(email)) {
-            if (superUser.getPassword().equals(value)) {
+            if (FieldValidator.verifyPassword(value, superUser.getPassword(), superUser.getSalt())) {
                 UserSession.login(superUser);
                 System.out.println("Login successful. Welcome, " + superUser.getName() + "!");
                 return;

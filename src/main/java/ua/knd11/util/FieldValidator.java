@@ -130,7 +130,7 @@ public final class FieldValidator {
      * - Must contain at least one digit.
      * - Must contain at least one lowercase letter.
      * - Must contain at least one uppercase letter.
-     * - Must contain at least one special character from the set {@code @#$%^&+=}.
+     * - Must contain at least one special character from the set {@code @#!$%^&+=}.
      * - Must not contain any whitespace characters.
      * - Must be at least 8 characters in length.
      *
@@ -144,7 +144,7 @@ public final class FieldValidator {
         // (?=.*[0-9])       # a digit must occur at least once
         // (?=.*[a-z])       # a lower case letter must occur at least once
         // (?=.*[A-Z])       # an upper case letter must occur at least once
-        // (?=.*[@#$%^&+=])  # a special character must occur at least once
+        // (?=.*[@#!$%^&+=])  # a special character must occur at least once
         // (?=\S+$)          # no whitespace allowed in the entire string
         // .{8,}             # anything, at least eight places though
         // $                 # end-of-string

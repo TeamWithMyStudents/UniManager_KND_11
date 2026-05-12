@@ -10,6 +10,7 @@ import ua.knd11.service.StudentService;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -46,6 +47,7 @@ class StudentControllerTest {
         String invalidInput = "John Doe KND-11";
 
         assertDoesNotThrow(() -> studentController.addStudentFromTerminal(invalidInput));
+        verify(studentService, never()).addStudent(any(Student.class));
     }
 
     /**
@@ -56,6 +58,7 @@ class StudentControllerTest {
         String invalidInput = "John Doe KND-11 john.doe@example.com Password123! extra";
 
         assertDoesNotThrow(() -> studentController.addStudentFromTerminal(invalidInput));
+        verify(studentService, never()).addStudent(any(Student.class));
     }
 
     /**
@@ -66,6 +69,7 @@ class StudentControllerTest {
         String invalidInput = "John123 Doe KND-11 john@example.com Password123!";
 
         assertDoesNotThrow(() -> studentController.addStudentFromTerminal(invalidInput));
+        verify(studentService, never()).addStudent(any(Student.class));
     }
 
     /**
@@ -76,6 +80,7 @@ class StudentControllerTest {
         String invalidInput = "John Doe KND-11 invalid-email Password123!";
 
         assertDoesNotThrow(() -> studentController.addStudentFromTerminal(invalidInput));
+        verify(studentService, never()).addStudent(any(Student.class));
     }
 
     /**
@@ -86,6 +91,7 @@ class StudentControllerTest {
         String invalidInput = "John Doe KND-11 john@example.com short";
 
         assertDoesNotThrow(() -> studentController.addStudentFromTerminal(invalidInput));
+        verify(studentService, never()).addStudent(any(Student.class));
     }
 
     /**
