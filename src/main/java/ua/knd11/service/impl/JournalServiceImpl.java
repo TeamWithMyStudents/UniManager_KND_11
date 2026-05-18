@@ -20,7 +20,6 @@ public class JournalServiceImpl implements JournalService {
 
     /**
      * Assigns a new grade to a student for a specific subject and stores it in the repository.
-     * Note: Validation of the input data is handled by the {@link Grade} constructor.
      *
      * @param studentId the unique identifier of the student
      * @param subject   the name of the subject
@@ -28,20 +27,21 @@ public class JournalServiceImpl implements JournalService {
      */
     @Override
     public void assignGrade(int studentId, String subject, int score) {
-        Grade newGrade = new Grade(studentId, subject, score);
-        grades.add(newGrade);
+        try {
+            Grade newGrade = new Grade(studentId, subject, score);
+            grades.add(newGrade);
+            System.out.println("[LOG] Successfully assigned grade: " + score + " for subject '" + subject + "' to Student ID: " + studentId);
+        } catch (IllegalArgumentException e) {
+            System.err.println("[ERROR] Failed to assign grade: " + e.getMessage());
+        }
     }
 
     /**
      * Retrieves a list of all grades belonging to a specific student.
-     * <p>
-     * This method creates and returns a <b>defensive copy</b> of the grades. By mapping
-     * the original objects to new {@link Grade} instances, it prevents external
-     * modification of the internal repository state.
-     * </p>
+     * Returns a defensive copy to prevent external modification of the internal repository.
      *
-     * @param studentId the unique identifier of the student whose grades are being retrieved
-     * @return a list of copied {@link Grade} objects for the specified student
+     * @param studentId the unique identifier of the student
+     * @return a list of {@link Grade} objects for the specified student
      */
     @Override
     public List<Grade> getGradesForStudent(int studentId) {
@@ -53,37 +53,35 @@ public class JournalServiceImpl implements JournalService {
     }
 
     /**
-     * Generate a formatted record-book report for a student listing subjects, scores, and the overall average.
+     * Generates a formatted record-book report for a student listing subjects, scores, and the average.
      *
      * @param studentId the student's unique identifier
-     * @return the formatted record-book string; if the student has no grades, returns "Grades are not yet available"
+     * @return the formatted record-book string
      */
     @Override
     public String generateRecordBook(int studentId) {
         List<Grade> studentGrades = getGradesForStudent(studentId);
 
-        // Handle the case where the student has no recorded grades
         if (studentGrades.isEmpty()) {
-            return "Grades are not yet available";
+            return "No academic records found for Student ID: " + studentId;
         }
 
         StringBuilder report = new StringBuilder();
-        report.append("--- Student record book (ID: ").append(studentId).append(") ---\n");
+        report.append("\n==========================================\n");
+        report.append("       STUDENT RECORD BOOK (ID: ").append(studentId).append(")\n");
+        report.append("==========================================\n");
 
-        int sum = 0;
-
+        int totalScore = 0;
         for (Grade grade : studentGrades) {
-            report.append("subject: ").append(grade.getSubject())
-                    .append(" | score: ").append(grade.getScore())
-                    .append("\n");
-            sum += grade.getScore();
+            report.append(String.format(" Subject: %-15s | Score: %3d\n",
+                    grade.getSubject(), grade.getScore()));
+            totalScore += grade.getScore();
         }
 
-        // Calculate the average score
-        double average = (double) sum / studentGrades.size();
-
-        report.append("--------------------------------------\n");
-        report.append(String.format("Average score: %.2f\n", average));
+        double average = (double) totalScore / studentGrades.size();
+        report.append("------------------------------------------\n");
+        report.append(String.format(" Average Academic Score: %.2f\n", average));
+        report.append("==========================================\n");
 
         return report.toString();
     }
