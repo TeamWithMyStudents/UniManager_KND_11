@@ -9,215 +9,119 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 /**
- * The primary View component of the application.
- * Provides a text-based Command Line Interface (CLI) for user interaction,
- * including authentication flows and management submenus for students and teachers.
+ * Main application management via the console.
+ * This class serves as the central hub, allowing users to navigate between
+ * the student and teacher management dashboards.
  */
 public class ConsoleMenu {
-    /**
-     * Scanner instance for reading user input from the standard input stream
-     */
-    private final Scanner sc = new Scanner(System.in);
-    /**
-     * Controller for handling student-related operations
-     */
-    private final StudentController studentController = new StudentController();
-    /**
-     * Controller for handling teacher-related operations
-     */
-    private final TeacherController teacherController = new TeacherController();
-    /**
-     * Service implementation for user authentication and registration
-     */
-    private final AuthServiceImpl authService = new AuthServiceImpl();
+
+    private final Scanner scanner = new Scanner(System.in);
+    private final StudentController studentController;
+    private final TeacherController teacherController;
 
     /**
-     * Entry point for the console application.
-     * Initiates the login/registration sequence and enters the main application loop.
+     * Constructs the ConsoleMenu with required controller dependencies.
+     *
+     * @param studentController handles student-related UI logic
+     * @param teacherController handles teacher-related UI logic
+     */
+    public ConsoleMenu(StudentController studentController, TeacherController teacherController) {
+        this.studentController = studentController;
+        this.teacherController = teacherController;
+    }
+
+    /**
+     * Starts the application's main loop.
+     * Directs the user to the appropriate sub-menus based on their choice.
      */
     public void startMenu() {
         LogOrReg();
         while (true) {
-            System.out.print(""" 
-                      \n MAIN MENU
-                    1. STUDENT MANAGER
-                    2. TEACHER MANAGER
-                    3. ADMIN MANAGER
-                    4. LOGOUT
-                    0. EXIT
-                    """);
-            System.out.print("Select an option (number): ");
+            System.out.println("\n===== UNIVERSITY MANAGEMENT SYSTEM =====");
+            System.out.println("1. STUDENT SECTION (Grades, Schedule, Profile)");
+            System.out.println("2. TEACHER SECTION (Grading, Scheduling, Admin)");
+            System.out.println("3. EXIT");
+            System.out.print("Select an option: ");
 
-            String choice = sc.nextLine().trim();
+            String choice = scanner.nextLine().trim();
 
             switch (choice) {
-                case "1":
-                    studentSubMenu();
-                    break;
-                case "2":
-                    teacherSubMenu();
-                    break;
-                case "3":
-                    adminSubMenu();
-                    break;
-                case "4":
-                    UserSession.logout();
-                    LogOrReg();
-                    break;
-                case "0":
-                    sc.close();
+                case "1" -> studentSubMenu();
+                case "2" -> teacherSubMenu();
+                case "3" -> {
+                    System.out.println("Exiting system. Goodbye!");
                     return;
-                default:
-                    System.out.println("Invalid option. Please try again ");
+                }
+                default -> System.out.println("[WARNING] Invalid option. Please try again.");
             }
         }
     }
 
     /**
-     * Displays and manages the Student Management submenu.
-     * Allows for adding, viewing, deleting, and assigning roles to students.
-     * Permission checks are enforced via {@link UserSession}.
+     * Routing for student-related tasks.
      */
     private void studentSubMenu() {
         boolean back = false;
         while (!back) {
-            System.out.print("""
-                    \n STUDENT MENU:
-                    1. Show All Students
-                    0. Back to Main Menu
-                    """);
-            System.out.print("Select an option (number): ");
-            String choice = sc.nextLine().trim();
+            System.out.println("\n--- Student Section ---");
+            System.out.println("1. Go to Student Dashboard (Academic)");
+            System.out.println("2. Add New Student Profile");
+            System.out.println("3. Delete Student by ID");
+            System.out.println("4. Return to Main Menu");
+            System.out.print("Choice: ");
+
+            String choice = scanner.nextLine().trim();
             switch (choice) {
-                case "1":
-                    studentController.getAll();
-                    break;
-                case "0":
-                    System.out.println("returning to Main Menu");
-                    back = true;
-                    break;
-                default:
-                    System.out.println("Invalid option. Please try again.");
-                    break;
+                case "1" -> {
+                    // Simulated login: using ID 1 as default for testing
+                    System.out.print("Enter Student ID to login: ");
+                    try {
+                        int id = Integer.parseInt(scanner.nextLine());
+                        studentController.displayMenu(scanner, id);
+                    } catch (NumberFormatException e) {
+                        System.err.println("Invalid ID format.");
+                    }
+                }
+                case "2" -> {
+                    System.out.println("Format: Name Surname Lastname Group Email Password");
+                    studentController.create(scanner.nextLine());
+                }
+                case "3" -> {
+                    System.out.print("Enter ID to delete: ");
+                    try {
+                        studentController.delete(Integer.parseInt(scanner.nextLine()));
+                    } catch (NumberFormatException e) {
+                        System.err.println("ID must be a number.");
+                    }
+                }
+                case "4" -> back = true;
+                default -> System.out.println("Invalid option.");
             }
         }
     }
 
     /**
-     * Displays and manages the Teacher Management submenu.
-     * Allows for adding, viewing, and deleting teachers, as well as
-     * performing budget calculations and degree filtering.
-     * Permission checks are enforced via {@link UserSession}.
+     * Routing for teacher-related tasks.
      */
     private void teacherSubMenu() {
         boolean back = false;
         while (!back) {
-            System.out.print("""
-                    \n TEACHER MANAGER:
-                    1. Show All Teachers
-                    2. Calculate Salary
-                    3. Filter Degree
-                    0. Back to Main Menu
-                    """);
-            System.out.print("Select an option (number): ");
+            System.out.println("\n--- Teacher Section ---");
+            System.out.println("1. Go to Teacher Dashboard (Academic)");
+            System.out.println("2. Add New Teacher Profile");
+            System.out.println("3. Return to Main Menu");
+            System.out.print("Choice: ");
 
-            String choice = sc.nextLine().trim();
-
+            String choice = scanner.nextLine().trim();
             switch (choice) {
-                case "1":
-                    teacherController.getAll();
-                    break;
-                case "2":
-                    if (!UserSession.checkAccess()) break;
-                    teacherController.calculateTotalSalary();
-                    break;
-                case "3":
-                    if (!UserSession.checkAccess()) break;
-                    System.out.print("Enter degree to filter by: ");
-                    teacherController.filterByDegree(sc.nextLine().trim());
-                    break;
-                case "0":
-                    System.out.println("returning to Main Menu ↺");
-                    back = true;
-                    break;
-                default:
-                    System.out.println("Invalid option. Please try again.");
-                    break;
+                case "1" -> teacherController.displayMenu(scanner);
+                case "2" -> {
+                    System.out.println("Format: Name Surname Dept Degree Salary Email Password");
+                    teacherController.create(scanner.nextLine());
+                }
+                case "3" -> back = true;
+                default -> System.out.println("Invalid option.");
             }
         }
-    }
-
-    public void adminSubMenu() {
-        if (!UserSession.checkAccess()) {
-            return;
-        }
-        boolean back = false;
-        while (!back) {
-            System.out.print("""
-                    \n ADMIN MENU:
-                    1. Add student
-                    2. Add teacher
-                    3. Remove student by id
-                    4. Remove teacher by id
-                    0. Back to Main Menu
-                    """);
-            System.out.print("Select an option (number): ");
-            String choice = sc.nextLine().trim();
-            int id;
-            switch (choice) {
-                case "1":
-                    System.out.println("Enter student details: Name Surname Group Email@example.com Password");
-                    studentController.addStudentFromTerminal(sc.nextLine());
-                    break;
-                case "2":
-                    System.out.println("Enter teacher details: Name Surname Dept Degree Salary Email@example.com Password");
-                    teacherController.addTeacherFromTerminal(sc.nextLine());
-                    break;
-                case "3":
-                    System.out.print("Enter student ID to remove: ");
-                    try {
-                        id = sc.nextInt();
-                        studentController.deleteStudent(id);
-                        sc.nextLine();
-                    } catch (InputMismatchException e) {
-                        System.err.println("Id must be integer");
-                        return;
-                    }
-                    break;
-                case "4":
-                    System.out.println("Enter teacher ID to remove: ");
-                    try {
-                        id = sc.nextInt();
-                        teacherController.deleteTeacher(id);
-                        sc.nextLine();
-                    } catch (InputMismatchException e) {
-                        System.err.println("Id must be integer");
-                        return;
-                    }
-                    break;
-                case "0":
-                    System.out.println("returning to Main Menu");
-                    back = true;
-                    break;
-                default:
-                    System.out.println("Invalid option. Please try again.");
-                    break;
-            }
-        }
-    }
-
-    /**
-     * Handles the initial authentication phase of the application.
-     * Provides an option for logging
-     * The loop continues until a user is successfully authenticated or the application is exited.
-     */
-    public void LogOrReg() {
-        do {
-            System.out.println("\n Please enter email and Password:");
-            String emailLog = sc.next().trim();
-            String passwordLog = sc.next().trim();
-            sc.nextLine();
-            authService.login(emailLog, passwordLog);
-        } while (!UserSession.isAuthenticated());
     }
 }
