@@ -1,78 +1,102 @@
 package ua.knd11.model;
 
-
+import lombok.Getter;
 import ua.knd11.util.FieldValidator;
 
 /**
- * <p>The basic user model from which others are built
- * <p>has fields for id, name, surname, email, password
- *
- * @see Student
- * @see Teacher
+ * An abstract base class representing a generic User in the system.
+ * Provides core attributes such as a unique ID, name, email, and password.
+ * This class handles basic validation and automatic ID assignment logic.
  */
+@Getter
 public abstract class User {
-    private static int nextId = 1;
+    /**
+     * The user's password, which must be protected/encrypted
+     */
+    private final String password;
+    /**
+     * The salt used for password protection
+     */
+    private final String salt;
+    /**
+     * The unique identifier for this specific user; 0 indicates an unassigned ID
+     */
     private int id = 0;
+    /**
+     * The user's first name
+     */
     private String name;
+    /**
+     * The user's last name (surname)
+     */
     private String surname;
+    /**
+     * The user's unique email address
+     */
     private String email;
-    private String password;
 
     /**
-     * Create a User with the given name, surname, email, and password.
+     * Constructs a new User instance with the specified name, surname, email, password, and salt.
+     * For internal use only, used when loading existing data from a database.
      *
-     * @param name     the user's first name; must pass alphabetic validation
-     * @param surname  the user's surname; must pass alphabetic validation
-     * @param email    the user's email; must pass email validation
-     * @param password the user's password; must pass password validation
-     * @throws IllegalArgumentException if any parameter fails its validation
+     * @param name     the first name of the user
+     * @param surname  the last name of the user
+     * @param email    the email address of the user
+     * @param password the raw password for the user, which may be salted and secured
+     * @param salt     the salt value used for hashing the user's password
      */
-    public User(String name, String surname, String email, String password) throws IllegalArgumentException {
-        FieldValidator.validateAlphabeticString("Name", name);
-        FieldValidator.validateAlphabeticString("Surname", surname);
-        FieldValidator.validateEmail(email);
-        if (!FieldValidator.isPasswordProtected(password)) FieldValidator.validatePassword(password);
+    public User(String name, String surname, String email, String password, String salt) {
         this.name = name;
         this.surname = surname;
         this.email = email;
         this.password = password;
+        this.salt = salt;
     }
 
     /**
-     * Assigns an ID to the user if it has not been assigned yet.
+     * Constructs a new User instance with the specified name, surname, email, and password.
+     * Validates the provided inputs for proper formatting and security considerations.
      *
-     * @throws IllegalStateException if the ID has already been assigned
+     * @param name     the first name of the user
+     * @param surname  the last name of the user
+     * @param email    the email address of the user
+     * @param password the raw password for the user, which will be salted and hashed for storage
+     *
      */
-    public void assignId() throws IllegalStateException {
-        if (this.id != 0) {
-            throw new IllegalStateException("Id has already been assigned");
+    public User(String name, String surname, String email, String password) {
+        FieldValidator.validateAlphabeticString("Name", name);
+        FieldValidator.validateAlphabeticString("Surname", surname);
+        FieldValidator.validateEmail(email);
+        FieldValidator.validatePassword(password);
+        this.name = name;
+        this.surname = surname;
+        this.email = email.toLowerCase();
+        this.salt = FieldValidator.makeProtectedSalt();
+        this.password = FieldValidator.makeProtectedPasswordWithSalt(password, this.salt);
+    }
+
+    /**
+     * Manually sets the user ID, typically used when loading existing data from a database.
+     *
+     * @param id the unique ID to be assigned
+     * @throws IllegalArgumentException if the provided id is not positive
+     * @throws IllegalStateException if the id has already been assigned
+     */
+    public void setIdFromDB(int id) {
+        if (id <= 0) {
+            throw new IllegalArgumentException("ID must be a positive integer, got: " + id);
         }
-        this.id = nextId++;
+        if (this.id != 0) {
+            throw new IllegalStateException("Id has already been assigned: " + this.id);
+        }
+        this.id = id;
     }
 
     /**
-     * Retrieve the user's unique identifier.
+     * Updates the user's first name with alphabetic validation.
      *
-     * @return the user's unique ID, or 0 if an ID has not been assigned
-     */
-    public int getId() {
-        return id;
-    }
-
-    /**
-     * Returns the user's first name.
-     *
-     * @return the user's first name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Update the user's given name.
-     *
-     * @param name the new given name; must contain only alphabetic characters
-     * @throws IllegalArgumentException if `name` is null, empty, or contains non-alphabetic characters
+     * @param name the new first name
+     * @throws IllegalArgumentException if the name is invalid
      */
     @SuppressWarnings("unused")
     public void setName(String name) throws IllegalArgumentException {
@@ -81,19 +105,10 @@ public abstract class User {
     }
 
     /**
-     * Gets surname.
+     * Updates the user's last name with alphabetic validation.
      *
-     * @return the surname
-     */
-    public String getSurname() {
-        return surname;
-    }
-
-    /**
-     * Update the user's surname after validating it contains only alphabetic characters.
-     *
-     * @param surname the new surname to set; must be a non-empty alphabetic string
-     * @throws IllegalArgumentException if the provided surname fails validation
+     * @param surname the new last name
+     * @throws IllegalArgumentException if the surname is invalid
      */
     @SuppressWarnings("unused")
     public void setSurname(String surname) throws IllegalArgumentException {
@@ -102,16 +117,7 @@ public abstract class User {
     }
 
     /**
-     * Retrieve the user's email address.
-     *
-     * @return the user's email address
-     */
-    public String getEmail() {
-        return email;
-    }
-
-    /**
-     * Update the user's email to the provided value after validating its format.
+     * Updates the user's email address with format validation.
      *
      * @param email the new email address
      * @throws IllegalArgumentException if the email format is invalid
@@ -122,45 +128,11 @@ public abstract class User {
         this.email = email;
     }
 
-    /**
-     * Retrieves the user's password.
-     *
-     * @return the user's password
-     */
-    public String getPassword() {
-        return password;
-    }
 
     /**
-     * Update the user's password after validating it.
+     * Returns a basic string representation of the user, excluding sensitive data like passwords.
      *
-     * @param password the new password to assign; must meet the user's password requirements
-     * @throws IllegalArgumentException if the provided password is invalid
-     */
-    public void setPassword(String password) throws IllegalArgumentException {
-
-        FieldValidator.validatePassword(password);
-        this.password = password;
-    }
-
-    /**
-     * Update the user's password after validating it.
-     *
-     * @param value the new password to assign; must meet the user's password requirements
-     * @throws IllegalArgumentException if the provided password is not protected
-     */
-    public void setProtectedPassword(String value) throws IllegalArgumentException {
-        if (!FieldValidator.isPasswordProtected(value))
-            throw new IllegalArgumentException("Cannot set unprotected password");
-        this.password = value;
-    }
-
-    /**
-     * Provides a string representation containing the user's id, name, surname, and email.
-     *
-     * <p>Does not include the user's password.</p>
-     *
-     * @return a string formatted as "ID: {id}, Name: {name}, Surname: {surname}, Email: {email}".
+     * @return a string containing ID, name, surname, and email
      */
     @Override
     public String toString() {

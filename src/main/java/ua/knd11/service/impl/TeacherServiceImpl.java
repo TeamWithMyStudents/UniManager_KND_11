@@ -4,34 +4,46 @@ import ua.knd11.model.Teacher;
 import ua.knd11.model.User;
 import ua.knd11.service.TeacherService;
 import ua.knd11.util.FieldValidator;
+import ua.knd11.util.SQLActions;
+
+import java.util.ArrayList;
 
 /**
- * The type Teacher service.
+ * Implementation of the {@link TeacherService} interface.
+ * Handles the business logic for teacher management, including salary budget calculations,
+ * degree-based filtering, and database persistence operations.
  */
-public class TeacherServiceImpl extends UserServiceImpl implements TeacherService {
+public class TeacherServiceImpl implements TeacherService {
 
     /**
-     * Calculates and prints the sum of salaries for all Teacher entries in the repository.
-     * <p>
-     * Iterates the repository, adds each Teacher's salary to a running total, and prints
-     * the result to standard output as "Total University Budget": followed by the sum.
+     * Calculates the total sum of salaries for all teachers currently in the system.
+     * Uses the Stream API to map and sum individual salaries.
+     * Outputs the "Total University Budget" to the console.
      */
     public void calculateTotalSalary() {
-        double result = repository.stream().mapToDouble(user -> user instanceof Teacher t ? t.getSalary() : 0).sum();
+        double result = getAllTeachers().stream()
+                .mapToDouble(user -> user instanceof Teacher t ? t.getSalary() : 0)
+                .sum();
         System.out.println("Total University Budget: " + result);
     }
 
     /**
-     * Prints all teachers whose degree contains the given degree string (case-insensitive).
+     * Filters and prints teachers who hold a specific academic degree.
+     * The search is case-insensitive and validates the input string format.
      *
-     * @param degree substring to match against teacher degrees (case-insensitive)
-     * @throws IllegalArgumentException if `degree` is null, empty, or contains non-alphabetic characters
+     * @param degree the academic degree or part of the degree string to filter by
+     * @throws IllegalArgumentException if the provided degree string fails alphabetic validation
      */
     public void filterByDegree(String degree) throws IllegalArgumentException {
-        FieldValidator.validateAlphabeticString("Degree", degree);
+        try {
+            FieldValidator.validateAlphabeticString("Degree", degree);
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+            return;
+        }
 
         boolean found = false;
-        for (User user : repository) {
+        for (User user : getAllTeachers()) {
             if (user instanceof Teacher t) {
                 if (t.getDegree().toLowerCase().contains(degree.toLowerCase())) {
                     System.out.println(t);
@@ -45,17 +57,31 @@ public class TeacherServiceImpl extends UserServiceImpl implements TeacherServic
     }
 
     /**
-     * Adds a teacher to the underlying repository.
+     * Registers a new teacher by persisting their record to the database.
      *
-     * @param user the user to add; must be a {@code Teacher} instance
-     * @return true if the user was added successfully, false otherwise
-     * @throws IllegalArgumentException if {@code user} is not an instance of {@code Teacher}
+     * @param teacher the {@link Teacher} object to be added
+     * @throws IllegalArgumentException if the teacher data is invalid
+     */
+    public void addTeacher(Teacher teacher) throws IllegalArgumentException {
+        SQLActions.addTeacherToDB(teacher);
+    }
+
+    /**
+     * Deletes a teacher from the database using their unique identifier.
+     *
+     * @param id the unique identifier of the teacher to be removed
      */
     @Override
-    public boolean add(User user) throws IllegalArgumentException {
-        if (!(user instanceof Teacher teacher)) {
-            throw new IllegalArgumentException("User must be an instance of Teacher");
-        }
-        return super.add(teacher);
+    public void deleteTeacher(int id) {
+        SQLActions.deleteTeacherFromDBWithID(id);
+    }
+
+    /**
+     * Retrieves a list of all teachers stored in the database.
+     *
+     * @return an {@link ArrayList} containing all {@link Teacher} records
+     */
+    public ArrayList<Teacher> getAllTeachers() {
+        return SQLActions.retrieveTeachersFromDB();
     }
 }

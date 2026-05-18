@@ -1,76 +1,114 @@
 package ua.knd11.util;
 
+import com.password4j.Hash;
+import com.password4j.Password;
+import io.github.cdimascio.dotenv.Dotenv;
+
+import java.security.SecureRandom;
+import java.util.Base64;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
- * Utility class for validating field inputs with business rules.
+ * A final utility class providing static methods for data validation and security.
+ * It handles format checks for user attributes, salary constraints, and password hashing
+ * using the password4j library.
  */
 public final class FieldValidator {
 
+    private static String getPepper() {
+        String pepper = Dotenv.load().get("STATIC_PEPPER");
+        if (pepper == null || pepper.isBlank()) {
+            throw new IllegalStateException("STATIC_PEPPER must be configured");
+        }
+        return pepper;
+    }
+
+    private static int getRandomSaltLength() {
+        String saltLengthStr = Dotenv.load().get("RANDOM_SALT_LENGTH");
+        if (saltLengthStr == null || saltLengthStr.isBlank()) {
+            throw new IllegalStateException("RANDOM_SALT_LENGTH must be a positive integer");
+        }
+        try {
+            int length = Integer.parseInt(saltLengthStr);
+            if (length <= 0) {
+                throw new IllegalStateException("RANDOM_SALT_LENGTH must be a positive integer");
+            }
+            return length;
+        } catch (NumberFormatException e) {
+            throw new IllegalStateException("RANDOM_SALT_LENGTH must be a positive integer", e);
+        }
+    }
+
     /**
-     * Prevents instantiation of this utility class.
+     * Private constructor to prevent instantiation of this utility class.
      *
-     * <p>This private constructor always throws an {@link UnsupportedOperationException} to
-     * enforce non-instantiability.
-     *
-     * @throws UnsupportedOperationException always thrown to prevent creating an instance
+     * @throws UnsupportedOperationException if an attempt is made to instantiate this class.
      */
     private FieldValidator() {
         throw new UnsupportedOperationException("Utility class");
     }
 
     /**
-     * Ensures the provided string is neither null nor blank.
+     * Internal helper to verify that a string is neither null nor empty/blank.
      *
-     * @param field the label of the validated field used in the exception message
-     * @param value the string value to validate
-     * @throws IllegalArgumentException if {@code value} is null or contains only whitespace; the exception message is "{@code <field> is null or empty}"
+     * @param fieldName      the name of the field being validated (for error messaging)
+     * @param valueToProcess the string value to check
+     * @throws IllegalArgumentException if the value is null or empty
      */
-    private static void validateNonEmptyString(String field, String value) throws IllegalArgumentException {
-        if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException(field + " is null or empty");
+    private static void validateNonEmptyString(String fieldName, String valueToProcess) throws IllegalArgumentException {
+        if (valueToProcess == null || valueToProcess.isBlank()) {
+            throw new IllegalArgumentException(fieldName + " is null or empty");
         }
     }
 
     /**
-     * Ensures the named field value is non-empty and contains only English or Ukrainian letters, spaces, apostrophes, or hyphens.
+     * Validates that the provided integer value is strictly positive.
      *
-     * @param field name used in thrown exception messages
-     * @param value value to validate
-     * @throws IllegalArgumentException if value is null, blank, or contains invalid characters
+     * @param fieldName      the name of the field being validated (used in the error message)
+     * @param valueToProcess the integer value to check
+     * @throws IllegalArgumentException if the value is less than or equal to zero
      */
-    public static void validateAlphabeticString(String field, String value) throws IllegalArgumentException {
-        validateNonEmptyString(field, value);
-
-        // regex matches only English and Ukrainian characters
-        // Used in fields that don't need too much attention
-        String regex = "^(?=.{1,100}$)[A-Za-zА-Яа-яЁёЄєҐґЇїІі][A-Za-zА-Яа-яЁёЄєҐґЇїІі\\s'\\-]*$";
-        if (!value.matches(regex)) throw new IllegalArgumentException(field + " has invalid characters");
+    private static void validatePositiveInteger(String fieldName, int valueToProcess) throws IllegalArgumentException {
+        if (valueToProcess <= 0) throw new IllegalArgumentException(fieldName + " must be a positive integer");
     }
 
     /**
-     * Validates an academic group name.
+     * Validates that a string contains only alphabetic characters, spaces, apostrophes, or hyphens.
+     * Supports both English and Ukrainian (Cyrillic) character sets.
      *
-     * <p>The name must be 1–100 characters long and may contain English and Ukrainian letters,
-     * digits, underscores (`_`), and hyphens (`-`). The value must not be `null` or blank.
+     * @param fieldName       the name of the field being validated
+     * @param valueToValidate the string value to check
+     * @throws IllegalArgumentException if the string contains invalid characters or exceeds 100 characters
+     */
+    public static void validateAlphabeticString(String fieldName, String valueToValidate) throws IllegalArgumentException {
+        validateNonEmptyString(fieldName, valueToValidate);
+
+        String regex = "^(?=.{1,100}$)[A-Za-zА-Яа-яЁёЄєҐґЇїІі][A-Za-zА-Яа-яЁёЄєҐґЇїІі\\s'\\-]*$";
+        if (!valueToValidate.matches(regex)) throw new IllegalArgumentException(fieldName + " has invalid characters");
+    }
+
+    /**
+     * Validates an academic group identifier.
+     * Allows English/Ukrainian characters, numbers, underscores, and hyphens.
      *
-     * @param value the group name to validate
-     * @throws IllegalArgumentException if the value is `null` or blank, longer than 100 characters,
-     *                                  or contains characters other than English/Ukrainian letters,
-     *                                  digits, underscore, or hyphen
+     * @param value the group string to validate
+     * @throws IllegalArgumentException if the format is invalid or exceeds 100 characters
      */
     public static void validateGroup(String value) throws IllegalArgumentException {
         validateNonEmptyString("Group", value);
 
-        // regex matches only English and Ukrainian characters, numbers, and special characters
-        // Used in fields that doesn't need too much attention
         String regex = "^(?=.{1,100}$)[A-Za-zА-Яа-яЁёЄєҐґЇїІі0-9_-]+$";
         if (!value.matches(regex)) throw new IllegalArgumentException("Group has invalid characters");
     }
 
     /**
-     * Checks that the provided email address is non-empty and conforms to the required email format.
+     * Validates that the provided string is a properly formatted email address.
+     * The email must adhere to standard conventions, including a valid domain and
+     * restrictions on length and character usage.
      *
-     * @param value the email address to validate
-     * @throws IllegalArgumentException if the email is null, blank, or does not match the required format
+     * @param value the email string to validate
+     * @throws IllegalArgumentException if the email is null, empty, or does not match the expected format
      */
     public static void validateEmail(String value) throws IllegalArgumentException {
         validateNonEmptyString("Email", value);
@@ -79,50 +117,47 @@ public final class FieldValidator {
         // and have 1 to 64 characters before the @ symbol
         // allows only English characters, numbers, and special characters
         // that can be used in email addresses
-        String regex = "^(?=.{1,254}$)(?=.{1,64}@)[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
-        if (!value.matches(regex)) throw new IllegalArgumentException("Email doesn't match regex");
+        Pattern regex = Pattern.compile("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@" +
+                "(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = regex.matcher(value);
+
+        if (!matcher.matches()) throw new IllegalArgumentException("Email doesn't match regex");
     }
 
     /**
-     * Ensures the password is not blank and meets the validator's format rules.
+     * Validates that the provided password string meets specified complexity requirements.
+     * The password must adhere to the following rules:
+     * - Must contain at least one digit.
+     * - Must contain at least one lowercase letter.
+     * - Must contain at least one uppercase letter.
+     * - Must contain at least one special character from the set {@code @#!$%^&+=}.
+     * - Must not contain any whitespace characters.
+     * - Must be at least 8 characters in length.
      *
-     * <p>The password must be at least 8 characters long and contain only English letters,
-     * digits, and the special characters -! @ # $ % ^ & * .</p>
-     *
-     * @param value the password to validate
-     * @throws IllegalArgumentException if the password is null, blank, shorter than 8 characters,
-     *                                  or contains characters outside the allowed set
+     * @param value the password string to validate
+     * @throws IllegalArgumentException if the password is null, empty, or does not meet the complexity requirements
      */
     public static void validatePassword(String value) throws IllegalArgumentException {
         validateNonEmptyString("Password", value);
-        if (isPasswordProtected(value)) return;
 
-        // regex matches passwords that have length of at least 8 characters,
-        // allows only English characters
-        // numbers, and special characters that can be used in passwords
-        String charactersRegex = "^[-!@#$%^&*.A-Za-z\\d]{8,}$";
-        if (!(value.length() >= 8)) throw new IllegalArgumentException("Too short password!");
-        if (!value.matches(charactersRegex)) throw new IllegalArgumentException("Invalid characters in password");
+        // ^                 # start-of-string
+        // (?=.*[0-9])       # a digit must occur at least once
+        // (?=.*[a-z])       # a lower case letter must occur at least once
+        // (?=.*[A-Z])       # an upper case letter must occur at least once
+        // (?=.*[@#!$%^&+=])  # a special character must occur at least once
+        // (?=\S+$)          # no whitespace allowed in the entire string
+        // .{8,}             # anything, at least eight places though
+        // $                 # end-of-string
+        String charactersRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#!$%^&+=])(?=\\S+$).{8,}$";
+        if (!value.matches(charactersRegex))
+            throw new IllegalArgumentException("Password must be at least 8 characters, contain at least one digit, one lowercase letter, one uppercase letter, one special character (@#!$%^&+=), and no whitespace");
     }
 
     /**
-     * Checks if the given string value represents a password-protected entity.
-     * The method verifies that the string is exactly 44 characters long
-     * and ends with the '=' character.
+     * Validates that a salary amount is a positive, finite numeric value.
      *
-     * @param value the string to check for password protection; cannot be null
-     * @return {@code true} if the string is 44 characters long and ends with '=', otherwise {@code false}
-     */
-    public static Boolean isPasswordProtected(String value) {
-        validateNonEmptyString("Password", value);
-        return value.length() == 44 && value.endsWith("=");
-    }
-
-    /**
-     * Ensures the salary is a positive finite number.
-     *
-     * @param value the salary amount to validate
-     * @throws IllegalArgumentException if `value` is NaN, infinite, or less than or equal to zero
+     * @param value the double salary value to check
+     * @throws IllegalArgumentException if the value is NaN, infinite, or less than or equal to zero
      */
     public static void validateSalary(double value) throws IllegalArgumentException {
         if (Double.isNaN(value) || Double.isInfinite(value) || value <= 0) {
@@ -131,10 +166,10 @@ public final class FieldValidator {
     }
 
     /**
-     * Ensure an identifier is a positive integer.
+     * Validates that a unique ID is a positive integer.
      *
-     * @param value the identifier to validate
-     * @throws IllegalArgumentException if {@code value} is less than or equal to zero
+     * @param value the integer ID to check
+     * @throws IllegalArgumentException if the ID is zero or negative
      */
     public static void validateId(int value) throws IllegalArgumentException {
         if (value <= 0) {
@@ -143,14 +178,61 @@ public final class FieldValidator {
     }
 
     /**
-     * Ensures the provided score is within the inclusive range 0 to 100.
+     * Validates that a student score falls within the standard 0-100 range.
      *
-     * @param value the score to validate (expected 0–100)
-     * @throws IllegalArgumentException if {@code value} is less than 0 or greater than 100
+     * @param value the integer score to check
+     * @throws IllegalArgumentException if the score is outside the allowed boundaries
      */
     public static void validateScore(int value) throws IllegalArgumentException {
         if (value < 0 || value > 100) {
             throw new IllegalArgumentException("The score should be between 0 and 100.");
         }
     }
+
+    /**
+     * Verifies whether a provided password matches a given hashed password using the specified salt.
+     *
+     * @param value        the raw password string to validate
+     * @param passwordHash the hashed password to compare against
+     * @param salt         the salt value used during the password hashing process
+     * @return true if the raw password matches the hashed password when processed with the salt; false otherwise
+     * @throws IllegalStateException if the pepper is not configured
+     */
+    public static boolean verifyPassword(String value, String passwordHash, String salt) {
+        String pepper = getPepper();
+        return Password.check(value, passwordHash).addSalt(salt).addPepper(pepper).withArgon2();
+    }
+
+    /**
+     * Generates a cryptographically secure random salt value.
+     * Uses SecureRandom for direct byte generation and encodes to Base64.
+     *
+     * @return a securely generated salt value as a Base64-encoded string
+     * @throws IllegalStateException if the salt length is invalid
+     */
+    public static String makeProtectedSalt() {
+        byte[] saltBytes = new byte[getRandomSaltLength()];
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(saltBytes);
+        return Base64.getEncoder().encodeToString(saltBytes);
+    }
+
+    /**
+     * Hashes a raw password string using Argon2id with a specific salt and pepper.
+     * This method secures the password for storage in the database.
+     *
+     * @param value the raw password to protect
+     * @param salt  the salt value used during hashing
+     * @return a hashed string representation of the password
+     * @throws IllegalStateException if the pepper is not configured
+     */
+    public static String makeProtectedPasswordWithSalt(String value, String salt) {
+        String pepper = getPepper();
+        Hash password = Password.hash(value)
+                .addSalt(salt)
+                .addPepper(pepper)
+                .withArgon2();
+        return password.getResult();
+    }
+
 }

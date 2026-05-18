@@ -1,0 +1,162 @@
+package ua.knd11.security.impl;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
+import org.mockito.junit.jupiter.MockitoExtension;
+import ua.knd11.model.Student;
+import ua.knd11.model.User;
+import ua.knd11.model.enums.StudentRole;
+import ua.knd11.security.UserSession;
+import ua.knd11.util.FieldValidator;
+import ua.knd11.util.SQLActions;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mockStatic;
+
+/**
+ * Unit tests for the {@link AuthServiceImpl} class.
+ * Tests authentication logic, input validation, and session management.
+ * Uses Mockito for mocking static SQLActions class.
+ *
+ * @see AuthServiceImpl
+ */
+@ExtendWith(MockitoExtension.class)
+class AuthServiceImplTest {
+
+    private AuthServiceImpl authService;
+
+    /**
+     * Sets up the auth service and ensures clean session state before each test.
+     */
+    @BeforeEach
+    void setUp() {
+        authService = new AuthServiceImpl();
+        if (UserSession.isAuthenticated()) {
+            UserSession.logout();
+        }
+    }
+
+    /**
+     * Cleans up session state after each test.
+     */
+    @AfterEach
+    void tearDown() {
+        if (UserSession.isAuthenticated()) {
+            UserSession.logout();
+        }
+    }
+
+    /**
+     * Tests that login with invalid email format does not authenticate.
+     */
+    @Test
+    void login_WithInvalidEmail_ShouldNotAuthenticate() {
+        authService.login("invalid-email", "Password123!");
+
+        assertFalse(UserSession.isAuthenticated());
+    }
+
+    /**
+     * Tests that login with invalid password does not authenticate.
+     */
+    @Test
+    void login_WithInvalidPassword_ShouldNotAuthenticate() {
+        authService.login("user@example.com", "short");
+
+        assertFalse(UserSession.isAuthenticated());
+    }
+
+    /**
+     * Tests that login when already authenticated keeps the current session.
+     */
+    @Test
+    void login_WhenAlreadyAuthenticated_ShouldNotAuthenticateAgain() {
+        try (MockedStatic<FieldValidator> fieldValidator = mockStatic(FieldValidator.class)) {
+            fieldValidator.when(() -> FieldValidator.makeProtectedSalt()).thenReturn("test-salt");
+            fieldValidator.when(() -> FieldValidator.makeProtectedPasswordWithSalt(anyString(), anyString())).thenReturn("test-hash");
+
+            User user = new User("John", "Doe", "john@example.com", "Password123!") {
+            };
+            UserSession.login(user);
+
+            authService.login("jane@example.com", "Password123!");
+
+            assertEquals(user, UserSession.getCurrentUser());
+        }
+    }
+
+    /**
+     * Tests that login with nonexistent email does not authenticate.
+     * Uses mocked SQLActions to verify database lookup attempts.
+     */
+    @Test
+    void login_WithNonexistentEmail_ShouldNotAuthenticate() {
+        try (MockedStatic<SQLActions> sqlActions = mockStatic(SQLActions.class)) {
+            sqlActions.when(() -> SQLActions.getTeacherByEmail(anyString())).thenReturn(null);
+            sqlActions.when(() -> SQLActions.getStudentByEmail(anyString())).thenReturn(null);
+
+            authService.login("nonexistent@example.com", "Password123!");
+
+            assertFalse(UserSession.isAuthenticated());
+            sqlActions.verify(() -> SQLActions.getTeacherByEmail("nonexistent@example.com"));
+            sqlActions.verify(() -> SQLActions.getStudentByEmail("nonexistent@example.com"));
+        }
+    }
+
+    /**
+     * Tests successful DB-backed login with correct credentials.
+     * Verifies that UserSession contains the authenticated user after login.
+     */
+    @Test
+    void login_WithValidDbCredentials_ShouldAuthenticate() {
+        String email = "student@example.com";
+        String plaintextPassword = "Password123!";
+        String salt = "test-salt";
+        String hashedPassword = "test-hash";
+
+        Student mockStudent = new Student("Test", "Student", "KND-11", email, hashedPassword, salt, StudentRole.REGULAR);
+
+        try (MockedStatic<SQLActions> sqlActions = mockStatic(SQLActions.class);
+             MockedStatic<FieldValidator> fieldValidator = mockStatic(FieldValidator.class)) {
+
+            fieldValidator.when(() -> FieldValidator.makeProtectedSalt()).thenReturn(salt);
+            fieldValidator.when(() -> FieldValidator.makeProtectedPasswordWithSalt(anyString(), anyString())).thenReturn(hashedPassword);
+            fieldValidator.when(() -> FieldValidator.verifyPassword(anyString(), anyString(), anyString())).thenReturn(true);
+            
+            sqlActions.when(() -> SQLActions.getTeacherByEmail(email)).thenReturn(null);
+            sqlActions.when(() -> SQLActions.getStudentByEmail(email)).thenReturn(mockStudent);
+
+            authService.login(email, plaintextPassword);
+
+            assertTrue(UserSession.isAuthenticated());
+            assertEquals(mockStudent, UserSession.getCurrentUser());
+        }
+    }
+
+    /**
+     * Tests that login returns early without DB lookup when already authenticated.
+     * Verifies that SQLActions methods are never called when session exists.
+     */
+    @Test
+    void login_WhenAlreadyAuthenticated_ShouldNotQueryDatabase() {
+        try (MockedStatic<FieldValidator> fieldValidator = mockStatic(FieldValidator.class)) {
+            fieldValidator.when(() -> FieldValidator.makeProtectedSalt()).thenReturn("test-salt");
+            fieldValidator.when(() -> FieldValidator.makeProtectedPasswordWithSalt(anyString(), anyString())).thenReturn("test-hash");
+
+            User user = new User("John", "Doe", "john@example.com", "Password123!") {
+            };
+            UserSession.login(user);
+
+            try (MockedStatic<SQLActions> sqlActions = mockStatic(SQLActions.class)) {
+                authService.login("jane@example.com", "Password123!");
+
+                assertEquals(user, UserSession.getCurrentUser());
+                sqlActions.verifyNoInteractions();
+            }
+        }
+    }
+}

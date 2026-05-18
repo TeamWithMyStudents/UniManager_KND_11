@@ -1,28 +1,34 @@
 package ua.knd11.model;
 
+import lombok.Getter;
 import ua.knd11.util.FieldValidator;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 
 /**
- * Represents a scheduled lesson in the university timetable.
+ * Data model representing a scheduled academic lesson.
+ * Stores information regarding the day of the week, start time, subject name,
+ * and the surname of the assigned teacher.
  */
+@Getter
 public class Lesson {
+    /** The day of the week the lesson takes place */
     private DayOfWeek dayOfWeek;
+    /** The specific start time of the lesson */
     private LocalTime time;
+    /** The name of the subject being taught */
     private String subject;
+    /** The surname of the teacher conducting the lesson */
     private String teacherSurname;
 
     /**
-     * Create a Lesson with validated day, time, subject, and teacher surname.
-     *
-     * @param dayOfWeek      the scheduled day of the lesson; must not be null
-     * @param time           the lesson start time; must not be null
-     * @param subject        the subject name; must be an alphabetic, non-empty string
-     * @param teacherSurname the teacher's surname; must be an alphabetic, non-empty string
-     * @throws IllegalArgumentException if {@code dayOfWeek} or {@code time} is null, or if {@code subject}
-     *                                  or {@code teacherSurname} fails alphabetic validation
+     * Constructs a new Lesson instance with validation for all fields.
+     * @param dayOfWeek      the day of the week (cannot be null)
+     * @param time           the start time (cannot be null)
+     * @param subject        the name of the subject (must be alphabetic)
+     * @param teacherSurname the surname of the teacher (must be alphabetic)
+     * @throws IllegalArgumentException if null values are provided or if string validation fails
      */
     public Lesson(DayOfWeek dayOfWeek, LocalTime time, String subject, String teacherSurname)
             throws IllegalArgumentException {
@@ -37,19 +43,9 @@ public class Lesson {
     }
 
     /**
-     * Gets day of week.
-     *
-     * @return the day of week
-     */
-    public DayOfWeek getDayOfWeek() {
-        return dayOfWeek;
-    }
-
-    /**
-     * Sets the lesson's day of week.
-     *
-     * @param dayOfWeek the new day of week
-     * @throws IllegalArgumentException if {@code dayOfWeek} is null
+     * Updates the day of the week for this lesson.
+     * @param dayOfWeek the new day of the week to set
+     * @throws IllegalArgumentException if the provided day is null
      */
     public void setDayOfWeek(DayOfWeek dayOfWeek) {
         if (dayOfWeek == null) throw new IllegalArgumentException("DayOfWeek must not be null");
@@ -57,19 +53,9 @@ public class Lesson {
     }
 
     /**
-     * Get the lesson's scheduled start time.
-     *
-     * @return the scheduled start time of this lesson
-     */
-    public LocalTime getTime() {
-        return time;
-    }
-
-    /**
-     * Set the lesson start time.
-     *
-     * @param time the lesson start time; must not be null
-     * @throws IllegalArgumentException if {@code time} is null
+     * Updates the start time for this lesson.
+     * @param time the new time to set
+     * @throws IllegalArgumentException if the provided time is null
      */
     public void setTime(LocalTime time) {
         if (time == null) throw new IllegalArgumentException("Time must not be null");
@@ -77,19 +63,9 @@ public class Lesson {
     }
 
     /**
-     * Gets the lesson subject.
-     *
-     * @return the lesson subject
-     */
-    public String getSubject() {
-        return subject;
-    }
-
-    /**
-     * Set the lesson's subject after validating its value.
-     *
-     * @param subject the subject name; must contain only alphabetic characters
-     * @throws IllegalArgumentException if {@code subject} is {@code null} or contains non-alphabetic characters
+     * Updates the subject name with alphabetic validation.
+     * @param subject the new subject name
+     * @throws IllegalArgumentException if the name contains non-alphabetic characters
      */
     public void setSubject(String subject) throws IllegalArgumentException {
         FieldValidator.validateAlphabeticString("Subject", subject);
@@ -97,19 +73,9 @@ public class Lesson {
     }
 
     /**
-     * Gets teacher surname.
-     *
-     * @return the teacher surname
-     */
-    public String getTeacherSurname() {
-        return teacherSurname;
-    }
-
-    /**
-     * Sets the teacher's surname after validating it contains only alphabetic characters.
-     *
-     * @param teacherSurname the teacher's surname; must contain only alphabetic characters
-     * @throws IllegalArgumentException if `teacherSurname` is null, empty, or contains non-alphabetic characters
+     * Updates the teacher's surname with alphabetic validation.
+     * @param teacherSurname the new surname of the teacher
+     * @throws IllegalArgumentException if the surname contains non-alphabetic characters
      */
     public void setTeacherSurname(String teacherSurname) throws IllegalArgumentException {
         FieldValidator.validateAlphabeticString("Teacher Surname", teacherSurname);
@@ -117,9 +83,8 @@ public class Lesson {
     }
 
     /**
-     * Produce a string representation of the lesson containing its day of week, time, subject, and teacher surname.
-     *
-     * @return a string in the form Lesson{dayOfWeek=..., time=..., subject='...', teacherSurname='...'}
+     * Returns a string representation of the lesson details.
+     * @return a string containing the day, time, subject, and teacher surname
      */
     @Override
     public String toString() {

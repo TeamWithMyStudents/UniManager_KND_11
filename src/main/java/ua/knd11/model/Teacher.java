@@ -1,32 +1,31 @@
 package ua.knd11.model;
 
+import lombok.Getter;
 import ua.knd11.util.FieldValidator;
 
 /**
- * <p>The teacher model that extends from the {@link User}
- * <p>has unique fields for department, degree, and salary
- *
- * @see User
+ * Data model representing a Teacher, extending the base {@link User} class.
+ * Stores professional information including academic department, degree, and salary.
  */
+@Getter
 public class Teacher extends User {
+    /** The academic department the teacher belongs to */
     private String department;
+    /** The teacher's academic degree (e.g., Professor, PhD, Master) */
     private String degree;
+    /** The teacher's monthly or annual salary amount */
     private double salary;
 
     /**
-     * Creates a Teacher with the specified personal, contact, and professional details.
-     *
-     * <p>Validates the department and degree as alphabetic strings and validates the salary value;
-     * throws IllegalArgumentException on validation failure.
-     *
-     * @param name       the teacher's given name
-     * @param surname    the teacher's family name
-     * @param department the teacher's department or faculty
-     * @param degree     the teacher's academic degree or qualification
-     * @param salary     the teacher's salary
-     * @param email      the teacher's email address
-     * @param password   the teacher's account password
-     * @throws IllegalArgumentException if any provided field fails validation
+     * Constructs a new Teacher instance with full field validation.
+     * @param name       the first name of the teacher
+     * @param surname    the last name of the teacher
+     * @param department the department name (must be alphabetic)
+     * @param degree     the academic degree (must be alphabetic)
+     * @param salary     the salary value (must pass numeric validation)
+     * @param email      the unique email address
+     * @param password   the account password
+     * @throws IllegalArgumentException if validation checks fail via {@link FieldValidator}
      */
     public Teacher(String name, String surname, String department, String degree, double salary, String email, String password)
             throws IllegalArgumentException {
@@ -40,19 +39,30 @@ public class Teacher extends User {
     }
 
     /**
-     * Department of the teacher.
+     * Constructor for database fill.
+     * Bypasses validation and hashing to save stored values.
      *
-     * @return the teacher's department
+     * @param name       the first name
+     * @param surname    the last name
+     * @param department the department name
+     * @param degree     the academic degree
+     * @param salary     the salary value
+     * @param email      the email address
+     * @param password   the stored hashed password
+     * @param salt       the stored salt
      */
-    public String getDepartment() {
-        return department;
+    public Teacher(String name, String surname, String department, String degree, double salary, String email, String password, String salt) {
+        super(name, surname, email, password, salt);
+        this.department = department;
+        this.degree = degree;
+        this.salary = salary;
     }
 
     /**
-     * Set the teacher's department after validating it contains only alphabetic characters.
+     * Updates the academic department with alphabetic validation.
      *
-     * @param department the department name; must contain only alphabetic characters
-     * @throws IllegalArgumentException if the department is null, empty, or contains non-alphabetic characters
+     * @param department the new department name
+     * @throws IllegalArgumentException if the string contains non-alphabetic characters
      */
     @SuppressWarnings("unused")
     public void setDepartment(String department) throws IllegalArgumentException {
@@ -61,19 +71,10 @@ public class Teacher extends User {
     }
 
     /**
-     * Retrieves the teacher's academic degree.
+     * Updates the academic degree with alphabetic validation.
      *
-     * @return the teacher's academic degree
-     */
-    public String getDegree() {
-        return degree;
-    }
-
-    /**
-     * Sets the teacher's academic degree or qualification.
-     *
-     * @param degree the degree or qualification (e.g., "PhD", "Master") to assign
-     * @throws IllegalArgumentException if {@code degree} is null, empty, or contains non-alphabetic characters
+     * @param degree the new academic degree
+     * @throws IllegalArgumentException if the string contains non-alphabetic characters
      */
     @SuppressWarnings("unused")
     public void setDegree(String degree) throws IllegalArgumentException {
@@ -82,19 +83,10 @@ public class Teacher extends User {
     }
 
     /**
-     * Get the teacher's salary.
+     * Updates the salary amount with numeric validation.
      *
-     * @return the current salary of the teacher
-     */
-    public double getSalary() {
-        return salary;
-    }
-
-    /**
-     * Updates the teacher's salary.
-     *
-     * @param salary the salary amount
-     * @throws IllegalArgumentException if the salary fails validation
+     * @param salary the new salary value
+     * @throws IllegalArgumentException if the salary amount is invalid
      */
     @SuppressWarnings("unused")
     public void setSalary(double salary) throws IllegalArgumentException {
@@ -103,9 +95,10 @@ public class Teacher extends User {
     }
 
     /**
-     * Produces a single-line string representation of the teacher including id, name, surname, department, degree, and salary.
+     * Returns a detailed string representation of the Teacher.
+     * Includes inherited fields from {@link User} such as ID and Full Name.
      *
-     * @return a formatted string containing the teacher's id, name, surname, department, degree, and salary
+     * @return a formatted string containing teacher professional details
      */
     @Override
     public String toString() {

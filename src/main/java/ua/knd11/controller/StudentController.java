@@ -7,6 +7,7 @@ import ua.knd11.service.JournalService;
 import ua.knd11.service.ScheduleService;
 import ua.knd11.service.StudentService;
 import ua.knd11.service.impl.StudentServiceImpl;
+import ua.knd11.util.FieldValidator;
 
 import java.time.DayOfWeek;
 import java.util.List;
@@ -101,7 +102,29 @@ public class StudentController {
     }
 
     /**
-     * Assigns the student with the given ID as a head student.
+     * Service layer instance for student data processing
+     */
+    private final StudentService service;
+
+    /**
+     * Constructs a StudentController with the default service implementation.
+     */
+    public StudentController() {
+        this(new StudentServiceImpl());
+    }
+
+    /**
+     * Constructs a StudentController with a provided service instance.
+     * Allows for dependency injection, primarily for testing purposes.
+     *
+     * @param service the StudentService implementation to use
+     */
+    public StudentController(StudentService service) {
+        this.service = service;
+    }
+
+    /**
+     * Assigns a specific student as the head student based on their unique ID.
      *
      * @param id the student's unique identifier
      */
@@ -110,56 +133,59 @@ public class StudentController {
     }
 
     /**
-     * Creates and adds a new Student parsed from a single-line input string.
-     * * @param input raw string containing student details (Name, Surname, Lastname, Group, Email, Password)
+     * Parses a raw string input from the terminal to add a new student.
+     * The input is expected to contain exactly 5 space-separated fields:
+     * Name, Surname, Group, Email, and Password.
+     *
+     * @param value the raw string containing student data from the terminal
      */
-    public void create(String input) {
-        String normalized = input.trim().replace(",", " ");
-        String[] parts = normalized.split("\\s+");
-        if (parts.length != 6) {
-            System.out.println("Error: Expected 6 fields (Name Surname Lastname Group Email Password).");
+    public void addStudentFromTerminal(String value) {
+        String[] parts = value.trim().split("\\s+");
+        if (parts.length != 5) {
+            System.out.println("Error: Expected 5 fields (Name Surname Group Email@example.com Password).");
             return;
         }
-
         try {
-            Student student = new Student(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5]);
-            if (studentManagementService.add(student)) {
-                System.out.println("Student added successfully!");
-            } else {
-                System.out.println("Student wasn't added.");
-            }
+            service.addStudent(createStudentWithParts(parts));
         } catch (IllegalArgumentException e) {
-            System.err.println("Error: " + e.getMessage());
+            System.err.println(e.getMessage());
         }
     }
 
     /**
-     * Removes the student with the given identifier from the system.
+     * Validates individual data parts and constructs a new Student object.
+     * Performs field-level validation using {@link FieldValidator}.
      *
-     * @param id the identifier of the student to remove
+     * @param parts an array of strings representing the student's attributes
+     * @return a new {@link Student} object populated with the validated data
      */
-    public void delete(int id) {
-        if (studentManagementService.delete(id)) {
-            System.out.println("Student successfully deleted.");
-        } else {
-            System.out.println("Student with ID " + id + " was not found.");
-        }
+    private Student createStudentWithParts(String[] parts) throws IllegalArgumentException {
+        FieldValidator.validateAlphabeticString("name", parts[0]);
+        FieldValidator.validateAlphabeticString("surname", parts[1]);
+        FieldValidator.validateGroup(parts[2]);
+        FieldValidator.validateEmail(parts[3]);
+        FieldValidator.validatePassword(parts[4]);
+        return new Student(parts[0], parts[1], parts[2], parts[3], parts[4]);
     }
 
     /**
-     * Retrieves and prints a list of all Student instances in the repository.
+     * Deletes a student from the system using their unique identifier.
+     *
+     * @param id the unique ID of the student to be removed
+     */
+    public void deleteStudent(int id) {
+        service.deleteStudent(id);
+    }
+
+    /**
+     * Retrieves all students from the service and prints them to the console.
+     * Displays a "No students found" message if the collection is empty.
      */
     public void getAll() {
-        List<User> users = studentManagementService.getAll();
-        boolean found = false;
-        for (User user : users) {
-            if (user instanceof Student student) {
-                System.out.println(student);
-                found = true;
-            }
-        }
-        if (!found) {
-            System.err.println("No students found in the repository.\n");
+        List<Student> students = service.getAllStudents();
+        students.stream().filter(Objects::nonNull).forEach(System.out::println);
+        if (students.isEmpty()) {
+            System.out.println("No students found");
         }
     }
 }

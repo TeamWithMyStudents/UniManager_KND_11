@@ -2,7 +2,10 @@ package ua.knd11.viewer;
 
 import ua.knd11.controller.StudentController;
 import ua.knd11.controller.TeacherController;
+import ua.knd11.security.UserSession;
+import ua.knd11.security.impl.AuthServiceImpl;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 /**
@@ -32,6 +35,7 @@ public class ConsoleMenu {
      * Directs the user to the appropriate sub-menus based on their choice.
      */
     public void startMenu() {
+        LogOrReg();
         while (true) {
             System.out.println("\n===== UNIVERSITY MANAGEMENT SYSTEM =====");
             System.out.println("1. STUDENT SECTION (Grades, Schedule, Profile)");

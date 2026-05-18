@@ -1,62 +1,65 @@
 package ua.knd11.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import ua.knd11.model.enums.StudentRole;
 import ua.knd11.util.FieldValidator;
 
 import java.util.Locale;
 
 /**
- * <p>The student model that extends from the {@link User}
- * <p>has unique fields group, lastname, and role
- *
- * @see User
+ * Data model representing a Student, extending the base {@link User} class.
+ * Includes student-specific attributes such as an academic group and a system role.
  */
+@Getter
 public class Student extends User {
+    /** The academic group the student belongs to (e.g., "KND-11") */
     private String group;
-    private String lastname;
+    /** The role of the student in the system, determining specific permissions */
+    @Setter
     private StudentRole role;
 
     /**
-     * Creates a Student with the given personal and authentication data after validating inputs.
-     *
-     * <p>Validates `group` and `lastname`, initializes user fields via {@link User#User(String, String, String, String)},
-     * stores `group` in uppercase (Locale.ROOT), assigns `lastname` as provided, and sets the initial role to
-     * {@link StudentRole#REGULAR}.
-     *
-     * @param name     given name
-     * @param surname  family name
-     * @param lastname family middle/last name; must contain only alphabetic characters
-     * @param group    group identifier; validated and stored in uppercase
-     * @param email    email address
-     * @param password account password
-     * @throws IllegalArgumentException if any validation fails
+     * Constructs a new Student instance and initializes them with a REGULAR role.
+     * The group name is automatically normalized to uppercase.
+     * @param name     the first name of the student
+     * @param surname  the last name of the student
+     * @param group    the academic group identifier
+     * @param email    the unique email address
+     * @param password the account password
+     * @throws IllegalArgumentException if field validation fails via {@link FieldValidator}
      */
-    public Student(String name, String surname, String lastname, String group, String email, String password)
+    public Student(String name, String surname, String group, String email, String password)
             throws IllegalArgumentException {
         super(name, surname, email, password);
         FieldValidator.validateGroup(group);
-        FieldValidator.validateAlphabeticString("Lastname", lastname);
         this.group = group.toUpperCase(Locale.ROOT);
-        this.lastname = lastname;
         this.role = StudentRole.REGULAR;
     }
 
     /**
-     * Retrieves the student's group identifier.
+     * Constructor for database fill.
+     * Bypasses validation and hashing to save stored values.
      *
-     * @return the student's group identifier in uppercase using Locale.ROOT
+     * @param name     the first name
+     * @param surname  the last name
+     * @param group    the academic group
+     * @param email    the email address
+     * @param password the stored hashed password
+     * @param salt     the stored salt
+     * @param role     the student role
      */
-    public String getGroup() {
-        return group.toUpperCase(Locale.ROOT);
+    public Student(String name, String surname, String group, String email, String password, String salt, StudentRole role) {
+        super(name, surname, email, password, salt);
+        this.group = group;
+        this.role = role;
     }
 
     /**
-     * Set the student's group code.
-     * <p>
-     * The provided group is validated and then stored in uppercase using Locale.ROOT.
-     *
-     * @param group the group code to assign; may be normalized to uppercase
-     * @throws IllegalArgumentException if the group value is invalid
+     * Updates the academic group name with validation.
+     * Normalizes the input string to uppercase for consistency.
+     * @param group the new academic group identifier
+     * @throws IllegalArgumentException if the group format is invalid
      */
     @SuppressWarnings("unused")
     public void setGroup(String group) throws IllegalArgumentException {
@@ -65,50 +68,15 @@ public class Student extends User {
     }
 
     /**
-     * Retrieves the student's lastname.
-     *
-     * @return the student's lastname
+     * Returns a detailed string representation of the Student.
+     * Includes inherited fields from {@link User} such as ID and Email.
+     * @return a formatted string of student details
      */
-    public String getLastname() {
-        return lastname;
-    }
-
-    /**
-     * Set the student's lastname after validating it contains only alphabetic characters.
-     *
-     * @param lastname the student's family name
-     * @throws IllegalArgumentException if the lastname is null, empty, or contains non-alphabetic characters
-     */
-    @SuppressWarnings("unused")
-    public void setLastname(String lastname) throws IllegalArgumentException {
-        FieldValidator.validateAlphabeticString("Lastname", lastname);
-        this.lastname = lastname;
-    }
-
-    /**
-     * Gets the student's role.
-     *
-     * @return the student's role
-     */
-    public StudentRole getRole() {
-        return role;
-    }
-
-    /**
-     * Assigns the student's role.
-     *
-     * @param role the role to assign to the student
-     */
-    public void setRole(StudentRole role) {
-        this.role = role;
-    }
-
     @Override
     public String toString() {
         return "Id: " + getId() +
                 ", Name: " + getName() +
                 ", Surname: " + getSurname() +
-                ", Lastname: " + getLastname() +
                 ", Group: " + getGroup() +
                 ", Role: " + getRole() +
                 ", Email: " + getEmail();

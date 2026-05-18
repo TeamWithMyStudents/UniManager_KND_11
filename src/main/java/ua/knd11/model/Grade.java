@@ -1,22 +1,27 @@
 package ua.knd11.model;
 
+import lombok.Getter;
 import ua.knd11.util.FieldValidator;
 
 /**
- * Represents a student's grade for a specific subject.
+ * Data model representing a grade assigned to a student for a specific subject.
+ * Includes built-in validation for student IDs, subject names, and score ranges.
  */
+@Getter
 public class Grade {
+    /** The unique identifier of the student associated with this grade */
     private int studentId;
+    /** The name of the academic subject */
     private String subject;
+    /** The numeric score achieved by the student */
     private int score;
 
     /**
-     * Constructs a new Grade with validated information.
-     *
-     * @param studentId student's unique ID
-     * @param subject   subject name
-     * @param score     numerical score (0-100)
-     * @throws IllegalArgumentException if any field is invalid
+     * Constructs a new Grade instance with full validation of provided data.
+     * @param studentId the unique ID of the student
+     * @param subject   the name of the subject (must be alphabetic)
+     * @param score     the numeric grade value
+     * @throws IllegalArgumentException if any validation check fails via {@link FieldValidator}
      */
     public Grade(int studentId, String subject, int score)
             throws IllegalArgumentException {
@@ -29,19 +34,9 @@ public class Grade {
     }
 
     /**
-     * Retrieve the student's identifier.
-     *
-     * @return the student's ID
-     */
-    public int getStudentId() {
-        return studentId;
-    }
-
-    /**
-     * Sets the student's identifier.
-     *
-     * @param studentId the student's identifier; must be a positive integer
-     * @throws IllegalArgumentException if the provided `studentId` is invalid
+     * Updates the student ID with validation.
+     * @param studentId the new student ID to set
+     * @throws IllegalArgumentException if the ID format is invalid
      */
     public void setStudentId(int studentId) throws IllegalArgumentException {
         FieldValidator.validateId(studentId);
@@ -49,19 +44,9 @@ public class Grade {
     }
 
     /**
-     * Subject name associated with this grade.
-     *
-     * @return the subject name
-     */
-    public String getSubject() {
-        return subject;
-    }
-
-    /**
-     * Set the subject name for this grade.
-     *
-     * @param subject the subject name consisting only of alphabetic characters
-     * @throws IllegalArgumentException if `subject` is null, empty, or contains non-alphabetic characters
+     * Updates the subject name with validation.
+     * @param subject the new subject name to set
+     * @throws IllegalArgumentException if the name is not purely alphabetic
      */
     public void setSubject(String subject) throws IllegalArgumentException {
         FieldValidator.validateAlphabeticString("Subject", subject);
@@ -69,19 +54,9 @@ public class Grade {
     }
 
     /**
-     * Retrieves the student's score for the subject.
-     *
-     * @return the student's score
-     */
-    public int getScore() {
-        return score;
-    }
-
-    /**
-     * Sets the grade's score.
-     *
-     * @param score the score value (0-100)
-     * @throws IllegalArgumentException if the score is less than 0 or greater than 100
+     * Updates the numeric score with validation.
+     * @param score the new score value to set
+     * @throws IllegalArgumentException if the score falls outside the allowed range
      */
     public void setScore(int score) throws IllegalArgumentException {
         FieldValidator.validateScore(score);
@@ -89,9 +64,8 @@ public class Grade {
     }
 
     /**
-     * Produces a single-line textual representation of this grade.
-     *
-     * @return a string formatted as "Grade [Student ID: %d, subject: '%s', score: %d]" containing this grade's studentId, subject, and score
+     * Returns a formatted string representation of the Grade object.
+     * @return a string containing the student ID, subject name, and score
      */
     @Override
     public String toString() {

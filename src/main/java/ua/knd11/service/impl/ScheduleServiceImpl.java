@@ -16,9 +16,7 @@ import java.util.List;
  */
 public class ScheduleServiceImpl implements ScheduleService {
 
-    /**
-     * In-memory repository storing all scheduled lessons.
-     */
+    /** Internal collection storing all scheduled lessons */
     private final List<Lesson> lessons = new ArrayList<>();
 
     /**
@@ -32,15 +30,12 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public void addLesson(String day, String time, String subject, String teacherSurname) {
         if (day == null || day.trim().isEmpty() || time == null || time.trim().isEmpty()) {
-            System.err.println("[ERROR] Day and time cannot be empty.");
+            System.err.println("Day and time cannot be empty.");
             return;
         }
 
         try {
-            DayOfWeek dayOfWeekEnum = parseDayOfWeek(day);
-            LocalTime localTime = LocalTime.parse(time.trim());
-
-            Lesson lesson = new Lesson(dayOfWeekEnum, localTime, subject, teacherSurname);
+            Lesson lesson = new Lesson(parseDayOfWeek(day), LocalTime.parse(time.trim()), subject, teacherSurname);
             lessons.add(lesson);
             System.out.println("[LOG] Successfully added lesson: " + subject + " on " + dayOfWeekEnum + " at " + time);
 

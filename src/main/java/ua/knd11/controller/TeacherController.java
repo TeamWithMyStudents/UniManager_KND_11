@@ -32,6 +32,70 @@ public class TeacherController {
     }
 
     /**
+     * Parses a raw string input from the terminal and attempts to add a new teacher.
+     * Expects exactly 7 space-separated fields: Name, Surname, Department, Degree, Salary, Email, and Password.
+     *
+     * @param value the raw string input containing teacher data
+     */
+    public void addTeacherFromTerminal(String value) {
+        String[] parts = value.trim().split("\\s+");
+        if (parts.length != 7) {
+            System.err.println("Error: Expected 7 fields (Name Surname Dept Degree Salary Email@example.com Password).");
+            return;
+        }
+        try {
+            service.addTeacher(createTeacherWithParts(parts));
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    /**
+     * Internal helper to validate input parts and create a Teacher model object.
+     * Uses {@link FieldValidator} to ensure data integrity for sensitive fields.
+     *
+     * @param parts an array of strings representing teacher attributes
+     * @return a new {@link Teacher} object populated with validated data
+     */
+    private Teacher createTeacherWithParts(String[] parts) throws IllegalArgumentException {
+        FieldValidator.validateAlphabeticString("name", parts[0]);
+        FieldValidator.validateAlphabeticString("surname", parts[1]);
+        FieldValidator.validateAlphabeticString("department", parts[2]);
+        FieldValidator.validateAlphabeticString("degree", parts[3]);
+        try {
+            FieldValidator.validateSalary(Double.parseDouble(parts[4]));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Salary must be a valid number");
+        }
+        FieldValidator.validateEmail(parts[5]);
+        FieldValidator.validatePassword(parts[6]);
+        return new Teacher(parts[0], parts[1], parts[2], parts[3], Double.parseDouble(parts[4]), parts[5], parts[6]);
+    }
+
+    /**
+     * Removes a teacher from the system based on their unique identifier.
+     *
+     * @param id the unique identifier of the teacher to be deleted
+     */
+    public void deleteTeacher(int id) {
+        service.deleteTeacher(id);
+    }
+
+    /**
+     * Fetches all teachers from the service layer and prints them to the terminal.
+     * Displays an empty state message if no teachers are currently registered.
+     */
+    public void getAll() {
+        List<Teacher> teachers = service.getAllTeachers();
+        teachers.stream().filter(Objects::nonNull).forEach(System.out::println);
+        if (teachers.isEmpty()) {
+            System.out.println("No teachers found");
+        }
+    }
+
+    /**
+     * Triggers the calculation of the total salary expenditure for all teachers.
+     * Results are handled by the service layer's output.
      * Displays the teacher-specific menu and handles user interactions.
      *
      * @param scanner the scanner used for console input
@@ -119,28 +183,11 @@ public class TeacherController {
     }
 
     /**
-     * Creates and adds a new teacher profile to the system.
-     * * @param input raw string containing teacher details separated by spaces
+     * Filters and displays teachers based on their academic degree.
+     *
+     * @param degree the academic degree string to filter by (e.g., "PhD", "Master")
      */
-    public void create(String input) {
-        String normalized = input.trim().replace(",", " ");
-        String[] parts = normalized.split("\\s+");
-
-        if (parts.length != 7) {
-            System.out.println("Error: Expected 7 fields (Name Surname Dept Degree Salary Email Password).");
-            return;
-        }
-
-        try {
-            double salary = Double.parseDouble(parts[4]);
-            Teacher teacher = new Teacher(parts[0], parts[1], parts[2], parts[3], salary, parts[5], parts[6]);
-            if (teacherProfileService.add(teacher)) {
-                System.out.println("Teacher added successfully!");
-            } else {
-                System.out.println("Teacher wasn't added.");
-            }
-        } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
-        }
+    public void filterByDegree(String degree) {
+        service.filterByDegree(degree);
     }
 }

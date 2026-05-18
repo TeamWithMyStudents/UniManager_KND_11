@@ -1,20 +1,15 @@
 package ua.knd11.service;
 
-/**
- * Service interface for student-specific operations.
- */
-public interface StudentService extends UserService {
-    /**
-     * Finds students by group name.
-     *
-     * @param groupName the academic group to search for
-     */
-    void findByGroup(String groupName);
+import ua.knd11.model.Student;
 
-    /**
-     * Assigns the head-student role to the student with the given identifier.
-     *
-     * @param studentId the student's identifier (e.g., database primary key)
-     */
+import java.util.ArrayList;
+
+public interface StudentService {
     void assignHeadStudent(int studentId);
+
+    void addStudent(Student student);
+
+    void deleteStudent(int id);
+
+    ArrayList<Student> getAllStudents();
 }

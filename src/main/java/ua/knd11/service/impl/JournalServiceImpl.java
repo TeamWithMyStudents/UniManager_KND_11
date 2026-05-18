@@ -7,30 +7,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Implementation of the {@link JournalService}.
- * Manages an in-memory repository of student grades and provides functionality
- * to assign grades, retrieve them safely, and generate academic reports.
+ * Implementation of the {@link JournalService} interface.
+ * Provides functionality for recording student grades, retrieving grade histories,
+ * and generating academic record reports.
  */
 public class JournalServiceImpl implements JournalService {
 
-    /**
-     * Internal in-memory list storing all assigned grades.
-     */
+    /** Internal storage for all grade records in the system */
     private final List<Grade> grades = new ArrayList<>();
 
     /**
      * Assigns a new grade to a student for a specific subject and stores it in the repository.
      *
      * @param studentId the unique identifier of the student
-     * @param subject   the name of the subject
-     * @param score     the numeric score achieved by the student
+     * @param subject   the name of the academic subject
+     * @param score     the numeric score achieved
      */
     @Override
     public void assignGrade(int studentId, String subject, int score) {
         try {
             Grade newGrade = new Grade(studentId, subject, score);
             grades.add(newGrade);
-            System.out.println("[LOG] Successfully assigned grade: " + score + " for subject '" + subject + "' to Student ID: " + studentId);
+            System.out.println("Successfully assigned grade: " + score + " for subject '" + subject + "' to Student : " + studentId);
         } catch (IllegalArgumentException e) {
             System.err.println("[ERROR] Failed to assign grade: " + e.getMessage());
         }
@@ -49,7 +47,7 @@ public class JournalServiceImpl implements JournalService {
                 .filter(grade -> grade.getStudentId() == studentId)
                 // Creating defensive copies to protect the internal state
                 .map(original -> new Grade(original.getStudentId(), original.getSubject(), original.getScore()))
-                .toList();
+                .collect(java.util.stream.Collectors.toList());
     }
 
     /**
