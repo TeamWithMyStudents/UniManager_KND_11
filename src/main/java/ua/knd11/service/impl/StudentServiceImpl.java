@@ -3,6 +3,7 @@ package ua.knd11.service.impl;
 import ua.knd11.model.Student;
 import ua.knd11.model.enums.StudentRole;
 import ua.knd11.service.StudentService;
+import ua.knd11.util.FieldValidator;
 import ua.knd11.util.SQLActions;
 
 import java.util.ArrayList;
@@ -13,7 +14,6 @@ import java.util.ArrayList;
  * specialized operations like assigning a Head Student within an academic group.
  */
 public class StudentServiceImpl implements StudentService {
-
     /**
      * Assigns the "Head Student" (Starosta) role to a specific student.
      * This operation first demotes any existing head students in the same group
@@ -39,21 +39,19 @@ public class StudentServiceImpl implements StudentService {
     }
 
     /**
-     * Persists a new student record into the database.
-     * @param student the student object to be added
+     * Validates individual data parts and constructs a new Student object.
+     * Performs field-level validation using {@link FieldValidator}.
+     *
+     * @param parts an array of strings representing the student's attributes
+     * @return a new {@link Student} object populated with the validated data
      */
-    @Override
-    public void addStudent(Student student) {
-        SQLActions.addStudentToDB(student);
-    }
-
-    /**
-     * Permanently removes a student from the database using their unique ID.
-     * @param id the unique identifier of the student to be deleted
-     */
-    @Override
-    public void deleteStudent(int id) {
-        SQLActions.deleteStudentFromDBWithID(id);
+    public Student createStudentWithParts(String[] parts) throws IllegalArgumentException {
+        FieldValidator.validateAlphabeticString("name", parts[0]);
+        FieldValidator.validateAlphabeticString("surname", parts[1]);
+        FieldValidator.validateGroup(parts[2]);
+        FieldValidator.validateEmail(parts[3]);
+        FieldValidator.validatePassword(parts[4]);
+        return new Student(parts[0], parts[1], parts[2], parts[3], parts[4]);
     }
 
     /**

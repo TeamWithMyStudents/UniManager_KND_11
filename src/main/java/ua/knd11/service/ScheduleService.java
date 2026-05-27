@@ -10,4 +10,6 @@ public interface ScheduleService {
     void addLesson(String day, String time, String subject, String teacherSurname);
 
     List<Lesson> getLessonsByDay(DayOfWeek dayOfWeek);
+
+    DayOfWeek parseDayOfWeek(String day);
 }

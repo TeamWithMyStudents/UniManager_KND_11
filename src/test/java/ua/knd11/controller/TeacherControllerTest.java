@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ua.knd11.service.impl.JournalServiceImpl;
+import ua.knd11.service.impl.ScheduleServiceImpl;
 import ua.knd11.util.SQLActions;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -26,7 +28,7 @@ class TeacherControllerTest {
      */
     @BeforeEach
     void setUp() {
-        teacherController = new TeacherController();
+        teacherController = new TeacherController(new JournalServiceImpl(), new ScheduleServiceImpl());
     }
 
     @AfterAll
@@ -130,7 +132,7 @@ class TeacherControllerTest {
      */
     @Test
     void deleteTeacher_ShouldWork() {
-        assertDoesNotThrow(() -> teacherController.deleteTeacher(1));
+        assertDoesNotThrow(() -> SQLActions.deleteTeacherFromDBWithID(1));
     }
 
     /**
@@ -138,7 +140,7 @@ class TeacherControllerTest {
      */
     @Test
     void getAll_ShouldWork() {
-        assertDoesNotThrow(() -> teacherController.getAll());
+        assertDoesNotThrow(SQLActions::retrieveTeachersFromDB);
     }
 
     /**

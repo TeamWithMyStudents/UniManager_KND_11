@@ -46,7 +46,7 @@ class UserTest {
      */
     @Test
     void constructor_WithHashedPassword_ShouldCreateUser() {
-        User dbUser = new User("Jane", "Smith", "jane.smith@example.com", "hashed_password", "salt_value") {
+        User dbUser = new User("Jane", "Smith", "jane.smith@example.com", "hashed_password") {
         };
         assertNotNull(dbUser);
         assertEquals("hashed_password", dbUser.getPassword());

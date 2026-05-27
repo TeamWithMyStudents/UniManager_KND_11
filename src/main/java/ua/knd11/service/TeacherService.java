@@ -9,9 +9,5 @@ public interface TeacherService {
 
     void filterByDegree(String degree);
 
-    void addTeacher(Teacher teacher);
-
-    void deleteTeacher(int id);
-
     ArrayList<Teacher> getAllTeachers();
 }

@@ -57,31 +57,33 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     /**
-     * Registers a new teacher by persisting their record to the database.
-     *
-     * @param teacher the {@link Teacher} object to be added
-     * @throws IllegalArgumentException if the teacher data is invalid
-     */
-    public void addTeacher(Teacher teacher) throws IllegalArgumentException {
-        SQLActions.addTeacherToDB(teacher);
-    }
-
-    /**
-     * Deletes a teacher from the database using their unique identifier.
-     *
-     * @param id the unique identifier of the teacher to be removed
-     */
-    @Override
-    public void deleteTeacher(int id) {
-        SQLActions.deleteTeacherFromDBWithID(id);
-    }
-
-    /**
      * Retrieves a list of all teachers stored in the database.
      *
      * @return an {@link ArrayList} containing all {@link Teacher} records
      */
     public ArrayList<Teacher> getAllTeachers() {
         return SQLActions.retrieveTeachersFromDB();
+    }
+
+    /**
+     * Internal helper to validate input parts and create a Teacher model object.
+     * Uses {@link FieldValidator} to ensure data integrity for sensitive fields.
+     *
+     * @param parts an array of strings representing teacher attributes
+     * @return a new {@link Teacher} object populated with validated data
+     */
+    public Teacher createTeacherWithParts(String[] parts) throws IllegalArgumentException {
+        FieldValidator.validateAlphabeticString("name", parts[0]);
+        FieldValidator.validateAlphabeticString("surname", parts[1]);
+        FieldValidator.validateAlphabeticString("department", parts[2]);
+        FieldValidator.validateAlphabeticString("degree", parts[3]);
+        try {
+            FieldValidator.validateSalary(Double.parseDouble(parts[4]));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Salary must be a valid number");
+        }
+        FieldValidator.validateEmail(parts[5]);
+        FieldValidator.validatePassword(parts[6]);
+        return new Teacher(parts[0], parts[1], parts[2], parts[3], Double.parseDouble(parts[4]), parts[5], parts[6]);
     }
 }

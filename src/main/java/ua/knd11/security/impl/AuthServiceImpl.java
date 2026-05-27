@@ -1,6 +1,5 @@
 package ua.knd11.security.impl;
 
-import ua.knd11.model.Teacher;
 import ua.knd11.model.User;
 import ua.knd11.security.AuthService;
 import ua.knd11.security.UserSession;
@@ -43,25 +42,14 @@ public class AuthServiceImpl implements AuthService {
             }
         }
 
-        User user = findUserByEmail(email);
+        User user = SQLActions.getStudentByEmail(email);
+        if (user == null) user = SQLActions.getTeacherByEmail(email);
+
         if (user != null && FieldValidator.verifyPassword(value, user.getPassword(), user.getSalt())) {
             UserSession.login(user);
             System.out.println("Login successful. Welcome, " + user.getName() + "!");
             return;
         }
         System.err.println("Incorrect email or password");
-    }
-
-    /**
-     * Helper method to find a user in the database by their email address.
-     * The search priority is Teachers first, then Students.
-     *
-     * @param email the email address to search for (assumed to be already validated by caller)
-     * @return the found {@link User} (Teacher or Student), or null if no match is found
-     */
-    private User findUserByEmail(String email) {
-        Teacher teacher = SQLActions.getTeacherByEmail(email);
-        if (teacher != null) return teacher;
-        return SQLActions.getStudentByEmail(email);
     }
 }

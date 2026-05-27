@@ -7,9 +7,7 @@ import java.util.ArrayList;
 public interface StudentService {
     void assignHeadStudent(int studentId);
 
-    void addStudent(Student student);
-
-    void deleteStudent(int id);
+    Student createStudentWithParts(String[] parts) throws IllegalArgumentException;
 
     ArrayList<Student> getAllStudents();
 }
