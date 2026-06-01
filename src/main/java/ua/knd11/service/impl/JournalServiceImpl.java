@@ -24,7 +24,7 @@ public class JournalServiceImpl implements JournalService {
     public void assignGrade(int studentId, String subject, int score) {
         try {
             SQLActions.addGradeToDB(studentId, subject, score);
-            System.out.println("Successfully assigned grade: " + score + " for subject '" + subject + "' to Student : " + studentId);
+
         } catch (IllegalArgumentException e) {
             System.err.println("[ERROR] Failed to assign grade: " + e.getMessage());
         }

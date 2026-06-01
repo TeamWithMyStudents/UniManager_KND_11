@@ -7,6 +7,8 @@ import ua.knd11.util.FieldValidator;
 import ua.knd11.util.SQLActions;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Implementation of the {@link TeacherService} interface.
@@ -21,7 +23,7 @@ public class TeacherServiceImpl implements TeacherService {
      * Outputs the "Total University Budget" to the console.
      */
     public void calculateTotalSalary() {
-        double result = getAllTeachers().stream()
+        double result = SQLActions.retrieveTeachersFromDB().stream()
                 .mapToDouble(user -> user instanceof Teacher t ? t.getSalary() : 0)
                 .sum();
         System.out.println("Total University Budget: " + result);
@@ -43,7 +45,7 @@ public class TeacherServiceImpl implements TeacherService {
         }
 
         boolean found = false;
-        for (User user : getAllTeachers()) {
+        for (User user : SQLActions.retrieveTeachersFromDB()) {
             if (user instanceof Teacher t) {
                 if (t.getDegree().toLowerCase().contains(degree.toLowerCase())) {
                     System.out.println(t);
@@ -54,15 +56,6 @@ public class TeacherServiceImpl implements TeacherService {
         if (!found) {
             System.out.println("No teachers found with the specified degree.");
         }
-    }
-
-    /**
-     * Retrieves a list of all teachers stored in the database.
-     *
-     * @return an {@link ArrayList} containing all {@link Teacher} records
-     */
-    public ArrayList<Teacher> getAllTeachers() {
-        return SQLActions.retrieveTeachersFromDB();
     }
 
     /**

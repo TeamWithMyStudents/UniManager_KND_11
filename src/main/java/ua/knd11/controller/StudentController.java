@@ -39,7 +39,7 @@ public class StudentController {
      * @param scanner   the scanner used for console input
      * @param studentId the ID of the currently logged-in student
      */
-    public void displayMenu(Scanner scanner, int studentId) { //TODO: implement db integration to grades and lessons
+    public void displayMenu(Scanner scanner, int studentId) {
         boolean running = true;
         while (running) {
             System.out.println("\n--- Student Dashboard ---");
@@ -81,15 +81,6 @@ public class StudentController {
         } catch (IllegalArgumentException e) {
             System.err.println("[ERROR] Invalid day entered. Please check your spelling.");
         }
-    }
-
-    /**
-     * Assigns a specific student as the head student based on their unique ID.
-     *
-     * @param id the student's unique identifier
-     */
-    public void assignHeadStudent(int id) {
-        studentService.assignHeadStudent(id);
     }
 
     /**

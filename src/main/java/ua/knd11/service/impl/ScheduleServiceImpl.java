@@ -19,7 +19,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     /**
      * Adds a new lesson to the schedule after validating and parsing the input data.
      *
-     * @param day            the day of the week (e.g., "Monday" or "Понеділок")
+     * @param day            the day of the week (e.g., "Monday")
      * @param time           the starting time in 24-hour format (e.g., "14:30")
      * @param subject        the name of the subject
      * @param teacherSurname the surname of the teacher
@@ -30,7 +30,6 @@ public class ScheduleServiceImpl implements ScheduleService {
             System.err.println("Day and time cannot be empty.");
             return;
         }
-
         try {
             Lesson lesson = new Lesson(parseDayOfWeek(day), LocalTime.parse(time.trim()), subject, teacherSurname);
             SQLActions.addLessonToDB(lesson);
@@ -38,7 +37,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         } catch (DateTimeParseException | IllegalArgumentException e) {
             System.err.println("[ERROR] Invalid format: " + e.getMessage());
-            System.err.println("Hint: Use 'MONDAY' or 'ПОНЕДІЛОК' and time like '14:30'.");
+            System.err.println("Hint: Use 'MONDAY' and time like '14:30'.");
         }
     }
 

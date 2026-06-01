@@ -1,8 +1,10 @@
 package ua.knd11.controller;
 
 import ua.knd11.model.Teacher;
+import ua.knd11.security.UserSession;
 import ua.knd11.service.JournalService;
 import ua.knd11.service.ScheduleService;
+import ua.knd11.service.TeacherService;
 import ua.knd11.service.impl.TeacherServiceImpl;
 import ua.knd11.util.SQLActions;
 
@@ -16,8 +18,7 @@ import java.util.Scanner;
  * for managing teacher profiles, academic schedules, and student grades.
  */
 public class TeacherController {
-
-    private final TeacherServiceImpl teacherService = new TeacherServiceImpl();
+    private final TeacherService teacherService = new TeacherServiceImpl();
     private final JournalService journalService;
     private final ScheduleService scheduleService;
 
@@ -51,17 +52,7 @@ public class TeacherController {
         }
     }
 
-    /**
-     * Fetches all teachers from the service layer and prints them to the terminal.
-     * Displays an empty state message if no teachers are currently registered.
-     */
-    private void getAll() {
-        List<Teacher> teachers = SQLActions.retrieveTeachersFromDB();
-        teachers.stream().filter(Objects::nonNull).forEach(System.out::println);
-        if (teachers.isEmpty()) {
-            System.out.println("No teachers found");
-        }
-    }
+
 
     /**
      * Triggers the calculation of the total salary expenditure for all teachers.
@@ -71,6 +62,11 @@ public class TeacherController {
      * @param scanner the scanner used for console input
      */
     public void displayMenu(Scanner scanner) { //TODO: Implement db integration to grades and lessons
+        if (UserSession.getCurrentUser().getAccessLevel() < 1){
+            System.err.println("You can`t do that");
+            return;
+        }
+
         boolean running = true;
         while (running) {
             System.out.println("\n--- Teacher Management Menu ---");
@@ -85,8 +81,8 @@ public class TeacherController {
             switch (choice) {
                 case "1" -> handleAssignGrade(scanner);
                 case "2" -> handleAddLesson(scanner);
-                case "3" -> getAll();
-                case "4" -> calculateTotalSalary();
+                case "3" -> System.out.println(SQLActions.retrieveTeachersFromDB());
+                case "4" -> teacherService.calculateTotalSalary();
                 case "5" -> running = false;
                 default -> System.out.println("[WARNING] Invalid choice. Please try again.");
             }
@@ -127,13 +123,6 @@ public class TeacherController {
         scheduleService.addLesson(day, time, subject, surname);
     }
 
-    /**
-     * Calculates and displays the total salary of all teachers.
-     */
-    public void calculateTotalSalary() {
-        // Просто викликаємо метод сервісу, бо він сам друкує результат у консоль
-        teacherService.calculateTotalSalary();
-    }
 
     /**
      * Filters and displays teachers based on their academic degree.

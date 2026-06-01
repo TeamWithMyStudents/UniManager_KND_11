@@ -6,12 +6,17 @@ import ua.knd11.security.UserSession;
 import ua.knd11.util.FieldValidator;
 import ua.knd11.util.SQLActions;
 
+import java.util.Scanner;
+
 /**
  * Implementation of the {@link AuthService} interface.
  * Handles user registration, authentication (login), and user removal
  * by coordinating between the model layer, session management, and database persistence.
  */
 public class AuthServiceImpl implements AuthService {
+
+    Scanner input = new Scanner(System.in);
+
     /**
      * Authenticates a user based on email and password.
      * Compares provided credentials against users in the database and the system SuperUser.
@@ -42,8 +47,21 @@ public class AuthServiceImpl implements AuthService {
             }
         }
 
-        User user = SQLActions.getStudentByEmail(email);
-        if (user == null) user = SQLActions.getTeacherByEmail(email);
+        User student = SQLActions.getStudentByEmail(email);
+        User teacher = SQLActions.getTeacherByEmail(email);
+        User user = null;
+
+        if (student != null && teacher != null) {
+            System.out.println("Provided email has two entries\n 1. Student\n 2. Teacher");
+            switch (input.nextLine().trim()) {
+                case "1" -> user = student;
+                case "2" -> user = teacher;
+            }
+        } else if (student != null) {
+            user = student;
+        } else if (teacher != null) {
+            user = teacher;
+        }
 
         if (user != null && FieldValidator.verifyPassword(value, user.getPassword(), user.getSalt())) {
             UserSession.login(user);

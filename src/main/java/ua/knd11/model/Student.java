@@ -52,7 +52,7 @@ public class Student extends User {
      * @param role     the student role
      */
     public Student(String name, String surname, String group, String email, String password, String salt, StudentRole role) {
-        super(name, surname, email, password);
+        super(name, surname, email, password, salt, 0);
         this.group = group;
         this.role = role;
     }

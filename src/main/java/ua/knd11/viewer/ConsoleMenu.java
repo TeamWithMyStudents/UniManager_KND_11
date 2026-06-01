@@ -8,6 +8,8 @@ import ua.knd11.util.SQLActions;
 
 import java.util.Scanner;
 
+import static ua.knd11.util.FieldValidator.validateEmail;
+
 /**
  * Main application management via the console.
  * This class serves as the central hub, allowing users to navigate between
@@ -51,7 +53,7 @@ public class ConsoleMenu {
                     2. TEACHER SECTION (Grading, Scheduling)
                     3. EXIT""");
             if (isAdmin) {
-                System.out.print("4. ADMIN SECTION (User Management)");
+                System.out.print("4. ADMIN SECTION (User Management) \n");
             }
 
             System.out.println("Select an option: ");
@@ -68,7 +70,7 @@ public class ConsoleMenu {
                 case "4" -> {
                     if (isAdmin) {
                         adminSubMenu();
-                    }
+                    }else System.out.println("Invalid option. Please try again.");
                 }
                 default -> System.out.println("Invalid option. Please try again.");
             }
@@ -104,23 +106,42 @@ public class ConsoleMenu {
                     teacherController.addTeacherFromTerminal(scanner.nextLine());
                 }
                 case "3" -> {
-                    System.out.print("Enter student ID to remove: ");
+                    System.out.println("Enter student ID to remove: ");
                     try {
                         id = scanner.nextLine();
                         SQLActions.deleteStudentFromDBWithID(Integer.parseInt(id));
                     } catch (NumberFormatException e) {
                         System.err.println("Id must be integer");
-                        return;
                     }
                 }
                 case "4" -> {
+                    System.out.println("Enter student email to remove: ");
+                    try {
+                       String email = scanner.nextLine();
+                        validateEmail(email);
+                        SQLActions.deleteStudentFromDBWithEmail(email);
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Email must be in the format Email@example.com");
+                    }
+                }
+
+                case "5" -> {
                     System.out.println("Enter teacher ID to remove: ");
                     try {
                         id = scanner.nextLine();
                         SQLActions.deleteTeacherFromDBWithID(Integer.parseInt(id));
                     } catch (NumberFormatException e) {
                         System.err.println("Id must be integer");
-                        return;
+                    }
+                }
+                case "6" -> {
+                    System.out.println("Enter teacher email to remove: ");
+                    try {
+                        String email = scanner.nextLine();
+                        validateEmail(email);
+                        SQLActions.deleteTeacherFromDBWithEmail(email);
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Email must be in the format Email@example.com " + e.getMessage());
                     }
                 }
                 case "0" -> {

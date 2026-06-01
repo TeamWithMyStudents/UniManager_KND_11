@@ -53,7 +53,7 @@ public class Teacher extends User {
      * @param salt       the stored salt
      */
     public Teacher(String name, String surname, String department, String degree, double salary, String email, String password, String salt) {
-        super(name, surname, email, password);
+        super(name, surname, email, password, salt, 1);
         this.department = department;
         this.degree = degree;
         this.salary = salary;
@@ -108,6 +108,7 @@ public class Teacher extends User {
                 ", Surname: " + getSurname() +
                 ", Department: " + getDepartment() +
                 ", Degree: " + getDegree() +
-                ", Salary: " + getSalary();
+                ", Salary: " + getSalary()+
+                ", Email: " + getEmail();
     }
 }

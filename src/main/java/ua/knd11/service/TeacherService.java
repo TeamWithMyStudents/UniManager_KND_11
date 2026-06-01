@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public interface TeacherService {
     void calculateTotalSalary();
 
-    void filterByDegree(String degree);
+    Teacher createTeacherWithParts(String[] parts) throws IllegalArgumentException;
 
-    ArrayList<Teacher> getAllTeachers();
+    void filterByDegree(String degree);
 }

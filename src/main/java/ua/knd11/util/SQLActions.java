@@ -42,8 +42,8 @@ public final class SQLActions {
      * SQL query to insert a new record into the GRADES table.
      */
     private static final String QUERY_ADD_GRADE = """
-            INSERT INTO GRADES (name, student_id, subject_name, score) 
-            VALUES (?, ?, ?, ?);
+            INSERT INTO GRADES (student_id, subject_name, score) 
+            VALUES (?, ?, ?);
             """;
 
     /**
@@ -123,7 +123,7 @@ public final class SQLActions {
     /**
      * SQL query to retrieve all grades for a specific student.
      */
-    private static final String QUERY_GET_GRADES_BY_STUDENT = "SELECT name, score FROM GRADES WHERE student_id = ?";
+    private static final String QUERY_GET_GRADES_BY_STUDENT = "SELECT subject_name, score FROM GRADES WHERE student_id = ?";
 
     /**
      * SQL query to demote all head students in a group to regular students.
@@ -200,7 +200,6 @@ public final class SQLActions {
      * SQL query to update a grade's score by ID.
      */
     private static final String QUERY_SET_GRADE_SCORE_BY_ID = "UPDATE GRADES SET score = ? WHERE id = ?";
-
     /**
      * SQL DDL statement to create the STUDENTS table if it does not already exist.
      */
@@ -246,7 +245,6 @@ public final class SQLActions {
     private static final String QUERY_CREATE_GRADES_TABLE = """
             CREATE TABLE IF NOT EXISTS GRADES (
                 id SERIAL PRIMARY KEY,
-                name VARCHAR(255) NOT NULL,
                 student_id INT NOT NULL,
                 subject_name VARCHAR(255) NOT NULL,
                 score INT NOT NULL
@@ -295,7 +293,6 @@ public final class SQLActions {
      * Inserts a new student record into the database.
      *
      * @param student the {@link Student} object to persist
-     * @throws RuntimeException if the database operation fails
      */
     public static void addStudentToDB(Student student) {
         if (student == null) return;
@@ -310,7 +307,7 @@ public final class SQLActions {
             stmt.executeUpdate();
             System.out.println("Student added to database");
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to add student to database", e);
+            System.err.println("Failed to add student to database" + e.getMessage());
         }
     }
 
@@ -347,21 +344,22 @@ public final class SQLActions {
             stmt.setString(4, lesson.getTeacherSurname());
             stmt.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("Failed to add lesson to schedule");
+            System.err.println("Failed to add lesson to schedule" + e);
         }
     }
 
     public static void addGradeToDB(int studentId, String subject_name, int score) {
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(QUERY_ADD_GRADE)) {
-            String studentName = Objects.requireNonNull(getStudentById(studentId)).getName();
-            stmt.setString(1, studentName);
-            stmt.setInt(2, studentId);
-            stmt.setString(3, subject_name);
-            stmt.setInt(4, score);
+            stmt.setInt(1, studentId);
+            stmt.setString(2, subject_name);
+            stmt.setInt(3, score);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("Failed to add grade");
+            System.err.println("Failed to add grade " + e);
+        } catch (NullPointerException e) {
+            System.err.println("No student with id " + studentId + " was found");
         }
+        System.out.println("Successfully assigned grade: " + score + " for subject '" + subject_name + "' to Student : " + studentId);
     }
 
     // --- RETRIEVAL METHODS ---
@@ -400,6 +398,8 @@ public final class SQLActions {
         }
     }
 
+    @NotNull
+    @Contract(" -> new")
     public static List<Lesson> retrieveLessonsFromDB() {
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement();
@@ -507,7 +507,7 @@ public final class SQLActions {
             if (deleted) {
                 System.out.println("Student with ID " + id + " deleted from database");
             } else {
-                System.out.println("No student found with ID " + id);
+                System.out.println("No student with ID " + id +" was found");
             }
         } catch (SQLException e) {
             throw new RuntimeException("Failed to delete student with ID " + id, e);
@@ -530,7 +530,7 @@ public final class SQLActions {
             if (deleted) {
                 System.out.println("Teacher with ID " + id + " deleted from database");
             } else {
-                System.out.println("No teacher found with ID " + id);
+                System.out.println("No teacher with ID " + id+" was found");
             }
         } catch (SQLException e) {
             throw new RuntimeException("Failed to delete teacher with ID " + id, e);
@@ -583,7 +583,7 @@ public final class SQLActions {
             if (deleted) {
                 System.out.println("Teacher with email " + email + " deleted from database");
             } else {
-                System.out.println("No teacher found with email " + email);
+                System.out.println("No teacher with email " + email +" was found");
             }
         } catch (SQLException e) {
             throw new RuntimeException("Failed to delete teacher with email " + email, e);
@@ -607,7 +607,7 @@ public final class SQLActions {
             if (deleted) {
                 System.out.println("Student with email " + email + " deleted from database");
             } else {
-                System.out.println("No student found with email " + email);
+                System.out.println("No student with email " + email+" was found");
             }
             return deleted;
         } catch (SQLException e) {
@@ -726,9 +726,9 @@ public final class SQLActions {
     private static List<Grade> parseGradesFromResultSet(@NotNull ResultSet resultSet, int studentId) throws SQLException {
         List<Grade> list = new ArrayList<>();
         while (resultSet.next()) {
-            String name = resultSet.getString("name");
+            String subject = resultSet.getString("subject_name");
             int score = resultSet.getInt("score");
-            list.add(new Grade(studentId, name, score));
+            list.add(new Grade(studentId, subject, score));
         }
         return list;
     }

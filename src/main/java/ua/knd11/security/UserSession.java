@@ -43,7 +43,7 @@ public class UserSession {
     }
 
     @Getter
-    static final User superUser = new User("admin", "admin", email, password, salt, 5) {
+    static final User superUser = new User("admin", "admin", email, password, salt, 999) {
     };
 
     /**
