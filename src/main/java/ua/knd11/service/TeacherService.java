@@ -10,4 +10,10 @@ public interface TeacherService {
     Teacher createTeacherWithParts(String[] parts) throws IllegalArgumentException;
 
     void filterByDegree(String degree);
+
+    void addTeacher(Teacher teacher);
+
+    void deleteTeacher(int id);
+
+    ArrayList<Teacher> getAllTeachers();
 }

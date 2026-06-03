@@ -6,6 +6,7 @@ import ua.knd11.security.AuthService;
 import ua.knd11.security.UserSession;
 import ua.knd11.util.SQLActions;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import static ua.knd11.util.FieldValidator.validateEmail;
