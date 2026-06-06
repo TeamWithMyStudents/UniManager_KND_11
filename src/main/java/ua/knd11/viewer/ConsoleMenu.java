@@ -43,6 +43,10 @@ public class ConsoleMenu {
         while (!UserSession.isAuthenticated()) {
             System.out.println("\n Please enter email and Password:");
             String[] parts = scanner.nextLine().trim().split("\\s+");
+            if (parts.length != 2) {
+                System.err.println("Enter email and password separated by a space.");
+                continue;
+            }
             authService.login(parts[0], parts[1]);
         }
         boolean isAdmin = UserSession.checkAccess();
@@ -71,7 +75,7 @@ public class ConsoleMenu {
                 case "4" -> {
                     if (isAdmin) {
                         adminSubMenu();
-                    }else System.out.println("Invalid option. Please try again.");
+                    } else System.out.println("Invalid option. Please try again.");
                 }
                 default -> System.out.println("Invalid option. Please try again.");
             }
@@ -118,7 +122,7 @@ public class ConsoleMenu {
                 case "4" -> {
                     System.out.println("Enter student email to remove: ");
                     try {
-                       String email = scanner.nextLine();
+                        String email = scanner.nextLine();
                         validateEmail(email);
                         SQLActions.deleteStudentFromDBWithEmail(email);
                     } catch (IllegalArgumentException e) {
