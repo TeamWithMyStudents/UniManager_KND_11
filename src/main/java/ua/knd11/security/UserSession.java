@@ -43,7 +43,7 @@ public class UserSession {
     }
 
     @Getter
-    static final User superUser = new User("admin", "admin", email, password, salt) {
+    static final User superUser = new User("admin", "admin", email, password, salt, 999) {
     };
 
     /**
@@ -111,10 +111,6 @@ public class UserSession {
             }
         }
         User current = UserSession.getCurrentUser();
-        if (current.equals(superUser)) {
-            return true;
-        }
-        System.err.println(" Access denied!");
-        return false;
+        return current.equals(superUser);
     }
 }

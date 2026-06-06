@@ -46,11 +46,12 @@ class UserTest {
      */
     @Test
     void constructor_WithHashedPassword_ShouldCreateUser() {
-        User dbUser = new User("Jane", "Smith", "jane.smith@example.com", "hashed_password", "salt_value") {
-        };
+        User dbUser = new User("Jane", "Smith", "jane.smith@example.com", "hashed_password", "salt_value", 1) {};
+
         assertNotNull(dbUser);
         assertEquals("hashed_password", dbUser.getPassword());
         assertEquals("salt_value", dbUser.getSalt());
+        assertEquals(1, dbUser.getAccessLevel());
     }
 
     /**

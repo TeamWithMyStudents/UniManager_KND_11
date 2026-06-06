@@ -1,11 +1,12 @@
 package ua.knd11.security.impl;
 
-import ua.knd11.model.Teacher;
 import ua.knd11.model.User;
 import ua.knd11.security.AuthService;
 import ua.knd11.security.UserSession;
 import ua.knd11.util.FieldValidator;
 import ua.knd11.util.SQLActions;
+
+import java.util.Scanner;
 
 /**
  * Implementation of the {@link AuthService} interface.
@@ -13,6 +14,9 @@ import ua.knd11.util.SQLActions;
  * by coordinating between the model layer, session management, and database persistence.
  */
 public class AuthServiceImpl implements AuthService {
+
+    Scanner input = new Scanner(System.in);
+
     /**
      * Authenticates a user based on email and password.
      * Compares provided credentials against users in the database and the system SuperUser.
@@ -43,25 +47,27 @@ public class AuthServiceImpl implements AuthService {
             }
         }
 
-        User user = findUserByEmail(email);
+        User student = SQLActions.getStudentByEmail(email);
+        User teacher = SQLActions.getTeacherByEmail(email);
+        User user = null;
+
+        if (student != null && teacher != null) {
+            System.out.println("Provided email has two entries\n 1. Student\n 2. Teacher");
+            switch (input.nextLine().trim()) {
+                case "1" -> user = student;
+                case "2" -> user = teacher;
+            }
+        } else if (student != null) {
+            user = student;
+        } else if (teacher != null) {
+            user = teacher;
+        }
+
         if (user != null && FieldValidator.verifyPassword(value, user.getPassword(), user.getSalt())) {
             UserSession.login(user);
             System.out.println("Login successful. Welcome, " + user.getName() + "!");
             return;
         }
         System.err.println("Incorrect email or password");
-    }
-
-    /**
-     * Helper method to find a user in the database by their email address.
-     * The search priority is Teachers first, then Students.
-     *
-     * @param email the email address to search for (assumed to be already validated by caller)
-     * @return the found {@link User} (Teacher or Student), or null if no match is found
-     */
-    private User findUserByEmail(String email) {
-        Teacher teacher = SQLActions.getTeacherByEmail(email);
-        if (teacher != null) return teacher;
-        return SQLActions.getStudentByEmail(email);
     }
 }

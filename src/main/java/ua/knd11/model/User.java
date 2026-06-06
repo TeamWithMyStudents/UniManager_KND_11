@@ -1,6 +1,7 @@
 package ua.knd11.model;
 
 import lombok.Getter;
+import lombok.Setter;
 import ua.knd11.util.FieldValidator;
 
 /**
@@ -10,30 +11,42 @@ import ua.knd11.util.FieldValidator;
  */
 @Getter
 public abstract class User {
+
     /**
      * The user's password, which must be protected/encrypted
      */
     private final String password;
+
     /**
      * The salt used for password protection
      */
     private final String salt;
+
     /**
      * The unique identifier for this specific user; 0 indicates an unassigned ID
      */
     private int id = 0;
+
     /**
      * The user's first name
      */
     private String name;
+
     /**
      * The user's last name (surname)
      */
     private String surname;
+
     /**
      * The user's unique email address
      */
     private String email;
+
+    /**
+     * The user's access level, determining their permissions in the system
+     */
+    @Setter
+    public int accessLevel;
 
     /**
      * Constructs a new User instance with the specified name, surname, email, password, and salt.
@@ -45,12 +58,13 @@ public abstract class User {
      * @param password the raw password for the user, which may be salted and secured
      * @param salt     the salt value used for hashing the user's password
      */
-    public User(String name, String surname, String email, String password, String salt) {
+    public User(String name, String surname, String email, String password, String salt, int accessLevel) {
         this.name = name;
         this.surname = surname;
         this.email = email;
         this.password = password;
         this.salt = salt;
+        this.accessLevel = accessLevel;
     }
 
     /**
@@ -73,6 +87,7 @@ public abstract class User {
         this.email = email.toLowerCase();
         this.salt = FieldValidator.makeProtectedSalt();
         this.password = FieldValidator.makeProtectedPasswordWithSalt(password, this.salt);
+        this.accessLevel = 0;
     }
 
     /**

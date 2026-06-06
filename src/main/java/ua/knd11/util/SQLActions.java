@@ -2,11 +2,15 @@ package ua.knd11.util;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import ua.knd11.model.Grade;
+import ua.knd11.model.Lesson;
 import ua.knd11.model.Student;
 import ua.knd11.model.Teacher;
 import ua.knd11.model.enums.StudentRole;
 
 import java.sql.*;
+import java.time.DayOfWeek;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -19,16 +23,6 @@ import java.util.Objects;
 @SuppressWarnings({"SqlResolve", "unused"})
 public final class SQLActions {
     /**
-     * Lazy resolver for the database connection string from environment variables.
-     *
-     * @return the DATABASE_URL environment variable value
-     * @throws NullPointerException if DATABASE_URL is not set
-     */
-    private static String getDatabaseUrl() {
-        return Objects.requireNonNull(System.getenv("DATABASE_URL"), "Environment variable DATABASE_URL must be set");
-    }
-
-    /**
      * SQL query to insert a new record into the STUDENTS table.
      */
     @SuppressWarnings("SqlResolve")
@@ -36,7 +30,6 @@ public final class SQLActions {
             INSERT INTO STUDENTS (name, surname, "group" , role, email, password, salt)
             VALUES (?, ?, ?, ?, ?, ?, ?);
             """;
-
     /**
      * SQL query to insert a new record into the TEACHERS table.
      */
@@ -44,6 +37,21 @@ public final class SQLActions {
     private static final String QUERY_ADD_TEACHER = """
             INSERT INTO TEACHERS (name, surname, department, degree, salary, email, password, salt)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+            """;
+    /**
+     * SQL query to insert a new record into the GRADES table.
+     */
+    private static final String QUERY_ADD_GRADE = """
+            INSERT INTO GRADES (student_id, subject_name, score) 
+            VALUES (?, ?, ?);
+            """;
+
+    /**
+     * SQL query to insert a new record into the SCHEDULE table.
+     */
+    private static final String QUERY_ADD_SCHEDULE = """
+            INSERT INTO SCHEDULE (dayOfweek, time, subject, teacherSurname) 
+            VALUES (?, ?, ?, ?);
             """;
 
     /**
@@ -57,7 +65,6 @@ public final class SQLActions {
      */
     @SuppressWarnings("SqlResolve")
     private static final String QUERY_GET_TEACHERS = "SELECT * FROM TEACHERS";
-
 
     /**
      * SQL query to delete a specific teacher based on their unique email.
@@ -84,6 +91,16 @@ public final class SQLActions {
     private static final String QUERY_DELETE_STUDENT_BY_ID = "DELETE FROM STUDENTS WHERE id = ?";
 
     /**
+     * SQL query to delete a specific lesson based on their unique ID.
+     */
+    private static final String QUERY_DELETE_LESSON_BY_ID = "DELETE FROM SCHEDULE WHERE id = ?";
+
+    /**
+     * SQL query to delete a specific grade based on their unique ID.
+     */
+    private static final String QUERY_DELETE_GRADE_BY_ID = "DELETE FROM GRADES WHERE id = ?";
+
+    /**
      * SQL query to retrieve a student's full record using their email address.
      */
     private static final String QUERY_GET_STUDENT_BY_EMAIL = "SELECT * FROM STUDENTS WHERE email = ?";
@@ -92,6 +109,21 @@ public final class SQLActions {
      * SQL query to retrieve a teacher's full record using their email address.
      */
     private static final String QUERY_GET_TEACHER_BY_EMAIL = "SELECT * FROM TEACHERS WHERE email = ?";
+
+    /**
+     * SQL query to retrieve all SCHEDULE from the database.
+     */
+    private static final String QUERY_GET_LESSONS = "SELECT * FROM SCHEDULE";
+
+    /**
+     * SQL query to retrieve all SCHEDULE for a specific day of the week.
+     */
+    private static final String QUERY_GET_LESSONS_BY_DAY = "SELECT * FROM SCHEDULE WHERE dayOfWeek = ?";
+
+    /**
+     * SQL query to retrieve all grades for a specific student.
+     */
+    private static final String QUERY_GET_GRADES_BY_STUDENT = "SELECT subject_name, score FROM GRADES WHERE student_id = ?";
 
     /**
      * SQL query to demote all head students in a group to regular students.
@@ -103,54 +135,71 @@ public final class SQLActions {
      */
     private static final String QUERY_PROMOTE_STUDENT_ROLE = "UPDATE STUDENTS SET role = ? WHERE id = ?";
 
-    /* Update Queries for Students */
-
     /**
      * SQL query to update a student's first name by ID.
      */
     private static final String QUERY_SET_NAME_STUDENT_BY_ID = "UPDATE STUDENTS SET name = ? WHERE id = ?";
+
     /**
      * SQL query to update a student's last name by ID.
      */
     private static final String QUERY_SET_SURNAME_STUDENT_BY_ID = "UPDATE STUDENTS SET surname = ? WHERE id = ?";
+
     /**
      * SQL query to update a student's academic group by ID.
      */
     private static final String QUERY_SET_GROUP_STUDENT_BY_ID = "UPDATE STUDENTS SET \"group\" = ? WHERE id = ?";
+
     /**
      * SQL query to update a student's email address by ID.
      */
     private static final String QUERY_SET_EMAIL_STUDENT_BY_ID = "UPDATE STUDENTS SET email = ? WHERE id = ?";
 
-    /* Update Queries for Teachers */
+    // Update Queries for Teachers
 
     /**
      * SQL query to update a teacher's first name by ID.
      */
     private static final String QUERY_SET_NAME_TEACHER_BY_ID = "UPDATE TEACHERS SET name = ? WHERE id = ?";
+
     /**
      * SQL query to update a teacher's last name by ID.
      */
     private static final String QUERY_SET_SURNAME_TEACHER_BY_ID = "UPDATE TEACHERS SET surname = ? WHERE id = ?";
+
     /**
      * SQL query to update a teacher's academic department by ID.
      */
     private static final String QUERY_SET_DEPARTMENT_TEACHER_BY_ID = "UPDATE TEACHERS SET department = ? WHERE id = ?";
+
     /**
      * SQL query to update a teacher's academic degree by ID.
      */
     private static final String QUERY_SET_DEGREE_TEACHER_BY_ID = "UPDATE TEACHERS SET degree = ? WHERE id = ?";
+
     /**
      * SQL query to update a teacher's salary amount by ID.
      */
     private static final String QUERY_SET_SALARY_TEACHER_BY_ID = "UPDATE TEACHERS SET salary = ? WHERE id = ?";
+
     /**
      * SQL query to update a teacher's email address by ID.
      */
     private static final String QUERY_SET_EMAIL_TEACHER_BY_ID = "UPDATE TEACHERS SET email = ? WHERE id = ?";
 
-    /* DDL Table Creation Queries */
+    /*Update Queries for SCHEDULE*/
 
+    private static final String QUERY_SET_LESSON_TIME_BY_ID = "UPDATE SCHEDULE SET time = ? WHERE id = ?";
+
+    /**
+     * SQL query to update a lesson's teacher's last name by ID.
+     */
+    private static final String QUERY_SET_LESSON_TEACHER_BY_ID = "UPDATE SCHEDULE SET teacherSurname = ? WHERE id = ?";
+
+    /**
+     * SQL query to update a grade's score by ID.
+     */
+    private static final String QUERY_SET_GRADE_SCORE_BY_ID = "UPDATE GRADES SET score = ? WHERE id = ?";
     /**
      * SQL DDL statement to create the STUDENTS table if it does not already exist.
      */
@@ -167,6 +216,7 @@ public final class SQLActions {
             );
             """;
 
+    /* DDL Table Creation Queries */
     /**
      * SQL DDL statement to create the TEACHERS table if it does not already exist.
      */
@@ -183,6 +233,33 @@ public final class SQLActions {
                 salt VARCHAR(255) NOT NULL
             );
             """;
+    private static final String QUERY_CREATE_SCHEDULE_TABLE = """
+            CREATE TABLE IF NOT EXISTS SCHEDULE (
+                id SERIAL PRIMARY KEY,
+                dayOfWeek VARCHAR(255) NOT NULL,
+                time TIME NOT NULL,
+                subject VARCHAR(255) NOT NULL,
+                teacherSurname VARCHAR(255) NOT NULL
+            );
+            """;
+    private static final String QUERY_CREATE_GRADES_TABLE = """
+            CREATE TABLE IF NOT EXISTS GRADES (
+                id SERIAL PRIMARY KEY,
+                student_id INT NOT NULL,
+                subject_name VARCHAR(255) NOT NULL,
+                score INT NOT NULL
+            );
+            """;
+
+    /**
+     * Lazy resolver for the database connection string from environment variables.
+     *
+     * @return the DATABASE_URL environment variable value
+     * @throws NullPointerException if DATABASE_URL is not set
+     */
+    private static String getDatabaseUrl() {
+        return Objects.requireNonNull(System.getenv("DATABASE_URL"), "Environment variable DATABASE_URL must be set");
+    }
 
     /**
      * Establishes a raw connection to the database.
@@ -203,6 +280,8 @@ public final class SQLActions {
         try (Connection conn = getConnection(); Statement stmt = conn.createStatement()) {
             stmt.executeUpdate(QUERY_CREATE_STUDENTS_TABLE);
             stmt.executeUpdate(QUERY_CREATE_TEACHERS_TABLE);
+            stmt.executeUpdate(QUERY_CREATE_SCHEDULE_TABLE);
+            stmt.executeUpdate(QUERY_CREATE_GRADES_TABLE);
         } catch (SQLException e) {
             throw new RuntimeException("Database initialization failed", e);
         }
@@ -214,7 +293,6 @@ public final class SQLActions {
      * Inserts a new student record into the database.
      *
      * @param student the {@link Student} object to persist
-     * @throws RuntimeException if the database operation fails
      */
     public static void addStudentToDB(Student student) {
         if (student == null) return;
@@ -229,7 +307,7 @@ public final class SQLActions {
             stmt.executeUpdate();
             System.out.println("Student added to database");
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to add student to database", e);
+            System.err.println("Failed to add student to database" + e.getMessage());
         }
     }
 
@@ -255,6 +333,33 @@ public final class SQLActions {
         } catch (SQLException e) {
             throw new RuntimeException("Failed to add teacher to database", e);
         }
+    }
+
+    public static void addLessonToDB(Lesson lesson) {
+        if (lesson == null) return;
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(QUERY_ADD_SCHEDULE)) {
+            stmt.setString(1, lesson.getDayOfWeek().name());
+            stmt.setTime(2, java.sql.Time.valueOf(lesson.getTime()));
+            stmt.setString(3, lesson.getSubject());
+            stmt.setString(4, lesson.getTeacherSurname());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Failed to add lesson to schedule" + e);
+        }
+    }
+
+    public static void addGradeToDB(int studentId, String subject_name, int score) {
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(QUERY_ADD_GRADE)) {
+            stmt.setInt(1, studentId);
+            stmt.setString(2, subject_name);
+            stmt.setInt(3, score);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Failed to add grade " + e);
+        } catch (NullPointerException e) {
+            System.err.println("No student with id " + studentId + " was found");
+        }
+        System.out.println("Successfully assigned grade: " + score + " for subject '" + subject_name + "' to Student : " + studentId);
     }
 
     // --- RETRIEVAL METHODS ---
@@ -293,6 +398,18 @@ public final class SQLActions {
         }
     }
 
+    @NotNull
+    @Contract(" -> new")
+    public static List<Lesson> retrieveLessonsFromDB() {
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(QUERY_GET_LESSONS)) {
+            return parseLessonsFromResultSet(rs);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving SCHEDULE table", e);
+        }
+    }
+
     // --- PARSING HELPERS ---
 
     /**
@@ -310,7 +427,7 @@ public final class SQLActions {
             String studentEmail = resultSet.getString("email");
             String studentPassword = resultSet.getString("password");
             String studentSalt = resultSet.getString("salt");
-            
+
             StudentRole role;
             try {
                 role = StudentRole.valueOf(roleStr);
@@ -358,6 +475,20 @@ public final class SQLActions {
         return list;
     }
 
+    @NotNull
+    private static List<Lesson> parseLessonsFromResultSet(@NotNull ResultSet resultSet) throws SQLException {
+        List<Lesson> list = new ArrayList<>();
+        while (resultSet.next()) {
+            DayOfWeek day = DayOfWeek.valueOf(resultSet.getString("dayOfWeek"));
+            LocalTime time = resultSet.getTime("time").toLocalTime();
+            String subject = resultSet.getString("subject");
+            String teacherSurname = resultSet.getString("teacherSurname");
+
+            list.add(new Lesson(day, time, subject, teacherSurname));
+        }
+        return list;
+    }
+
     // --- DELETION METHODS ---
 
     /**
@@ -376,7 +507,7 @@ public final class SQLActions {
             if (deleted) {
                 System.out.println("Student with ID " + id + " deleted from database");
             } else {
-                System.out.println("No student found with ID " + id);
+                System.out.println("No student with ID " + id +" was found");
             }
         } catch (SQLException e) {
             throw new RuntimeException("Failed to delete student with ID " + id, e);
@@ -399,10 +530,39 @@ public final class SQLActions {
             if (deleted) {
                 System.out.println("Teacher with ID " + id + " deleted from database");
             } else {
-                System.out.println("No teacher found with ID " + id);
+                System.out.println("No teacher with ID " + id+" was found");
             }
         } catch (SQLException e) {
             throw new RuntimeException("Failed to delete teacher with ID " + id, e);
+        }
+    }
+
+    public static void deleteLessonFromDBWithID(int lessonId) {
+        if (lessonId <= 0) return;
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(QUERY_DELETE_LESSON_BY_ID)) {
+            stmt.setInt(1, lessonId);
+            int affectedRows = stmt.executeUpdate();
+            boolean deleted = affectedRows > 0;
+            if (deleted) {
+                System.out.println("LESSON with ID " + lessonId + " deleted from database");
+            } else {
+                System.out.println("No SCHEDULE found with ID " + lessonId);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to delete LESSON with ID " + lessonId, e);
+        }
+    }
+
+    public static void deleteGradeById(int gradeId) {
+        if (gradeId <= 0) return;
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(QUERY_DELETE_GRADE_BY_ID)) {
+            stmt.setInt(1, gradeId);
+            stmt.executeUpdate();
+            System.out.println("Grade with ID " + gradeId + " deleted.");
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to delete grade", e);
         }
     }
 
@@ -423,7 +583,7 @@ public final class SQLActions {
             if (deleted) {
                 System.out.println("Teacher with email " + email + " deleted from database");
             } else {
-                System.out.println("No teacher found with email " + email);
+                System.out.println("No teacher with email " + email +" was found");
             }
         } catch (SQLException e) {
             throw new RuntimeException("Failed to delete teacher with email " + email, e);
@@ -447,7 +607,7 @@ public final class SQLActions {
             if (deleted) {
                 System.out.println("Student with email " + email + " deleted from database");
             } else {
-                System.out.println("No student found with email " + email);
+                System.out.println("No student with email " + email+" was found");
             }
             return deleted;
         } catch (SQLException e) {
@@ -535,6 +695,43 @@ public final class SQLActions {
         }
     }
 
+    public static List<Lesson> getLessonsByDay(DayOfWeek day) {
+        if (day == null) return new ArrayList<>();
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(QUERY_GET_LESSONS_BY_DAY)) {
+            stmt.setString(1, day.name().toUpperCase());
+            try (ResultSet rs = stmt.executeQuery()) {
+                return parseLessonsFromResultSet(rs);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving SCHEDULE for day: " + day);
+        }
+        return List.of();
+    }
+
+    public static List<Grade> getGradesForStudent(int studentId) {
+        if (studentId <= 0) return new ArrayList<>();
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(QUERY_GET_GRADES_BY_STUDENT)) {
+            stmt.setInt(1, studentId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return parseGradesFromResultSet(rs, studentId);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving grades for student: " + studentId, e);
+        }
+    }
+
+    @NotNull
+    private static List<Grade> parseGradesFromResultSet(@NotNull ResultSet resultSet, int studentId) throws SQLException {
+        List<Grade> list = new ArrayList<>();
+        while (resultSet.next()) {
+            String subject = resultSet.getString("subject_name");
+            int score = resultSet.getInt("score");
+            list.add(new Grade(studentId, subject, score));
+        }
+        return list;
+    }
     // --- UPDATE METHODS (STUDENTS) ---
 
     /**
@@ -696,6 +893,55 @@ public final class SQLActions {
             System.out.println("Successfully updated teacher email: " + email);
         } catch (SQLException e) {
             throw new RuntimeException("Failed to update teacher email for id=" + id, e);
+        }
+    }
+
+    /**
+     * Updates the start time of a specific lesson.
+     */
+    public static void updateLessonTime(int lessonId, java.time.LocalTime newTime) {
+        if (lessonId <= 0 || newTime == null) return;
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(QUERY_SET_LESSON_TIME_BY_ID)) {
+            stmt.setTime(1, java.sql.Time.valueOf(newTime));
+            stmt.setInt(2, lessonId);
+            stmt.executeUpdate();
+            System.out.println("Lesson ID " + lessonId + " time updated to " + newTime);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to update lesson time", e);
+        }
+    }
+
+    /**
+     * Updates the teacher assigned to a specific lesson.
+     */
+    public static void updateLessonTeacher(int lessonId, String teacherSurname) {
+        if (lessonId <= 0) return;
+        FieldValidator.validateAlphabeticString("Teacher Surname", teacherSurname);
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(QUERY_SET_LESSON_TEACHER_BY_ID)) {
+            stmt.setString(1, teacherSurname.strip());
+            stmt.setInt(2, lessonId);
+            stmt.executeUpdate();
+            System.out.println("Lesson ID " + lessonId + " teacher updated to " + teacherSurname);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to update lesson teacher", e);
+        }
+    }
+
+    /**
+     * Updates the score value of an existing grade record.
+     */
+    public static void updateGradeScore(int gradeId, int newScore) {
+        if (gradeId <= 0) return;
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(QUERY_SET_GRADE_SCORE_BY_ID)) {
+            stmt.setInt(1, newScore);
+            stmt.setInt(2, gradeId);
+            stmt.executeUpdate();
+            System.out.println("Grade ID " + gradeId + " successfully updated to " + newScore);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to update grade score", e);
         }
     }
 

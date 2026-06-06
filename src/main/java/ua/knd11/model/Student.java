@@ -22,11 +22,12 @@ public class Student extends User {
     /**
      * Constructs a new Student instance and initializes them with a REGULAR role.
      * The group name is automatically normalized to uppercase.
-     * @param name     the first name of the student
-     * @param surname  the last name of the student
-     * @param group    the academic group identifier
-     * @param email    the unique email address
-     * @param password the account password
+     *
+     * @param name        the first name of the student
+     * @param surname     the last name of the student
+     * @param group       the academic group identifier
+     * @param email       the unique email address
+     * @param password    the account password
      * @throws IllegalArgumentException if field validation fails via {@link FieldValidator}
      */
     public Student(String name, String surname, String group, String email, String password)
@@ -35,6 +36,7 @@ public class Student extends User {
         FieldValidator.validateGroup(group);
         this.group = group.toUpperCase(Locale.ROOT);
         this.role = StudentRole.REGULAR;
+        this.accessLevel = 0;
     }
 
     /**
@@ -50,7 +52,7 @@ public class Student extends User {
      * @param role     the student role
      */
     public Student(String name, String surname, String group, String email, String password, String salt, StudentRole role) {
-        super(name, surname, email, password, salt);
+        super(name, surname, email, password, salt, 0);
         this.group = group;
         this.role = role;
     }

@@ -1,13 +1,11 @@
 package ua.knd11.controller;
 
 import ua.knd11.model.Lesson;
-import ua.knd11.model.Student;
-import ua.knd11.model.User;
 import ua.knd11.service.JournalService;
 import ua.knd11.service.ScheduleService;
 import ua.knd11.service.StudentService;
 import ua.knd11.service.impl.StudentServiceImpl;
-import ua.knd11.util.FieldValidator;
+import ua.knd11.util.SQLActions;
 
 import java.time.DayOfWeek;
 import java.util.List;
@@ -20,7 +18,7 @@ import java.util.Scanner;
  */
 public class StudentController {
 
-    private final StudentService studentManagementService = new StudentServiceImpl();
+    private final StudentService studentService = new StudentServiceImpl();
     private final JournalService journalService;
     private final ScheduleService scheduleService;
 
@@ -54,8 +52,8 @@ public class StudentController {
             String choice = scanner.nextLine();
             switch (choice) {
                 case "1" -> System.out.println(journalService.generateRecordBook(studentId));
-                case "2" -> handleViewSchedule(scanner);
-                case "3" -> getAll();
+                case "2" -> ViewScheduleOnWeekDay(scanner);
+                case "3" -> System.out.println(studentService.getAllStudents());
                 case "4" -> running = false;
                 default -> System.out.println("[WARNING] Invalid choice. Please try again.");
             }
@@ -65,13 +63,13 @@ public class StudentController {
     /**
      * Internal helper to prompt for a day and display the corresponding schedule.
      */
-    private void handleViewSchedule(Scanner scanner) {
-        System.out.print("Enter Day of Week (e.g., MONDAY or ПОНЕДІЛОК): ");
+    private void ViewScheduleOnWeekDay(Scanner scanner) { // todo: format output
+        System.out.print("Enter Day of Week (e.g., MONDAY): ");
         String input = scanner.nextLine().trim().toUpperCase();
 
         try {
             // We use a helper similar to the one in ScheduleService to ensure consistent parsing
-            DayOfWeek day = parseDay(input);
+            DayOfWeek day = scheduleService.parseDayOfWeek(input);
             List<Lesson> lessons = scheduleService.getLessonsByDay(day);
 
             if (lessons.isEmpty()) {
@@ -83,53 +81,6 @@ public class StudentController {
         } catch (IllegalArgumentException e) {
             System.err.println("[ERROR] Invalid day entered. Please check your spelling.");
         }
-    }
-
-    /**
-     * Helper to parse day input for schedule viewing.
-     */
-    private DayOfWeek parseDay(String day) {
-        return switch (day) {
-            case "ПОНЕДІЛОК", "MONDAY" -> DayOfWeek.MONDAY;
-            case "ВІВТОРОК", "TUESDAY" -> DayOfWeek.TUESDAY;
-            case "СЕРЕДА", "WEDNESDAY" -> DayOfWeek.WEDNESDAY;
-            case "ЧЕТВЕР", "THURSDAY" -> DayOfWeek.THURSDAY;
-            case "П'ЯТНИЦЯ", "FRIDAY" -> DayOfWeek.FRIDAY;
-            case "СУБОТА", "SATURDAY" -> DayOfWeek.SATURDAY;
-            case "НЕДІЛЯ", "SUNDAY" -> DayOfWeek.SUNDAY;
-            default -> throw new IllegalArgumentException();
-        };
-    }
-
-    /**
-     * Service layer instance for student data processing
-     */
-    private final StudentService service;
-
-    /**
-     * Constructs a StudentController with the default service implementation.
-     */
-    public StudentController() {
-        this(new StudentServiceImpl());
-    }
-
-    /**
-     * Constructs a StudentController with a provided service instance.
-     * Allows for dependency injection, primarily for testing purposes.
-     *
-     * @param service the StudentService implementation to use
-     */
-    public StudentController(StudentService service) {
-        this.service = service;
-    }
-
-    /**
-     * Assigns a specific student as the head student based on their unique ID.
-     *
-     * @param id the student's unique identifier
-     */
-    public void assignHeadStudent(int id) {
-        studentManagementService.assignHeadStudent(id);
     }
 
     /**
@@ -146,46 +97,9 @@ public class StudentController {
             return;
         }
         try {
-            service.addStudent(createStudentWithParts(parts));
+            SQLActions.addStudentToDB(studentService.createStudentWithParts(parts));
         } catch (IllegalArgumentException e) {
             System.err.println(e.getMessage());
-        }
-    }
-
-    /**
-     * Validates individual data parts and constructs a new Student object.
-     * Performs field-level validation using {@link FieldValidator}.
-     *
-     * @param parts an array of strings representing the student's attributes
-     * @return a new {@link Student} object populated with the validated data
-     */
-    private Student createStudentWithParts(String[] parts) throws IllegalArgumentException {
-        FieldValidator.validateAlphabeticString("name", parts[0]);
-        FieldValidator.validateAlphabeticString("surname", parts[1]);
-        FieldValidator.validateGroup(parts[2]);
-        FieldValidator.validateEmail(parts[3]);
-        FieldValidator.validatePassword(parts[4]);
-        return new Student(parts[0], parts[1], parts[2], parts[3], parts[4]);
-    }
-
-    /**
-     * Deletes a student from the system using their unique identifier.
-     *
-     * @param id the unique ID of the student to be removed
-     */
-    public void deleteStudent(int id) {
-        service.deleteStudent(id);
-    }
-
-    /**
-     * Retrieves all students from the service and prints them to the console.
-     * Displays a "No students found" message if the collection is empty.
-     */
-    public void getAll() {
-        List<Student> students = service.getAllStudents();
-        students.stream().filter(Objects::nonNull).forEach(System.out::println);
-        if (students.isEmpty()) {
-            System.out.println("No students found");
         }
     }
 }
