@@ -8,6 +8,7 @@
     <artifactId>UniManager_KND_11</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>UniManager KND-11</name>
+    <packaging>war</packaging>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -73,22 +74,61 @@
             <version>${junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
+        <finalName>unimanager</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/webapp</directory>
+                <targetPath>../unimanager</targetPath>
+            </resource>
+        </resources>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>ua.knd11.UniManager</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.13.0</version> <configuration>
+            <source>21</source>
+            <target>21</target>
+            <annotationProcessorPaths>
+                <path>
+                    <groupId>org.projectlombok</groupId>
+                    <artifactId>lombok</artifactId>
+                    <version>1.18.44</version>
+                </path>
+            </annotationProcessorPaths>
+        </configuration>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.tomcat.maven</groupId>
+            <artifactId>tomcat7-maven-plugin</artifactId>
+            <version>2.2</version>
+            <configuration>
+                <systemProperties>
+                    <file.encoding>UTF-8</file.encoding>
+                    <psw4j.configuration>${project.basedir}/src/main/resources/psw4j.properties</psw4j.configuration>
+                </systemProperties>
+                <path>/</path>
+                <port>8080</port>
+            </configuration>
+        </plugin>
+
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>3.3.2</version>
+            <configuration>
+                <failOnMissingWebXml>false</failOnMissingWebXml>
+                <warSourceDirectory>${project.basedir}/src/main/webapp</warSourceDirectory>
+            </configuration>
+        </plugin>
         </plugins>
     </build>
 </project>

@@ -7,8 +7,6 @@ import ua.knd11.util.FieldValidator;
 import ua.knd11.util.SQLActions;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * Implementation of the {@link TeacherService} interface.
@@ -22,11 +20,11 @@ public class TeacherServiceImpl implements TeacherService {
      * Uses the Stream API to map and sum individual salaries.
      * Outputs the "Total University Budget" to the console.
      */
-    public void calculateTotalSalary() {
+    public String calculateTotalSalary() {
         double result = SQLActions.retrieveTeachersFromDB().stream()
                 .mapToDouble(user -> user instanceof Teacher t ? t.getSalary() : 0)
                 .sum();
-        System.out.println("Total University Budget: " + result);
+       return "Total University Budget: " + result;
     }
 
     /**
@@ -78,5 +76,10 @@ public class TeacherServiceImpl implements TeacherService {
         FieldValidator.validateEmail(parts[5]);
         FieldValidator.validatePassword(parts[6]);
         return new Teacher(parts[0], parts[1], parts[2], parts[3], Double.parseDouble(parts[4]), parts[5], parts[6]);
+    }
+
+    @Override
+    public ArrayList<Teacher> getAllTeachers() {
+        return SQLActions.retrieveTeachersFromDB();
     }
 }
